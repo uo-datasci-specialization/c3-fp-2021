@@ -1,0 +1,85 @@
+baseURL: #https://mlm2-2021.netlify.app
+ignoreFiles: ["\\.Rmd$", "\\.Rmarkdown$", "_cache$", "\\.knit\\.md$", "\\.utf8\\.md$"]
+languageCode: en-us
+title: Functional Programming for Educational Data Science
+theme: vanilla-bootstrap-hugo-theme
+# googleAnalytics: UA-123456789-1
+
+pygmentsUseClasses: true
+
+taxonomies:
+  tag: tags
+
+permalinks:
+  post: /:filename/
+
+# See https://feathericons.com/
+# The value of pre is the icon name
+menu:
+  nav:
+  - name: Home
+    pre: home
+    url: /
+    weight: 1
+  - name: Schedule
+    pre: calendar
+    url: /schedule/
+    weight: 2
+  - name: Assignments
+    pre: edit
+    url: /assignments/
+    weight: 3
+  - name: Syllabus
+    pre: book
+    url: /syllabus/
+    weight: 4
+  - name: Tags
+    pre: tag
+    url: /tags/
+    weight: 5
+  - name: Class repo
+    pre: github
+    url: #https://github.com/datalorax/mlm2
+    weight: 6
+
+params:
+  includeBootstrapJs: false
+  showActiveNav: true
+  # containerMaxWidth: 800px # This is overidden by my css; couldn't get it to work, but it is 800px
+  dateFormat: Jan 2, 2006
+  footerText: Made with [Hugo](https://gohugo.io/) & [Vanilla](https://github.com/zwbetz-gh/vanilla-bootstrap-hugo-theme)
+  hideFooter: false
+  katex: true
+  custom_js: ["custom.js"]
+  custom_highlight: ["highlight.css"]
+
+markup:
+  defaultMarkdownHandler: goldmark
+  goldmark:
+    extensions:
+      definitionList: true
+      footnote: true
+      linkify: true
+      strikethrough: true
+      table: true
+      taskList: true
+      typographer: true
+    parser:
+      attribute: true
+      autoHeadingID: true
+    renderer:
+      hardWraps: false
+      unsafe: true
+      xHTML: false
+  highlight:
+    codeFences: true
+    hl_Lines: ""
+    lineNoStart: 1
+    lineNos: false
+    lineNumbersInTable: true
+    noClasses: true
+    style:  xcode # base16-snazzy pastie rrt
+    tabWidth: 2
+  tableOfContents:
+    endLevel: 3
+    startLevel: 2

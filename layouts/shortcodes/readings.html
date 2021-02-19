@@ -1,0 +1,34 @@
+{{ $arg1 := (.Get 0) }}
+
+{{ if eq  $arg1 "" }}
+
+	-
+
+{{ else }}
+
+<!-- Create correct link -->
+	{{ if eq $arg1 "adv-r" }}
+
+		<span class = "readings"><a class = "adv-r" href= "https://adv-r.hadley.nz/{{ .Get 1 }}"> <i data-feather="book"></i> {{ .Get 2 }} </a></span>
+
+	{{ else if eq $arg1 "shiny" }}
+
+		<span class = "readings"><a class = "shiny" href="https://mastering-shiny.org/{{ .Get 1 }}"> <i data-feather="book"></i> </a></span>
+	
+	{{ else if eq $arg1 "r4ds" }}
+
+		<span class = "readings"><a class = "r4ds" href="https://r4ds.had.co.nz/{{ .Get 1 }}"> <i data-feather="book"></i> </a></span>
+
+	{{ else if eq $arg1 "happygit" }}
+
+		<span class = "readings"><a class = "happygit" href= "https://happygitwithr.com/{{ .Get 1 }}"> <i data-feather="book"></i> {{ .Get 2 }} </a></span>
+
+	{{ else if eq $arg1 "other" }}
+
+		<span class = "readings"><a class = "other" href="{{ .Get 1 }}"> <i data-feather="book"></i> </a></span>
+
+	{{end}}
+
+
+
+{{ end }}

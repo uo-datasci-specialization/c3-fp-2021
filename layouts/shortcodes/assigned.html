@@ -1,0 +1,9 @@
+	{{ $arg1 := (.Get 0) }}
+
+	{{ if eq  $arg1 "" }}
+	
+	{{ else }}
+
+  <a class = "assigned" href= "../{{ .Get 0 }}" ><i data-feather="file-plus"></i> {{ .Get 1 }}</a>
+
+  {{ end }}

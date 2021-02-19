@@ -1,0 +1,20 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {{ range .Site.Params.custom_js }}
+  <script src="{{ "/js/" | relURL }}{{ . }}"></script>
+  {{ end }}
+  {{ range .Site.Params.custom_highlight }}
+  <link rel="stylesheet" href="{{ "/highlight/" | relURL }}{{ . }}">
+  {{ end }}
+  {{ hugo.Generator }}
+  <link rel="stylesheet" href="{{ "css/bootstrap.min.css" | absURL }}">
+  {{ $title := print .Title " | " .Site.Title }}
+  {{ if .IsHome }}
+    {{ $title = .Site.Title }}
+  {{ end }}
+  <title>{{ $title }}</title>
+  {{ partial "style.html" . }}
+</head>
+
+
