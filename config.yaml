@@ -1,4 +1,4 @@
-baseURL: #https://mlm2-2021.netlify.app
+baseURL: https://fp-2021.netlify.app/
 ignoreFiles: ["\\.Rmd$", "\\.Rmarkdown$", "_cache$", "\\.knit\\.md$", "\\.utf8\\.md$"]
 languageCode: en-us
 title: Functional Programming for Educational Data Science
@@ -39,7 +39,7 @@ menu:
     weight: 5
   - name: Class repo
     pre: github
-    url: #https://github.com/datalorax/mlm2
+    url: https://github.com/uo-datasci-specialization/c3-fp-2021
     weight: 6
 
 params:
