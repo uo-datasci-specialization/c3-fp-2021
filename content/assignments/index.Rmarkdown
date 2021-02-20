@@ -40,7 +40,7 @@ shortcode_close("bootstrap-table", .type = "html")
 ## Midterm
 
 ### Quiz
-On April 19th, we will use the last 20 minutes of class for a quiz. This quiz 
+On April 21st, we will use the last 20 minutes of class for a quiz. This quiz 
 will be mostly multiple-choice and/or fill-in the blank, but there may be one
 or two free-response questions asking you to rewrite code and/or identify bugs
 in some provided code. 
@@ -48,6 +48,9 @@ in some provided code.
 The quiz must be completed independently.
 
 ### Take-home
+
+**60 points, Assigned April 19th, Due by midnight on May 5th**
+
 The take-home portion will be similar to labs with two exceptions: (a) there 
 will be no time in class devoted to the midterm, and (b) responses will be
 scored on a correct/incorrect bases (rather than a best-honest-effort basis). 

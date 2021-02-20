@@ -127,7 +127,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< assigned "assignments" "Lab 2" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< due "lab-1" "Lab 1" >}}
+{{< due "assigments" "Lab 1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "r4ds" "many-models.html" "25" >}}
@@ -169,7 +169,8 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< assigned "assignments" "Quiz" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< due "assignments/#proposal" "Prop" >}}
+{{< due "assignments" "Lab 2" >}}
+{{< due "assignments/#outline" "Outline" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "adv-r" "functionals.html" "9.4-9.6" >}}
@@ -211,8 +212,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 
 {{< /wrap >}}
   {{< wrap >}}
-{{< due "lab-2" "Lab 2" >}}
-{{< due "homework-1" "HW 1" >}}
+
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "NA" "NA" "NA" >}}
@@ -251,10 +251,10 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< slides "" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< assigned "assignments" "Lab 3" >}}
+
 {{< /wrap >}}
   {{< wrap >}}
-{{< due "lab-3" "Lab 3" >}}
+{{< due "assignments" "Midterm" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "adv-r" "functions.html" "6.1-6.4" >}}
@@ -269,12 +269,12 @@ Each of the below links to the full book. Icons in the schedule link to specific
  {{< schedule >}}
 
 {{< week-odd "05-10" >}}
-  {{< description "Lab 3" "The odd Monday lab day - this lab was delayed a bit so we could have a bit more of an introduction to functions before having an entire lab devoted to them. This will be the final lab for the calss and will ask you to create and apply functions." >}}
+  {{< description "Lab 3" "The odd Monday lab day - this lab was delayed a bit so we could have a bit more of an introduction to functions before having an entire lab devoted to them. This will be the final lab for the class and will ask you to create and apply functions." >}}
   {{< wrap >}}
 {{< slides "" >}}
 {{< /wrap >}}
   {{< wrap >}}
-
+{{< assigned "assignments" "Lab 3" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
@@ -320,7 +320,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 
 {{< /wrap >}}
   {{< wrap >}}
-
+{{< due "assignments" "Lab 3" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "shiny" "https://mastering-shiny.org/basic-app.html" "NA" >}}
@@ -337,11 +337,10 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< slides "" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< assigned "assignments" "PR" >}}
+{{< assigned "assignments/#peer-review" "PR" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< due "assignments/#draft" "Draft" >}}
-{{< due "homework-2" "HW2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "shiny" "https://mastering-shiny.org/action-workflow.html" "NA" >}}
