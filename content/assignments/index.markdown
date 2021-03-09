@@ -43,11 +43,9 @@ The take-home portion is worth 60 points, or 30% of your grade. It will
 primarily cover working with and subsetting lists, as well as iterating with
 [**{purrr}**](https://purrr.tidyverse.org).
 
-The take-home portion of the midterm may be completed independently or in
-group of 2-4. If you choose to complete the midterm as a group, **you must 
-collaborate through a shared GitHub repository**. I will then inspect the 
-commit history to ensure all group members contributed roughly equally and
-award points.
+The [take-home portion of the midterm](../take-home-midterm) must be completed in
+groups of 3-5 and must be housed on GitHub. I would encourage you to use branching to help avoid conflicts, but I will not grade you on anything related to git, other than inspecting the 
+commit history to ensure all group members contributed roughly equally.
 
 ## Final Project
 
