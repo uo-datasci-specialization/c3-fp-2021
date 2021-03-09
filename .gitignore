@@ -40,3 +40,7 @@ vignettes/*.pdf
 *.knit.md
 
 website-data/~$course-schedule.xlsx
+
+content/post/take-home-midterm/plots/
+
+content/post/take-home-midterm/index.Rmarkdown

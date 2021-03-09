@@ -20,7 +20,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< slides "" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< assigned "syllabus/#final-project" "Final" >}}
+{{< assigned "assignments/#final-project" "Final" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
@@ -147,7 +147,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< slides "" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< assigned "assignments" "Midterm" >}}
+{{< assigned "take-home-midterm" "Midterm" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
