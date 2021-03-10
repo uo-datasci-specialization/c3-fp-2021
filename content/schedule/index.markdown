@@ -17,7 +17,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "03-29" >}}
   {{< description "Introduction" "Weekly schedule of topics and an overview of the course requirements. We will also have an intro to data types." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w1p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< assigned "assignments/#final-project" "Final" >}}

@@ -4,10 +4,10 @@
     <title>Welcome!</title>
     <meta charset="utf-8" />
     <meta name="author" content="Daniel Anderson" />
-    <script src="libs/header-attrs-2.6.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.7.2/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
-    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
-    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="new.css" type="text/css" />
   </head>
@@ -34,15 +34,15 @@ layout: true
   &lt;div class="slides-footer"&gt;
   &lt;span&gt;
   
-  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c2-dataviz-2021/raw/main/static/slides/w1p1.pdf"&gt;
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w1p1.pdf"&gt;
     &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
   &lt;/a&gt;
   
-  &lt;a class = "footer-icon-link" href = "https://dataviz-2021.netlify.app/slides/w1p1.html"&gt;
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w1p1.html"&gt;
     &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
   &lt;/a&gt;
   
-  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c2-dataviz-2021"&gt;
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021"&gt;
     &lt;i class = "footer-icon" data-feather="github"&gt;&lt;/i&gt;
   &lt;/a&gt;
   
@@ -51,707 +51,720 @@ layout: true
   
 
 ---
+
 # Agenda 
 
 .pull-left[
 
 * Getting on the same page
+
 * Syllabus
-* A little bit of git/GitHub
+
+* Intro to data types
+
 ]
 
-.pull-right[
-![](../edld629-logo.png)
-]
-
----
-
-# whoami
-
-.pull-left[
-* Research Assistant Professor: Behavioral Research and Teaching
-* Dad (two daughters: 8 and 6)
-* Pronouns: he/him/his
-* Primary areas of interest: 💗💗R💗💗, computational research, achievement gaps, systemic inequities, and variance between educational institutions
-]
 
 .pull-right[
 
-![](img/IMG_1306.jpeg)
-&lt;/div&gt;
+.right[
+
+&lt;img src="../edld653-logo.png" width="200" height="200" /&gt;
+
+]
+
 ]
 
 ---
-class: center middle inverse-blue
+background-image: url(https://images.pexels.com/photos/1005324/literature-book-open-pages-1005324.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=2&amp;h=650&amp;w=940)
+class: inverse bottom
+background-size:cover
 
-# whoisyou?
-
-.left[
-* Introduce yourself
-* Why are you here?
-* What pronouns would you like us to use for you for this class?
-* What was one thing you did not related to academic work over winter break?
-]
+# Getting on the same page
 
 ---
+# Introduce yourself!
 
-# A few class policies
+* Most of us know each other, but a few do not.
 
---
-* Be kind
+* Tell us why you're taking the class 
 
-
---
-* Be understanding and have patience, with others and yourself
-
-
---
-* Help others whenever possible
-
-
---
-Truly the most important part of this class. Important not just in terms of decency, but also in your learning, and most importantly, for equity. 
+* What's one fun thing you've done recently outside of school stuff?
 
 ---
-# A bit more specific
-
-Normally I would have information here about welcoming kids into class.
-
-Because we're virtual, that part is both easier and harder.
-
-
---
-
-If you need to not attend class, or a portion of class, for any reason, that is fine.
-
---
-
-Ideally you would let me know ahead of time. But we're in the middle of a pandemic and life is cray. Please .b[try] to contact me beforehand. If this isn't possible, please check in with me after.
-
----
-
-# Last intro thing
-
-* I'm here for you
-
-* We won't have specific office hours, but know I'm always willing to meet
-
-* This course, like all in the sequence, can be difficult. Don't suffer in silence. Don't do this alone.
-
----
-class: inverse-green middle
+background-image: url(https://akm-img-a-in.tosshub.com/indiatoday/images/story/201802/Syllabus-featured.jpeg?rpmIvNBBqGMDT7lPG.Qe4AzWs6OfDh9K)
+class: inverse bottom
 background-size:cover
 
 # Syllabus
 
 ---
-
 # Course Website(s)
 
-.pull-left[
-## [website](https://dataviz-2021.netlify.app)
-]
-
-.pull-right[
-.right[
-## [repo](https://github.com/uo-datasci-specialization/c2-dataviz-2021)
-  ]
-]
-
-
-&lt;iframe src="https://dataviz-2021.netlify.app" width="100%" height="400px"&gt;&lt;/iframe&gt;
+![](img/course-website.png)
 
 ---
-# Materials
-* Nearly everything will be distributed through the repo and through the website.
+# Course learning objectives
 
-* Please clone the repo now, if you haven't already. Pull each week for the most recent changes.
-
-* We'll use Canvas for grading, and that is essentially it.
-
----
-# R Markdown notes
-* These slides were produced with [**{xaringan}**](https://github.com/yihui/xaringan), an R Markdown variant. I encourage you to try it out and use it for your final project presentation.
-
-* The website was also produced with R Markdown (sort of)
-  + It's a [**{blogdown}**](https://github.com/rstudio/blogdown) website with some custom CSS and Hugo shortcodes
-  
-* This course is not just about data viz, but also mediums for communication. This includes websites and [data dashboards](https://jenthompson.me/examples/insight_progress.html) among other possibilities.
-
-
----
-class: inverse-red middle
-
-# My assumptions about you
-
----
-# I assume you
-
-* Understand the R package ecosystem (how to find, install, load, and learn about them)
+--
+* Understand and be able to describe the differences in R's data structures and when each is most appropriate for a given task
 
 
 --
-* Can read "flat" (i.e., rectangular) datasets into R 
+* Explore `purrr::map` and its variants, how they relate to base R functions, and why the {purrr} variants are often preferable.
 
-  + I don't care what you use, but you should be using RStudio Projects &amp; the [{here}](https://github.com/r-lib/here) package
 
-    - See [Jenny Bryan's blog post](https://www.tidyverse.org/articles/2017/12/workflow-vs-script/) for why.
+--
+* Work with lists and list columns using `purrr::nest` and `purrr:unnest`
 
 
 
 ---
-* Can perform basic data wrangling and transformations in R, using the
-tidyverse  
+# Course learning objectives
 
-  + Leverage appropriate functions for introductory data science tasks (pipeline)
-  + "clean up" the dataset using scripts and reproducible workflows
 
---
-
-* Use version control with R via git and GitHub  
+* Convert repetitive tasks into functions 
 
 
 --
-* Use R Markdown to create reproducible dynamic reports
+* Understand elements of good functions, and things to avoid
 
+
+--
+* Write effective and clear functions with the mantra of "Don't Repeat Yourself"
 
 ---
-# Learning objectives
+# This Week's learning objectives
 
-* Transform data in a variety of ways to create effective data visualizations
-
---
-
-* Understand and fluently apply different types of data joins
-
---
-* Understand best practices in data visualization
-
---
-
-* Customize ggplot2 graphics by reordering factors, creating themes, and applying ggthemes
-
-
---
-
-* Create an online data visualization portfolio using distill and/or flexdashboards to demonstrate key learning 
-
-
----
-
-# Examples
-Below are some links to final projects from students who took this class last year.
-
-.pull-left[
-### Dashboards
-* [Alexis Adams-Clark](https://alexisadamsclark.github.io/dashboard_finalproj/)
-* [Brendan Cullen](https://brendanhcullen.github.io/data-viz-dashboard/)
-* [Ouafaa Hmaddi](https://ohmaddi.github.io/Portfolio-Kiva/)
-]
-
-.pull-right[
-### Blog post
-* [Teresa Chen](https://teresashchen.github.io/blog/)
-* [Ashley Miller](https://ashlynnmiller.github.io/MsRememberingBlog/)
-* [Karlena Ochoa](https://karlenaochoa.github.io/610_website/)
-]
-
-
----
-# Weekly learning objectives
-
-Provide you a frame for what you should be working to learn for that specific week.
-
---
-
-### This week's objectives
 * Understand the requirements of the course
+
 * Understand the requirements of the final project
-* Be ready to go with *git* and GitHub
-
-
----
-
-# Required Textbooks (free)
-
-.pull-left[
-## [Healy](http://socviz.co)
-
-&lt;div&gt;
-&lt;img src = http://socviz.co/assets/dv-cover-pupress.jpg height = 400&gt;
-&lt;/div&gt;
-
-]
-
-.pull-right[
-.right[
-## [Wilke](https://serialmentor.com/dataviz/)
-]
-
-&lt;div&gt;
-&lt;img src =
-https://clauswilke.com/dataviz/cover.png height = 400&gt; &lt;/div&gt;
-
-
-]
-
-
----
-
-# Other books (also free)
-
-.pull-left[
-![](https://happygitwithr.com/img/watch-me-diff-watch-me-rebase-smaller.png)
-## [Bryan](http://happygitwithr.com)
-]
-
-.pull-right[
-.right[
-&lt;div&gt;
-&lt;img src =https://d33wubrfki0l68.cloudfront.net/b88ef926a004b0fce72b2526b0b5c4413666a4cb/24a30/cover.png height = 400&gt; 
-&lt;/div&gt;
-  ]
-]
-
-.right[
-### [Wickham &amp; Grolemund](https://r4ds.had.co.nz)
-]
----
-class: inverse-green middle
-
-## Another resource
-See the current draft [here](https://www.sds.pub). Please read Chapter 8 before next class.
-
-&lt;iframe src="https://www.sds.pub" width="100%" height="400px"&gt;&lt;/iframe&gt;
-
-
----
-class: inverse-orange middle
-# Extra credit opportunity
-**10 points**: Deep dive into a topic not covered by the course
-
-
----
-# Some options
-
-* Geographic data (we'll have an intro, but there's a ton here and we won't really do it justice)
-* Network data
-* Text data
-* DAGs
-* Flow data (e.g., alluvial diagrams)
-* Relational data (SQL &amp; friends)
-* Interactive plots
-* Animated plots
-
----
-class: inverse-blue  middle
-# Some examples
-
----
-background-image:url(https://timogrossenbacher.ch/wp-content/uploads/2016/12/tm-final-map-1.png)
-background-size:contain
-
-&lt;br/&gt;
-
-
-[Timo Grossenbacher](https://timogrossenbacher.ch/2016/12/beautiful-thematic-maps-with-ggplot2-only/)
-
----
-class: inverse
-background-image:url(https://user-images.githubusercontent.com/25231784/41408567-08313b66-6fcb-11e8-8c55-75baa36364cd.png)
-background-size:contain
-
-&lt;br/&gt;
-&lt;br/&gt;
-
-[Paul Campbell](https://gist.github.com/PaulC91/e767ca4f0c4335e6e0d2f71eb7cc98cc)
-
----
-class: bottom
-background-image:url(https://ggdag.netlify.com/articles/intro-to-dags_files/figure-html/unnamed-chunk-11-1.png)
-background-size:contain
-
-&lt;br/&gt;
-&lt;br/&gt;
-
-[ggdag](https://ggdag.netlify.com/articles/intro-to-dags.html) via Malcolm Barrett
-
-
----
-class: bottom
-background-image:url(https://static01.nyt.com/images/2018/05/02/learning/economic-mobilityLN/economic-mobilityLN-superJumbo.png?quality=90&amp;auto=webp)
-background-size:contain
-
-&lt;br/&gt;
-&lt;br/&gt;
-
-[Patrick Honner](https://www.nytimes.com/2018/05/03/learning/lesson-plans/moving-on-up-teaching-with-the-data-of-economic-mobility.html) via NYT
-
----
-class: bottom
-background-image:url(https://cloud.githubusercontent.com/assets/7896861/17839509/d66b3c2a-67b7-11e6-9ee4-5f8ad54746d7.gif)
-background-size:contain
-
-&lt;br/&gt;
-&lt;br/&gt;
-
-[James Curley](https://github.com/jalapic/nba)
-
----
-# Labs
-
-See the [assignments](https://dataviz-2021.netlify.app/assignments/) page of the website.
-
-10 points each (30 points total; 15%)
-
-1. Distributions &amp; GitHub collabo 
-
-1. Visual perception  &amp; plot reproducing
-
-1. Color
-
-
----
-# Homework
-20 points each (40 points; 20%)
-
-* Basically the same as the labs, but scored correct/incorrect, and no in-class time devoted to them.
-
-* Okay to work on collaboratively - I actively encourage you to do so as long as you're using a shared repo
-
-
---
-
-* **Homework 1**: Creating new visuals while utilizing different types of joins 
-
-* **Homework 2**: Visualizing uncertainty, tables, and plot refinement
-
-
----
-# Quick note on reproducibility
-
-A [great blog post](https://simplystatistics.org/2019/08/28/you-can-replicate-almost-any-plot-with-ggplot2/) by [Rafael Irizarry](https://twitter.com/rafalab) shows how almost any plot you see in popular media can be reproduced in R with ggplot.
-
---
-
-### For example
-
-
----
-# WSJ Version
-
-![](img/measles_wsj.png) 
-
----
-# ggplot reproduction
-
-![](https://simplystatistics.org/post/2019-08-28-you-can-replicate-almost-any-plot-with-ggplot2_files/figure-html/wsj-vaccines-example-1.png)
-
-
----
-# Data viz "in the wild" presentations
-Everyone will present for ~5 minutes - order randomly assigned (coming up next)
-
-* Find two data viz examples intended for two different audiences
-
-* Discuss the following
-  - What's trying to be communicated
-  - How effective do you judge it? Why?
-  - At least 1 area of strength
-  - At least 1 area for (potential) improvement
-
-
----
-
-# Presentation order
-
-.footnote[I will email this out as well. ]
-
-
-
-.pull-left[
-&lt;table&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Presenter &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-11 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Kay &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-11 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Wanjia &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-13 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Joe &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-13 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Janette &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-20 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Kavya &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-20 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Meg &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-25 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Anisha &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-25 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Rachael &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-27 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Zach &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-01-27 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Tess &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-01 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Chris &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-]
-
-.pull-right[
-&lt;table&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Presenter &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-01 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Vinita &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-03 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Shijing &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-03 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; David &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-10 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Raleigh &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-10 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Maggie &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-15 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Ann-Marie &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-15 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Murat &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-17 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Sarah Don &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-22 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Hyeonjin &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-02-24 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Anwesha &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-03-01 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Makayla &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 2021-03-03 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Sarah Dim &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-]
-
----
-class: inverse-red middle
-# Final Project 
-120 points total (60%)
-
----
-# Six parts
-* Proposal (10 points): Due 1/27/21
-
-* Draft (15 points): Due 2/24/21
-
-* Peer review (15 points): Assigned, 2/24/21; Due 3/3/21
-
-* Presentation (20 points): 3/8/21 and 3/10/21 (Week 10)
-
-* Product (60 points): Due 11:59:59 PM, 3/17/21
-
-
----
-# Product
-
-### Four components: 
-
-* A web-deployed portfolio showcasing your [#dataviz](https://twitter.com/search?q=%23DataViz&amp;src=tyah)
-  skills.
-  + [distill](https://rstudio.github.io/distill/) (what I'll lecture on), 
-    [R Markdown](https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html), or
-    [blogdown](https://bookdown.org/yihui/blogdown/) website
-  + Technical document with [pagedown](https://github.com/rstudio/pagedown) or
-    [bookdown](https://bookdown.org/yihui/bookdown/)
-  + Scientific poster with [pagedown](https://github.com/rstudio/pagedown)
-  + [flexdashboard](https://rmarkdown.rstudio.com/flexdashboard/)
-
----
-
-* At least three finalized data displays, with each accompanied by a strong 
-  narrative/story, as well as the history of how the visualization changed over 
-  time.
-  
-* Housed on GitHub
-  + Fully reproducible
-
-* Deployed through [GitHub pages](https://pages.github.com) (or netlify or similar)
-
-
----
-# Proposal
-
-### Four components:
-
-* Description of the data source (**must** be publicly available)
-
-* Preliminary ideas of different viz
-
-* Identification of the intended audience for each viz 
-
-* The intended message to be communicated for each viz 
-
----
-# Draft
-
-* Expected to still be a work in progress
-  + Data visualizations should be largely complete
-
-* Deployment not expected
-
-* Provided to your peers so they can learn from you as much as you can learn from their feedback
-
----
-# Peer Review
-* We are all professionals here. It is imperative we act like it. 
-
-* Understand the purpose of the exercise.  
-
-* Zero tolerance policy for inappropriate comments
-
-* Should be vigorously encouraging 
-
---
-
-### Utilizing GitHub
-You'll be assigned three proposals to review (5 points each)
-
-* Fork their repo, embed comments &amp; suggest changes to their code, submit a PR
-
----
-# Presentation 
-Order randomly assigned. Basically a chance to share what you created!
-
-* Discuss what is trying to be communicated
-
-* Share the final products
-
-* Discuss the progression along the way and why specific changes were made
 
 
 ---
 class: inverse-blue middle
-# Grading
+# Textbooks
 
 ---
-# Points
-### 200 points total
-* 3 labs at 10 points each (30 points; 15%) 
-* 2 homework assignments at 20 points each (40 points; 20%) 
-* five-minute data visualization "in the wild" presentation (10 points; 5%) 
-* Final Project (120 points; 60%)
-  + Proposal (10 points; 5%)
-  + Draft (15 points; 7.5%)
-  + Peer review (25 points; 12.5%)
-  + Presentation (10 points; 10%)
-  + Product (60 points; 30%)
+background-image:url(https://d33wubrfki0l68.cloudfront.net/565916198b0be51bf88b36f94b80c7ea67cafe7c/7f70b/cover.png)
+background-size:contain
+class: middle
+
+.right[
+[Link](https://adv-r.hadley.nz)
+]
+
+---
+# Other books (also free)
+
+.pull-left[
+[Bryan](http://happygitwithr.com)
+&lt;div&gt;
+&lt;img src = https://happygitwithr.com/img/watch-me-diff-watch-me-rebase-smaller.png height = 400&gt; &lt;/div&gt;
+]
+
+.pull-right[
+[Wickham &amp; Grolemund](https://r4ds.had.co.nz)
+&lt;div&gt;
+&lt;img src =https://d33wubrfki0l68.cloudfront.net/b88ef926a004b0fce72b2526b0b5c4413666a4cb/24a30/cover.png height = 400&gt; &lt;/div&gt;
+
+]
+
+---
+# Structure of the course
+
+* First 5 weeks - mostly iteration
+
+  + Data types
+  + Base R iterations
+  + {purrr}
+  + Batch processes and working with list columns
+  + Parallel iterations (and a few extras)
+
+
+--
+* Second  5 weeks - Writing functions and shiny
+  + Writing functions 1-3
+  + Shiny 1-3
+  + Packages (briefly)
+
+---
+# Labs
+### 15%
+### 3 @ 10 points each
+
+Two labs on iteration and one on functions
+
+
+| Lab|Date Assigned |Date Due      |Topic                                          |
+|---:|:-------------|:-------------|:----------------------------------------------|
+|   1|Wed, April 07 |Wed, April 14 |Subsetting lists and base R `for()` loops      |
+|   2|Wed, April 14 |Wed, April 21 |Multiple models and API calls with **{purrr}** |
+|   3|Mon, May 10   |Mon, May 17   |Create and apply functions                     |
 
 
 ---
+# Midterm
+### 70 points total (35%)
+Two parts: 
+* Small quiz on canvas to demonstrate knowledge (4/21; 10 points)
+  + Identifying bugs in code
+  + Multiple choice/fill-in the blank questions
+  + Free response
+  
+* Take-home portion to demonstrate ability to write the correct code (assigned 4/21; 60 points)
+  + Write loops to solve problems
 
+
+---
+# Take home portion
+
+* Group project: 3-5 people
+
+* Shared GitHub repo
+
+* Fairly long - but the only homework assignment you have
+
+* Divide it up to ease the workload, then just check each other's work
+
+--
+
+Already &lt;a href="../take-home-midterm" target="_blank"&gt;posted&lt;/a&gt;!
+
+---
+# Final Project 
+### 150 points total (60%)
+
+5 parts
+
+|**Component**     | **Points**| **Due** | 
+|:-----------------|:----------|:--------| 
+| Groups Finalized | 0         |  4/10/19|
+| [Outline](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#outline_(10_points;_5%)  | 10 | 5/1/19 | 
+| [Draft](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#draft_data_preparation_script_(20_points) |  20 | 5/27/19 | 
+| [Peer review](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#peer_review_of_data_preparation_script_(20_points) | 20 | 6/3/19 | 
+| [Product](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#final_product_grading_(100_points) |  100 | 6/12/19 (11:59 pm) |
+
+
+---
+# What is it?
+### Two basic options
+
+--
+
+# Data Product 
+Similar to first class
+
+* Brief research manuscript (can be APA or not, I don't really care 🤷)
+* Shiny app
+* Dashboard
+  + Probably unlikely to work well though, unless you make it a shiny dashboard
+* Blog post
+* For the ambitious - a documented R package
+
+---
+# Tutorial
+* Probably best done through a blog post or series of blog posts
+* Approach as if you're teaching others about the content I'll ask you to cover
+* BONUS: You can actually release the blog post(s) and may get some traffic 🎉👏🥳
+
+
+---
+background-image:url(https://images.pexels.com/photos/1252869/pexels-photo-1252869.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=2&amp;h=750&amp;w=1260)
+background-size:cover
+class:inverse center middle
+
+# Make it your own
+
+
+---
+# What you have to have
+* Everything on GitHub
+
+* Publicly available dataset
+
+* Team of 2-4
+
+---
+# What you have to cover
+Unfortunately, this still is a class assignment. I have to be able to evaluate
+that you can actually apply the content within a messy, real-world setting.
+
+
+--
+The grading criteria (which follow) may force you into some use cases that are 
+a bit artificial. This is okay.
+
+
+---
+# Grading criteria
+
+* No code is used repetitively (no more than twice) .b[10 points]
+
+
+--
+* More than one variant of `purrr::map` is used .b[10 points]
+
+
+--
+* At least one {purrr} function outside the basic `map` family (`walk_*`, 
+  `reduce`, `modify_*`, etc.) .b[10 points]
+
+
+--
+* At least one instance of parallel iteration (e.g., `map2_*`, `pmap_*`) .b[10
+points]
+
+
+--
+* At least one use case of `purrr::nest %&gt;% mutate()` .b[10 points]
+
+
+---
+* At least two custom functions .b[20 points; 10 points each]
+  + Each function must do exactly one thing
+  + The functions **may** replicate the behavior of a base function - as noted 
+    above this is about practicing the skills you learn in class
+
+
+--
+* Code is fully reproducible and housed on GitHub .b[10 points]
+
+
+--
+* No obvious errors in chosen output format .b[10 points]
+
+
+--
+* Deployed on the web and shareable through a link .b[10 points]
+
+
+---
+# Outline
+### Due 5/1/19
+
+Four components:
+* Description of data source (must be publicly available)
+
+* Purpose (tutorial or substantive)
+
+* Chosen format
+
+* Lingering questions
+  + How can I help?
+
+
+--
+Please include all components - including the question(s) section!
+
+---
+# Draft
+### Due 5/27/19, before class
+* Expected to still be a work in progress
+
+  + This means some of your code may be rough and/or incomplete. However:
+
+* Direction should be obvious
+
+* Most, if not all, grading elements should be present
+
+* Provided to your peers so they can learn from you as much as you can learn 
+  from their feedback
+
+---
+# Peer Review
+* Exact same process we've used before
+
+* If, during your peer review, you find grading elements not present,
+definitely note them
+
+
+--
+### A note on last peer review
+
+* Make sure you review the syllabus on what you should be noting
+
+* Please take your time, try to be as thorough as possible
+
+---
+# Utilizing GitHub (required)
+* You'll be assigned two groups to review (.b[10 points each])
+
+* Fork their repo
+
+* Embed comments, suggest changes to their code
+
+* Submit a PR
+  
+  + Summarize your overall review in the PR
+
+
+---
 # Grading
+250 points total
 
+* 4 labs at 10 points each (40 points; 16%) 
+
+* Midterm in-class (10 points; 4%)
+
+* Midterm take-home (50 points; 20%)
+
+* Final Project (150 points; 60%)
+
+  + Proposal (10 points; 4%)
+
+  + Draft (20 points; 8%)
+
+  + Peer review (20 points; 8%)
+
+  + Product (100 points; 40%)
+
+
+---
+# Grading
 
 |  **Lower percent** |**Lower point range**  | **Grade** | **Upper point range**  | **Upper percent**|
 |  :------: | :------   | :-:| :-------: | ----:|
-|  0.97     | (194 pts) | A+ |           |      |
-|  0.93     | (186 pts) | A  | (194 pts) | 0.97 |
-|  0.90     | (180 pts) | A- | (186 pts) | 0.93 |
-|  0.87     | (174 pts) | B+ | (180 pts) | 0.90 |
-|  0.83     | (166 pts) | B  | (174 pts) | 0.87 |
-|  0.80     | (160 pts) | B- | (166 pts) | 0.83 |
-|  0.77     | (154 pts) | C+ | (160 pts) | 0.80 |
-|  0.73     | (146 pts) | C  | (154 pts) | 0.77 |
-|  0.70     | (140 pts) | C- | (146 pts) | 0.73 |
-|           |           | F  | (140 pts) | 0.70 |
+|  0.97     | (242 pts) | A+ | (250 pts) |      |
+|  0.93     | (232 pts) | A  | (242 pts) | 0.97 |
+|  0.90     | (225 pts) | A- | (232 pts) | 0.93 |
+|  0.87     | (218 pts) | B+ | (225 pts) | 0.90 |
+|  0.83     | (208 pts) | B  | (218 pts) | 0.87 |
+|  0.80     | (200 pts) | B- | (208 pts) | 0.83 |
+|  0.77     | (192 pts) | C+ | (200 pts) | 0.80 |
+|  0.73     | (182 pts) | C  | (192 pts) | 0.77 |
+|  0.70     | (175 pts) | C- | (182 pts) | 0.73 |
+|           |           | F  | (175 pts) | 0.70 |
 
 ---
 class: inverse
 background-image:url(https://d194ip2226q57d.cloudfront.net/original_images/10_Tips_for_Workplace_Communication)
 background-size:contain
 
+---
+class: inverse center middle
+# Any time left?
+
+--
+### Basic data types
 
 ---
-class: inverse-green center bottom
-background-image:url(https://cdn-images-1.medium.com/max/1600/1*aFHTAkhTkyWD93-UGRttPw.png)
-background-size:contain
+# Vectors
+### Pop quiz
+Discuss with your neighbor
+* What are the four basic types of atomic vectors?
 
-## Full lecture on Wednesday
+* What function creates a vector?
 
-**My goal:** To make you the most prepared cohort with GitHub to date!
+* .b[T]/.r[F]: A list (an R list) is not a vector.
 
----
-# Demo
-* The [gitkraken](https://www.gitkraken.com) GUI
-* Creating a GitHub repo
-* Sharing access (or creating an organization)
-* Cloning the repo
-* stage, commit, push
-* pull
-* branching
-* forking and issues
+* What is the fundamental difference between a matrix and a data frame?
 
+* What does *coercion* mean, and when does it come into play?
 
 ---
-class:inverse-orange middle center
+# Vector types
+### 4 basic types
+Note there are two others (complex and raw), but we don't care about them (I've never even seen them used).
 
+* Integer
+
+* Double
+
+* Logical
+
+* Character
+
+
+--
+Integer and double vectors are both numeric.
+
+---
+# Creating vectors
+
+Vectors are created with `c`. Below are examples of each of the four main types
+of vectors.
+
+
+```r
+integer &lt;- c(5L, 7L, 3L, 94L) # L explicitly an integer, not double
+double &lt;- c(3.27, 8.41, Inf, -Inf)
+logical &lt;- c(TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE)
+character &lt;- c("red", "orange", "yellow", "green", "blue", "violet", "rainbow")
+```
+
+---
+# Coercion
+* Vectors **must** be of the same type. 
+
+* If you try to mix types, implicit coercion will occur
+
+* Implicit coercion defaults to the most flexible type
+  + which is... ?
+
+--
+
+
+```r
+c(7L, 3.25)
+```
+
+```
+## [1] 7.00 3.25
+```
+
+```r
+c(3.24, TRUE, "April")
+```
+
+```
+## [1] "3.24"  "TRUE"  "April"
+```
+
+```r
+c(TRUE, 5)
+```
+
+```
+## [1] 1 5
+```
+
+---
+# Explicit coercion
+* You can alternatively define the coercion to occur
+
+
+```r
+as.integer(c(7L, 3.25))
+```
+
+```
+## [1] 7 3
+```
+
+```r
+as.logical(c(3.24, TRUE, "April"))
+```
+
+```
+## [1]   NA TRUE   NA
+```
+
+```r
+as.character(c(TRUE, 5)) # still maybe a bit unexpected?
+```
+
+```
+## [1] "1" "5"
+```
+
+---
+# Checking types
+
+* Use `typeof` to verify the type of vector
+
+
+```r
+typeof(c(7L, 3.25))
+```
+
+```
+## [1] "double"
+```
+
+```r
+typeof(as.integer(c(7L, 3.25)))
+```
+
+```
+## [1] "integer"
+```
+
+---
+# Piping
+* Although traditionally used within the tidyverse (not what we're doing here),
+it can still be useful. The following are equivalent
+
+
+```r
+library(magrittr)
+```
+
+```
+## 
+## Attaching package: 'magrittr'
+```
+
+```
+## The following object is masked from 'package:purrr':
+## 
+##     set_names
+```
+
+```
+## The following object is masked from 'package:tidyr':
+## 
+##     extract
+```
+
+```r
+typeof(as.integer(c(7L, 3.25)))
+```
+
+```
+## [1] "integer"
+```
+
+```r
+c(7L, 3.25) %&gt;%
+  as.integer() %&gt;%
+  typeof()
+```
+
+```
+## [1] "integer"
+```
+
+---
+# Pop quiz
+Without actually running the code, talk with your neighbor: Which will each of
+the following coerce to?
+
+
+```r
+c(1.25, TRUE, 4L)
+c(1L, FALSE)
+c(7L, 6.23, "eight")
+c(TRUE, 1L, 0L, "False")
+```
+
+<div class="countdown" id="timer_6046d0b6" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+---
+# Answers
+
+
+```r
+typeof(c(1.25, TRUE, 4L))
+```
+
+```
+## [1] "double"
+```
+
+```r
+typeof(c(1L, FALSE))
+```
+
+```
+## [1] "integer"
+```
+
+```r
+typeof(c(7L, 6.23, "eight"))
+```
+
+```
+## [1] "character"
+```
+
+```r
+typeof(c(TRUE, 1L, 0L, "False"))
+```
+
+```
+## [1] "character"
+```
+
+---
+# Lists
+* Lists are vectors, but not *atomic* vectors
+
+* Fundamental difference - each element can be a different type
+
+
+```r
+list("a", 7L, 3.25, TRUE)
+```
+
+```
+## [[1]]
+## [1] "a"
+## 
+## [[2]]
+## [1] 7
+## 
+## [[3]]
+## [1] 3.25
+## 
+## [[4]]
+## [1] TRUE
+```
+
+---
+# Lists
+
+.pull-left[
+
+* Technically, each element of the list is an atomic vector
+
+* The prior example included all *scalar* vectors
+
+* Lists do not require all elements to be the same length
+
+]
+
+
+.pull-right[
+
+
+```r
+list(c("a", "b", "c"),
+     rnorm(5), 
+     c(7L, 2L),
+     c(TRUE, TRUE, FALSE, TRUE))
+```
+
+```
+## [[1]]
+## [1] "a" "b" "c"
+## 
+## [[2]]
+## [1]  0.4506938 -1.9319970  0.2787778  0.4737095  1.6026553
+## 
+## [[3]]
+## [1] 7 2
+## 
+## [[4]]
+## [1]  TRUE  TRUE FALSE  TRUE
+```
+]
+
+---
+# Summary
+* Atomic vectors must all be the same type
+
+  + implicit coercion occurs if not (and you haven't specified the coercion explicitly)
+
+* Lists are also vectors, but not atomic vectors
+  
+  + Each element can be of a different type and length
+
+  + Incredibly flexible, but often a little more difficult to get the hang of
+
+---
 # Next time
+* More on data types
+  + Missing values
+  + Subsetting
+  + Attributes
+  + More on coercion (good to be fluent)
+* Lists
 
-### Collaborating with GitHub
+
+### Any lingering questions?
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

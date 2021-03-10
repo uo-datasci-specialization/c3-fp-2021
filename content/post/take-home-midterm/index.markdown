@@ -9,6 +9,7 @@ categories:
   - Assignments
 tags:
   - Midterm
+  - Assignments
 ---
 
 
