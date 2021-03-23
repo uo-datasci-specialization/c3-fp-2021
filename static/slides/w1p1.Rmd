@@ -42,8 +42,8 @@ source(here::here("static", "slides", "slide-setup.R"))
 
 .right[
 
-```{r out.height = 200, out.width = 200, echo = FALSE}
-knitr::include_graphics("../edld653-logo.png")
+```{r fig.asp = 1.3333, echo = FALSE}
+knitr::include_graphics("edld653-logo.png")
 ```
 
 ]
@@ -81,7 +81,6 @@ background-size:cover
 ---
 # Course learning objectives
 
---
 * Understand and be able to describe the differences in R's data structures and when each is most appropriate for a given task
 
 
@@ -91,6 +90,14 @@ background-size:cover
 
 --
 * Work with lists and list columns using `purrr::nest` and `purrr:unnest`
+
+
+--
+.gray[
+
+* Understand how the new `dplyr::rowwise()` can help you avoid some of the above
+
+]
 
 
 
@@ -225,33 +232,39 @@ Already <a href="../take-home-midterm" target="_blank">posted</a>!
 
 |**Component**     | **Points**| **Due** | 
 |:-----------------|:----------|:--------| 
-| Groups Finalized | 0         |  4/10/19|
-| [Outline](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#outline_(10_points;_5%)  | 10 | 5/1/19 | 
-| [Draft](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#draft_data_preparation_script_(20_points) |  20 | 5/27/19 | 
-| [Peer review](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#peer_review_of_data_preparation_script_(20_points) | 20 | 6/3/19 | 
-| [Product](https://uo-datasci-specialization.github.io/c3-fun_program2020/site-syllabus.html#final_product_grading_(100_points) |  100 | 6/12/19 (11:59 pm) |
+| Groups Finalized | 0         |  4/07/21|
+| [Outline](https://fp-2021.netlify.app/assignments/#outline)  | 5 | 4/21/21 | 
+| [Draft](https://fp-2021.netlify.app/assignments/#draft-data-preparation-script) |  10 | 5/19/21 | 
+| [Peer review](https://fp-2021.netlify.app/assignments/#peer-review) | 15 | 5/26/21 | 
+| [Product](https://fp-2021.netlify.app/assignments/#final-product) |  70 | 6/09/21 (11:59 pm) |
 
 
 ---
+class: inverse-red middle
 # What is it?
-### Two basic options
+## Two basic options
 
---
-
+---
 # Data Product 
 Similar to first class
 
-* Brief research manuscript (can be APA or not, I don't really care 🤷)
+* Brief research manuscript (can be APA or not, I don't really care 🤷‍♂️)
+
 * Shiny app
+
 * Dashboard
   + Probably unlikely to work well though, unless you make it a shiny dashboard
+
 * Blog post
+
 * For the ambitious - a documented R package
 
 ---
 # Tutorial
 * Probably best done through a blog post or series of blog posts
+
 * Approach as if you're teaching others about the content I'll ask you to cover
+
 * BONUS: You can actually release the blog post(s) and may get some traffic 🎉👏🥳
 
 
@@ -285,49 +298,47 @@ a bit artificial. This is okay.
 ---
 # Grading criteria
 
-* No code is used repetitively (no more than twice) .b[10 points]
+* No code is used repetitively (no more than twice) .gray[10 points]
 
 
 --
-* More than one variant of `purrr::map` is used .b[10 points]
+* More than one variant of `purrr::map` is used .gray[5 points]
 
 
 --
 * At least one {purrr} function outside the basic `map` family (`walk_*`, 
-  `reduce`, `modify_*`, etc.) .b[10 points]
+`reduce`, `modify_*`, etc.) .gray[5 points]
 
 
 --
-* At least one instance of parallel iteration (e.g., `map2_*`, `pmap_*`) .b[10
-points]
+* At least one instance of parallel iteration (e.g., `map2_*`, `pmap_*`) .gray[5 points]
 
 
 --
-* At least one use case of `purrr::nest %>% mutate()` .b[10 points]
-
+* At least one use case of `purrr::nest %>% mutate()` .gray[5 points]
 
 ---
-* At least two custom functions .b[20 points; 10 points each]
+# Grading criteria
+
+* At least two custom functions .gray[20 points; 10 points each]
   + Each function must do exactly one thing
-  + The functions **may** replicate the behavior of a base function - as noted 
-    above this is about practicing the skills you learn in class
+  + The functions **may** replicate the behavior of a base function - as noted above this is about practicing the skills you learn in class
 
 
 --
-* Code is fully reproducible and housed on GitHub .b[10 points]
+* Code is fully reproducible and housed on GitHub .gray[10 points]
 
 
 --
-* No obvious errors in chosen output format .b[10 points]
+* No obvious errors in chosen output format .gray[5 points]
 
 
 --
-* Deployed on the web and shareable through a link .b[10 points]
-
+* Deployed on the web and shareable through a link .gray[5 points]
 
 ---
 # Outline
-### Due 5/1/19
+### Due 4/21/21
 
 Four components:
 * Description of data source (must be publicly available)
@@ -345,7 +356,7 @@ Please include all components - including the question(s) section!
 
 ---
 # Draft
-### Due 5/27/19, before class
+### Due 5/19/21, before class
 * Expected to still be a work in progress
 
   + This means some of your code may be rough and/or incomplete. However:
@@ -365,20 +376,14 @@ Please include all components - including the question(s) section!
 definitely note them
 
 
---
-### A note on last peer review
-
-* Make sure you review the syllabus on what you should be noting
-
-* Please take your time, try to be as thorough as possible
-
 ---
 # Utilizing GitHub (required)
-* You'll be assigned two groups to review (.b[10 points each])
+* You'll be assigned two groups to review 
 
 * Fork their repo
 
 * Embed comments, suggest changes to their code
+  + Please do both of these
 
 * Submit a PR
   
@@ -387,40 +392,40 @@ definitely note them
 
 ---
 # Grading
-250 points total
+200 points total
 
-* 4 labs at 10 points each (40 points; 16%) 
+* 3 labs at 10 points each (30 points; 15%) 
 
-* Midterm in-class (10 points; 4%)
+* Midterm in-class (10 points; 5%)
 
-* Midterm take-home (50 points; 20%)
+* Midterm take-home (60 points; 30%)
 
-* Final Project (150 points; 60%)
+* Final Project (100 points; 50%)
 
-  + Proposal (10 points; 4%)
+  + Outline (5 points; 2.5%)
 
-  + Draft (20 points; 8%)
+  + Draft (10 points; 5%)
 
-  + Peer review (20 points; 8%)
+  + Peer review (15 points; 7.5%)
 
-  + Product (100 points; 40%)
+  + Product (70 points; 35%)
 
 
 ---
 # Grading
 
 |  **Lower percent** |**Lower point range**  | **Grade** | **Upper point range**  | **Upper percent**|
-|  :------: | :------   | :-:| :-------: | ----:|
-|  0.97     | (242 pts) | A+ | (250 pts) |      |
-|  0.93     | (232 pts) | A  | (242 pts) | 0.97 |
-|  0.90     | (225 pts) | A- | (232 pts) | 0.93 |
-|  0.87     | (218 pts) | B+ | (225 pts) | 0.90 |
-|  0.83     | (208 pts) | B  | (218 pts) | 0.87 |
-|  0.80     | (200 pts) | B- | (208 pts) | 0.83 |
-|  0.77     | (192 pts) | C+ | (200 pts) | 0.80 |
-|  0.73     | (182 pts) | C  | (192 pts) | 0.77 |
-|  0.70     | (175 pts) | C- | (182 pts) | 0.73 |
-|           |           | F  | (175 pts) | 0.70 |
+|  :------: | :------:  | :--| :-------: | :----|
+|  0.97     | (194 pts) | A+ |           |      |
+|  0.93     | (186 pts) | A  | (194 pts) | 0.97 |
+|  0.90     | (180 pts) | A- | (186 pts) | 0.93 |
+|  0.87     | (174 pts) | B+ | (180 pts) | 0.90 |
+|  0.83     | (166 pts) | B  | (174 pts) | 0.87 |
+|  0.80     | (160 pts) | B- | (166 pts) | 0.83 |
+|  0.77     | (154 pts) | C+ | (160 pts) | 0.80 |
+|  0.73     | (146 pts) | C  | (154 pts) | 0.77 |
+|  0.70     | (140 pts) | C- | (146 pts) | 0.73 |
+|           |           | F  | (140 pts) | 0.70 |
 
 ---
 class: inverse
@@ -428,7 +433,7 @@ background-image:url(https://d194ip2226q57d.cloudfront.net/original_images/10_Ti
 background-size:contain
 
 ---
-class: inverse center middle
+class: inverse-blue center middle
 # Any time left?
 
 --
@@ -442,11 +447,13 @@ Discuss with your neighbor
 
 * What function creates a vector?
 
-* .b[T]/.r[F]: A list (an R list) is not a vector.
+* **T**/**F**: A list (an R list) is not a vector.
 
 * What is the fundamental difference between a matrix and a data frame?
 
 * What does *coercion* mean, and when does it come into play?
+
+`r countdown::countdown(minutes = 5)`
 
 ---
 # Vector types
@@ -472,10 +479,12 @@ Vectors are created with `c`. Below are examples of each of the four main types
 of vectors.
 
 ```{r vector-types}
-integer <- c(5L, 7L, 3L, 94L) # L explicitly an integer, not double
+# L explicitly an integer, not double
+integer <- c(5L, 7L, 3L, 94L) 
 double <- c(3.27, 8.41, Inf, -Inf)
 logical <- c(TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE)
-character <- c("red", "orange", "yellow", "green", "blue", "violet", "rainbow")
+character <- c("red", "orange", "yellow", "green", "blue", 
+               "violet", "rainbow")
 ```
 
 ---
@@ -520,7 +529,7 @@ typeof(as.integer(c(7L, 3.25)))
 * Although traditionally used within the tidyverse (not what we're doing here),
 it can still be useful. The following are equivalent
 
-```{r pipe}
+```{r pipe, message = FALSE}
 library(magrittr)
 
 typeof(as.integer(c(7L, 3.25)))
@@ -532,14 +541,15 @@ c(7L, 3.25) %>%
 
 ---
 # Pop quiz
-Without actually running the code, talk with your neighbor: Which will each of
-the following coerce to?
+Without actually running the code, predict which type each of
+the following will coerce to.
 
 ```{r imp-coerce2-echo, eval = FALSE}
 c(1.25, TRUE, 4L)
 c(1L, FALSE)
 c(7L, 6.23, "eight")
 c(TRUE, 1L, 0L, "False")
+
 ```
 
 `r countdown::countdown(minutes = 1)`
@@ -568,7 +578,7 @@ list("a", 7L, 3.25, TRUE)
 
 .pull-left[
 
-* Technically, each element of the list is an atomic vector
+* Each element of the list is another vector, possibly atomic, possibly not
 
 * The prior example included all *scalar* vectors
 
@@ -580,10 +590,12 @@ list("a", 7L, 3.25, TRUE)
 .pull-right[
 
 ```{r list2}
-list(c("a", "b", "c"),
-     rnorm(5), 
-     c(7L, 2L),
-     c(TRUE, TRUE, FALSE, TRUE))
+list(
+  c("a", "b", "c"),
+  rnorm(5),
+  c(7L, 2L),
+  c(TRUE, TRUE, FALSE, TRUE)
+)
 ```
 ]
 
@@ -600,6 +612,7 @@ list(c("a", "b", "c"),
   + Incredibly flexible, but often a little more difficult to get the hang of
 
 ---
+class:inverse-green
 # Next time
 * More on data types
   + Missing values

@@ -1,0 +1,807 @@
+---
+title: "Data types"
+author: "Daniel Anderson "
+date: "Week 1, Class 2 "
+output:
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: "load-feather.html"
+---
+
+```{r include = FALSE, results = "asis"}
+source(here::here("static", "slides", "slide-setup.R"))
+```
+
+`r setup("w1p1")`
+
+---
+# Agenda
+* Finishing up on coercion
+
+* Attributes
+
+* Missing values
+
+* Intro to lists
+
+* Subsetting
+
+
+---
+# Learning objectives
+* Understand the fundamental difference between lists and atomic vectors
+
+
+--
+* Understand how atomic vectors are coerced, implicitly or explicitly
+
+
+--
+* Understand various ways to subset vectors, and how subsetting differs for lists
+
+
+--
+* Understand what an attribute is, and how to set and modify attributes
+
+---
+# Pop quiz
+Without actually running the code, predict which type each of
+the following will coerce to.
+
+```{r imp-coerce2-echo, eval = FALSE}
+c(TRUE, 1L, 0L, "False")
+c(1L, FALSE)
+c(7L, 6.23, "eight")
+c(1.25, TRUE, 4L)
+```
+
+`r countdown::countdown(minutes = 1)`
+
+---
+# Answers
+
+```{r imp-coerce2-eval}
+typeof(c(TRUE, 1L, 0L, "False"))
+typeof(c(1L, FALSE))
+typeof(c(7L, 6.23, "eight"))
+typeof(c(1.25, TRUE, 4L))
+```
+
+---
+# Challenge
+
+### Work with a partner
+One of you share your screen: 
+* Create four atomic vectors, one for each of the fundamental types
+
+* Combine two or more of the vectors. Predict the implicit coercion of each.
+
+* Apply explicit coercions, and predict the output for each.
+
+(basically quiz each other)
+
+`r countdown::countdown(minutes = 8)`
+
+---
+class: inverse-blue middle
+# Attributes
+
+---
+# Attributes
+* What are attributes?
+
+
+--
+  + metadata... what's metadata?
+
+
+--
+  + Data about the data
+
+
+---
+# Other data types
+
+Atomic vectors by themselves make up only a small fraction of the total number of data types in R
+
+
+--
+### What are some other data types?
+
+--
+* Data frames 
+
+--
+* Matrices & arrays 
+
+--
+* Factors 
+
+--
+* Dates 
+
+
+--
+Remember, atomic vectors are the atoms of R. Many other data structures are
+built from atomic vectors. 
+
+* We use attributes to create other data types from atomic vectors
+
+---
+# Attributes
+
+### Common
+* Names
+* Dimensions
+
+### Less common
+* Arbitrary metadata
+
+
+---
+# Examples
+### Please follow along!
+* See **all** attributes associated with a give object with `attributes`
+
+```{r attributes-iris}
+library(palmerpenguins)
+attributes(penguins[1:50, ]) # limiting rows just for slides
+```
+
+---
+```{r iris-head}
+head(penguins)
+```
+
+---
+# Get specific attribute
+* Access just a single attribute by naming it within `attr`
+
+```{r iris-class}
+attr(penguins, "class")
+attr(penguins, "names")
+```
+
+
+--
+Note - this is not generally how you would pull the names attribute. Rather, you would use `names()`. 
+
+---
+# Be specific
+* Note in the prior slides, I'm asking for attributes on the entire data frame. 
+
+* Is that what I want?... maybe. But the individual vectors may have attributes as well
+
+--
+```{r attr-species}
+attributes(penguins$species)
+attributes(penguins$bill_length_mm)
+```
+
+
+---
+# Set attributes
+* Just redefine them within `attr`
+
+```{r attr-redefine}
+attr(penguins$species, "levels") <- c("Big one", 
+                                      "Little one", 
+                                      "Funny one")
+
+head(penguins)
+```
+
+Note - you would generally not define levels this way, but it is a general method for modifying attributes.
+
+---
+# Dimensions
+
+* Let's create a matrix (please do it with me)
+
+```{r mat1}
+m <- matrix(1:6, ncol = 2)
+m
+```
+
+* Notice how the matrix fills
+
+--
+* Check out the attributes
+
+```{r mat1-attributes}
+attributes(m)
+```
+
+---
+# Modify the attributes
+* Let's change it to a 2 x 3 matrix, instead of 3 x 2 (you try first)
+
+--
+```{r mat1-modify-attr}
+attr(m, "dim") <- c(2, 3)
+m
+```
+
+--
+* is this the result you expected?
+
+---
+# Alternative creation
+* Create an atomic vector, assign a dimension attribute
+
+```{r v-to-m}
+v <- 1:6
+v
+attr(v, "dim") <- c(3, 2)
+v
+```
+
+---
+# Aside
+* What if we wanted it to fill by row?
+
+.pull-left[
+```{r by-row1}
+matrix(6:13, 
+       ncol = 2, 
+       byrow = TRUE) #<<
+vect <- 6:13
+dim(vect) <- c(2, 4)
+vect
+```
+]
+
+.pull-right[
+```{r by-row2}
+t(vect)
+```
+]
+
+---
+# Names
+* The following (this slide and the next) are equivalent 
+
+```{r dimnames1}
+attr(v, "dimnames") <- list(c("the first", "second", "III"),
+                            c("index", "value"))
+v
+```
+
+---
+# Names
+
+```{r dimnames2}
+v2 <- 1:6
+attr(v2, "dim") <- c(3, 2)
+rownames(v2) <- c("the first", "second", "III")
+colnames(v2) <- c("index", "value")
+v2
+```
+
+---
+# Arbitrary metadata
+* I don't use this often (wouldn't recommend you do either)
+
+```{r }
+attr(v, "matrix_mean") <- mean(v)
+v
+attr(v, "matrix_mean")
+```
+
+* Note that *anything* can be stored as an attribute (including matrices or data frames, etc.)
+
+---
+# Matrices vs Data frames
+
+Usually we want to work with data frames because they represent our data better.
+
+Sometimes a matrix is more efficient because you can operat on the **entire** matrix at once.
+
+```{r }
+set.seed(42)
+m <- matrix(rnorm(100, 200, 10), ncol = 10)
+m
+```
+
+---
+```{r }
+sum(m)
+mean(m)
+rowSums(m)
+colSums(m)
+
+# standardize the matrix
+z <- (m - mean(m)) / sd(m)
+```
+
+---
+```{r }
+z
+```
+
+---
+# Stripping attributes
+* Many operations will strip attributes (generally why it's not a good idea to store important things in them)
+
+.pull-left[
+```{r stripped1}
+v
+rowSums(v)
+```
+]
+
+--
+.pull-right[
+```{r stripped2}
+attributes(rowSums(v))
+```
+
+* Generally `names` are maintained
+
+* Sometimes, `dim` is maintained, sometimes not 
+
+* All else is stripped
+
+]
+
+
+
+---
+# More on `names`
+
+* The `names` attribute corresponds to the individual elements within a vector
+
+```{r names1}
+names(v)
+names(v) <- letters[1:6]
+v
+```
+
+---
+* Perhaps more straightforward
+
+```{r names2}
+v3a <- c(a = 5, b = 7, c = 12)
+v3a
+names(v3a)
+attributes(v3a)
+```
+
+---
+# Alternatives
+
+```{r names3}
+v3b <- c(5, 7, 12)
+names(v3b) <- c("a", "b", "c")
+v3b
+
+v3c <- setNames(c(5, 7, 12), c("a", "b", "c"))
+v3c
+```
+
+
+--
+* Note that `names` is **not** the same thing as `colnames`, but, somewhat confusingly, both work to rename the variables (columns) of a data frame. We'll talk more about why this is momentarily.
+
+
+---
+# Why names might be helpful
+
+```{r}
+v
+```
+
+.pull-left[
+```{r}
+v["b"]
+```
+]
+
+.pull-right[
+```{r }
+v["e"]
+```
+]
+
+---
+# Implementation of factors
+### Quickly
+
+```{r factor}
+fct <- factor(c("a", "a", "b", "c"))
+typeof(fct)
+attributes(fct)
+str(fct)
+```
+
+---
+# Implementation of dates
+### Quickly
+
+```{r dates}
+date <- Sys.Date()
+typeof(date)
+attributes(date)
+attributes(date) <- NULL
+date
+```
+
+* This number represents the days passed since January 1, 1970, known as the Unix epoch.
+
+---
+# Missing values
+
+* Missing values breed missing values
+
+```{r missing1}
+NA > 5
+NA * 7
+```
+
+--
+
+* What about this one?
+
+```{r missing2, eval = FALSE}
+NA == NA
+```
+
+--
+
+```{r missing2-eval, echo = FALSE}
+NA == NA
+```
+
+
+--
+It is correct because there's no reason to presume that one missing
+value is or is not equal to another missing value.
+
+---
+# When missing values don't propagate
+
+```{r missing-non-propagation}
+NA | TRUE
+x <- c(NA, 3, NA, 5)
+any(x > 4)
+```
+
+---
+# How to test missingness?
+
+* We've already seen the following doesn't work
+
+```{r missing3}
+x == NA
+```
+
+--
+* Instead, use `is.na`
+
+```{r missing4}
+is.na(x)
+```
+
+* When does this regularly come into play?
+
+
+---
+class: inverse-blue middle
+# Lists
+
+
+---
+# Lists
+* Lists are vectors, but not *atomic* vectors
+
+* Fundamental difference - each element can be a different type
+
+```{r list1}
+list("a", 7L, 3.25, TRUE)
+```
+
+---
+# Lists
+
+.pull-left[
+
+* Technically, each element of the list is a vector, possibly atomic
+
+* The prior example included all *scalars*, which are vectors of length 1.
+
+* Lists do not require all elements to be the same length
+
+]
+
+
+.pull-right[
+
+```{r list2}
+l <- list(
+  c("a", "b", "c"),
+  rnorm(5),
+  c(7L, 2L),
+  c(TRUE, TRUE, FALSE, TRUE)
+)
+l
+```
+]
+
+
+---
+# Check the list
+
+```{r list-attr}
+typeof(l)
+attributes(l)
+str(l)
+```
+
+---
+# Data frames as lists
+* A data frame is just a special case of a list, where all the elements are of the same length.
+
+.pull-left[
+```{r list-df1}
+l_df <- list(
+  a = c("red", "blue"),
+  b = rnorm(2),
+  c = c(7L, 2L),
+  d = c(TRUE, FALSE)
+)
+l_df
+```
+]
+
+.pull-right[
+```{r list-df2}
+data.frame(l_df)
+```
+]
+
+
+---
+class: inverse-red middle
+# Subsetting Lists
+
+---
+# A nested list
+Lists are often complicated objects. Let's create a somewhat complicated one
+
+```{r }
+x <- c(a = 3, b = 5, c = 7)
+l <- list(
+  x = x,
+  x2 = c(x, x),
+  x3 = list(
+    vect = x,
+    squared = x^2,
+    cubed = x^3)
+)
+```
+
+---
+# Subsetting lists
+Multiple methods
+* Most common: `$`, `[`, and `[[`
+
+.pull-left[
+```{r subset-lists-left}
+l[1]
+typeof(l[1])
+
+l[[1]]
+```
+]
+
+
+.pull-right[
+```{r subset-lists-right}
+typeof(l[[1]])
+
+l[[1]]["c"]
+```
+]
+
+---
+# Named list
+* Because the elements of the list are named, we can use `$`
+
+```{r dollar-subset}
+l$x2
+l$x3
+```
+
+
+---
+# Subsetting nested lists
+* Multiple `$` if all named
+
+```{r dollar-subset-nested}
+l$x3$squared
+```
+
+* Note this doesn't work on named elements of an atomic vector, just the named elements of a list
+
+```{r dollar-subset-error, error = TRUE}
+l$x3$squared$b
+```
+
+
+---
+But we could do something like...
+
+```{r dollar-subset-success}
+l$x3$squared["b"]
+```
+
+---
+# Alternatives
+
+* You can always use logical
+
+* Indexing works too
+
+.pull-left[
+```{r alternative-subset-list1}
+l[c(TRUE, FALSE, TRUE)]
+```
+]
+
+.pull-right[
+```{r alternative-subset-list2}
+l[c(1, 3)]
+```
+]
+
+---
+# Careful with your brackets
+
+```{r bracket-fail, error = TRUE}
+l[[c(TRUE, FALSE, FALSE)]]
+```
+
+* Why doesn't the above work?
+
+---
+## Subsetting in multiple dimensions
+
+* Generally we deal with 2d data frames
+
+* If there are two dimensions, we separate the `[` subsetting with a comma
+
+```{r head-mtcars}
+head(mtcars)
+mtcars[3, 4]
+```
+
+---
+# Empty indicators
+* An empty indicator implies "all"
+
+
+--
+### Select the entire fourth column
+
+```{r mtcars-col4}
+mtcars[ ,4]
+```
+
+--
+### Select the entire 4th row
+
+```{r mtcars-row4}
+mtcars[4, ]
+```
+
+---
+# Data types returned
+
+* By default, each of the prior will return a vector, which itself can be subset
+
+The following are equivalent
+
+```{r mtcars-row4-mpg1}
+mtcars[4, c("mpg", "hp")]
+```
+
+```{r mtcars-row4-mpg2}
+mtcars[4, ][c("mpg", "hp")]
+```
+
+---
+# Return a data frame
+* Often, you don't want the vector returned, but rather the modified data frame. 
+
+* Specify `drop = FALSE`
+
+```{r drop-false}
+mtcars[ ,4]
+mtcars[ ,4, drop = FALSE]
+```
+
+---
+# tibbles
+* Note dropping the data frame attribute is the default for a `data.frame` but .b[.bolder[NOT]] a `tibble`.
+
+```{r tibble-nodrop-att}
+mtcars_tbl <- tibble::as_tibble(mtcars)
+mtcars_tbl[ ,4]
+```
+
+---
+# You can override this
+
+```{r tibble-drop-att}
+mtcars_tbl[ ,4, drop = TRUE]
+```
+
+---
+# More than two dimensions
+* Depending on your applications, you may not run into this much
+
+```{r array}
+array <- 1:12
+dim(array) <- c(2, 3, 2)
+array
+```
+
+---
+# Subset array
+### Select just the second matrix
+
+--
+
+```{r array-select-mat}
+array[ , ,2]
+```
+
+--
+
+### Select first column of each matrix
+
+--
+
+```{r array-select-col}
+array[ ,1, ]
+```
+
+---
+# Back to lists
+### Why are they so useful?
+* Fairly obviously, they're much more flexible
+
+* Often returned by functions, for example, `lm`
+
+```{r lm1}
+m <- lm(mpg ~ hp, mtcars)
+str(m)
+```
+
+---
+# Summary
+* Atomic vectors must all be the same type
+
+  + implicit coercion occurs if not (and you haven't specified the coercion
+  explicitly)
+
+* Lists are also vectors, but not atomic vectors
+  
+  + Each element can be of a different type and length
+
+  + Incredibly flexible, but often a little more difficult to get the hang of, particularly with subsetting
+
+
+---
+class: inverse-green middle
+# Next time
+### Loops with base R
+

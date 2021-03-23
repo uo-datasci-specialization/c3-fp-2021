@@ -37,7 +37,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-even "03-31" >}}
   {{< description "Data types" "We will finish up on discussing the four basic data types in depth and how coercion occurs. We will also discuss attributes, introduce lists, and discuss subsetting for lists versus atomic vectors." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w1p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
@@ -82,7 +82,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< slides "" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< assigned "assignments" "Lab 1" >}}
+{{< assigned "lab-1" "Lab 1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
