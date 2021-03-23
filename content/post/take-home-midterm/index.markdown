@@ -26,7 +26,7 @@ The problem with caching is that sometimes results of a later chunk depend upon 
 
 If this is confusing, don't worry about it. Either check in with me or ignore this part and don't use caching. It will just take a little longer to render your file each time you click "knit".
 
-I would also recommend not tracking the cache files. This means adding the cache folder to your `.gitignore` file. If you initialized your repo with the R `.gitignore` file this is actually already taken of for you. If not, add `/*_cache/` to your `.gitignore`.
+I would also recommend not tracking the cache files. This means adding the cache folder to your `.gitignore` file. If you initialized your repo with the R `.gitignore` file this is actually already taken care of for you. If not, add `/*_cache/` to your `.gitignore`.
 
 # Part A: Data 
 ### 20 points
@@ -34,7 +34,7 @@ I would also recommend not tracking the cache files. This means adding the cache
 The following function downloads data from the Oregon Department of education
 website on the number of students who scored in each performance category on the
 statewide assessment by race/ethnicity for every school in the state. It takes
-one argument, `year`, which must be a two digit integer from 15 to 18 (representing the 2014-15 to 2017-18 school years).
+one argument, `year`, which must be a two digit integer from 15 to 18 (representing the 2014-15 to 2017-18 school years). It actually won't work on later years because the file structure changed and I wanted to keep the function simple.
 
 **NOTE:** This function uses the `glue` function from the package of the same name. If you do not already have this package installed, please first install it with `install.packages("glue")`. It also uses `{rio}` for the import, which you should already have installed, but if not, install that first too.
 
@@ -46,7 +46,7 @@ download_file <- function(year) {
 }
 ```
 
-1. (10 points) Use the function above to download all the data from 2014-15 to  each of the past 4 school years and bind it into a single data frame, using a single function (i.e., one line of code). Note, this may take a minute or two to run, depending on your Internet speed.
+1. (10 points) Use the function above to download *all* of the data from the 2014-15 to 2017-18 school years and bind it into a single data frame, **using a single function** (i.e., one line of code). Note, this may take a minute or two to run, depending on your Internet speed.
 
 
 
@@ -71,8 +71,19 @@ Conduct some basic data cleaning to make your data file look like the following.
 ##  8 2014-2015     Adrian SD 61 Adrian Elementary School Hispanic/Latino
 ##  9 2014-2015     Adrian SD 61 Adrian Elementary School Hispanic/Latino
 ## 10 2014-2015     Adrian SD 61 Adrian Elementary School Hispanic/Latino
-## # … with 90,566 more rows, and 3 more variables: grade_level <chr>,
-## #   level <chr>, n <int>
+##    grade_level level     n
+##    <chr>       <chr> <int>
+##  1 Grade 3     1         2
+##  2 Grade 3     2         1
+##  3 Grade 3     3         2
+##  4 Grade 3     4         1
+##  5 Grade 6     1         2
+##  6 Grade 6     2         3
+##  7 Grade 6     3         2
+##  8 Grade 6     4         0
+##  9 Grade 7     1         2
+## 10 Grade 7     2         2
+## # … with 90,566 more rows
 ```
 
 2. (10 points) Sum the *n* across grades and school for each district within each academic year, student group, and level. Calculate the number of schools (unique schools listed) for each district. Also move your data to a wider format where the student groups become new columns, filled by the district n. Remove districts that did not report numbers for one or both student groups (i.e., drop missing data from the new columns). Your data frame should look like the below
@@ -131,7 +142,7 @@ standard deviations below students coded White within this school district for t
 
 
 
-Note, on my computer thes took about 38 seconds per analysis. It will likely take a bit longer for you, but shouldn't take *too* long. You may get a warning. Just go ahead and ignore that for now.
+Note, on my computer these took about 40 seconds per analysis. It will likely take a bit longer for you, but shouldn't take *too* long. You may get a warning. Just go ahead and ignore that for now.
 
 2. (5 points)
 
@@ -144,7 +155,7 @@ Reproduce the following plot to confirm that the estimates are equivalent across
 
 Hint: You need to select unique *districts*. You may want to try something like the following
 
-**Extra Credit:** For up to one point extra credit, create a third set that "staples together" each of the preceding pairs of plots (i.e., to confirm that the plots were produced identically by both methods).
+
 
 
 ```r
@@ -159,6 +170,8 @@ model_list_object %>%
 <img src="{{< blogdown/postref >}}index_files/figure-html/bandon-1.png" width="1440" />
 
 
+
+**Extra Credit:** For up to one point extra credit, create a third set that "staples together" each of the preceding pairs of plots (i.e., to confirm that the plots were produced identically by both methods).
 
 4. (10 points) Save the plots into a "plots" directory. Make sure the file names are meaningful.
 
