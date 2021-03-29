@@ -66,6 +66,8 @@ background-size:cover
 
 * What's one fun thing you've done recently outside of school stuff?
 
+* What pronouns would you like us to use for you in this class?
+
 ---
 background-image: url(https://akm-img-a-in.tosshub.com/indiatoday/images/story/201802/Syllabus-featured.jpeg?rpmIvNBBqGMDT7lPG.Qe4AzWs6OfDh9K)
 class: inverse bottom
@@ -210,7 +212,7 @@ Two parts:
 
 
 ---
-# Take home portion
+# Take home midterm
 
 * Group project: 3-5 people
 
@@ -226,7 +228,7 @@ Already <a href="../take-home-midterm" target="_blank">posted</a>!
 
 ---
 # Final Project 
-### 150 points total (60%)
+### 100 points total (60%)
 
 5 parts
 
@@ -321,6 +323,7 @@ a bit artificial. This is okay.
 # Grading criteria
 
 * At least two custom functions .gray[20 points; 10 points each]
+
   + Each function must do exactly one thing
   + The functions **may** replicate the behavior of a base function - as noted above this is about practicing the skills you learn in class
 
@@ -442,7 +445,7 @@ class: inverse-blue center middle
 ---
 # Vectors
 ### Pop quiz
-Discuss with your neighbor
+Discuss in small breakout groups
 * What are the four basic types of atomic vectors?
 
 * What function creates a vector?
