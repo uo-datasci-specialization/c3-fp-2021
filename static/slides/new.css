@@ -114,6 +114,9 @@ a:focus {
 .gray {
   color: #8d98a5;
 }
+.blue {
+  color: #22ABF6;
+}
 
 .inverse-blue {
 	background-color: #22ABF6;
@@ -185,7 +188,7 @@ a:focus {
 div.slides-footer {
   position: absolute;
   bottom: 15px;
-  left: 81%;
+  left: 77%;
   height: 20px;
   width: 100%;
 }

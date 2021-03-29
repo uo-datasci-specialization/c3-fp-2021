@@ -17,6 +17,10 @@ setup <- function(slides) {
     <i class = "footer-icon" data-feather="link"></i>
   </a>
   
+  <a class = "footer-icon-link" href = "https://fp-2021.netlify.app/">
+    <i class = "footer-icon" data-feather="globe"></i>
+  </a>
+  
   <a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021">
     <i class = "footer-icon" data-feather="github"></i>
   </a>
