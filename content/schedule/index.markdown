@@ -30,7 +30,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "adv-r" "vectors-chap.html" "3" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/8GeUGWMaf-M" >}}
 {{< /wrap >}}
 {{< /week-odd >}}
 
@@ -60,7 +60,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "04-05" >}}
   {{< description "Iteration 1" "This lecture will focus on base R methods for looping, specifically with `for` loops and the `*apply` family of loops" >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w2p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
