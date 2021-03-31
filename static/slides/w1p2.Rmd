@@ -18,6 +18,7 @@ output:
 
 ```{r include = FALSE, results = "asis"}
 source(here::here("static", "slides", "slide-setup.R"))
+xaringanExtra::use_clipboard()
 ```
 
 `r setup("w1p2")`
@@ -172,7 +173,7 @@ attr(penguins, "names")
 
 
 --
-Note - this is not generally how you would pull the names attribute. Rather, you would use `names()`. 
+Note - this is not generally how you would pull these attributes. Rather, you would use `class()` and `names()`. 
 
 ---
 # Be specific
@@ -199,7 +200,7 @@ attr(penguins$species, "levels") <- c("Big one",
 head(penguins)
 ```
 
-Note - you would generally not define levels this way, but it is a general method for modifying attributes.
+Note - you would generally not define levels this way either, but it is a general method for modifying attributes.
 
 ---
 # Dimensions
@@ -243,6 +244,7 @@ v
 attr(v, "dim") <- c(3, 2)
 v
 ```
+
 
 ---
 # Aside
@@ -297,6 +299,17 @@ attr(v, "matrix_mean")
 ```
 
 * Note that *anything* can be stored as an attribute (including matrices or data frames, etc.)
+
+---
+# Real example
+Fit a multilevel model and pull the variance-covariance matrix
+
+```{r }
+m <- lme4::lmer(Reaction ~ 1 + Days + (1 + Days|Subject), 
+                data = lme4::sleepstudy)
+
+lme4::VarCorr(m)$Subject
+```
 
 ---
 # Matrices vs Data frames
@@ -422,6 +435,21 @@ attributes(fct)
 str(fct)
 ```
 
+---
+# More manually
+
+```{r }
+# First create integer vector
+int <- c(1L, 1L, 2L, 3L, 1L, 3L)
+
+# assign some levels
+attr(int, "levels") <- c("red", "green", "blue")
+
+# change the class to a factor
+class(int) <- "factor"
+
+int
+```
 ---
 # Implementation of dates
 ### Quickly
@@ -798,6 +826,23 @@ str(m)
   + Each element can be of a different type and length
 
   + Incredibly flexible, but often a little more difficult to get the hang of, particularly with subsetting
+
+---
+# Any time left?
+Practice: Fit the model on the slide two previous
+
+```{r }
+m <- lm(mpg ~ hp, mtcars)
+```
+
+Pull each of the following from the model object
+
+* `effects`
+* `names` of the `effects`
+* `qr` matrix
+* third row of the `qr` matrix
+* fifth `rowname` of the `qr` matrix
+* `data.frame` used in the estimation of the model
 
 
 ---
