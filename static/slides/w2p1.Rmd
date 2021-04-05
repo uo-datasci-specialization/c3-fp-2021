@@ -415,9 +415,8 @@ simulated
 # The `lapply` version
 
 ```{r lapply-sim}
-sim_l <- lapply(seq(1, 5, by = 0.2), function(sd) {
- rnorm(10, 0, sd) 
-})
+increments <- seq(1, 5, by = 0.2)
+sim_l <- lapply(increments, function(sd) rnorm(10, 0, sd))
 sim_l
 ```
 
