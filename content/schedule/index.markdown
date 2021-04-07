@@ -91,7 +91,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "adv-r" "functionals.html" "9.1-9.3" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/iUAUUwJKad0" >}}
 {{< /wrap >}}
 {{< /week-even >}}
 
