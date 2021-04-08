@@ -1,0 +1,199 @@
+---
+title: Lab 2
+author: Daniel Anderson
+date: '2021-03-09'
+assigned: '2021-04-14'
+due: '2021-04-21'
+slug: lab-2
+categories:
+  - Assignments
+tags:
+  - Labs
+  - Assignments
+---
+
+
+This lab will be similar to Lab 1 but will focus specifically on looping with 
+{purrr}.
+
+
+### Part A: Multiple Models
+
+Run the code below to load the following dataset.
+
+```{r load_data}
+file <- "https://github.com/datalorax/esvis/raw/master/data/benchmarks.rda"
+load(url(file))
+head(benchmarks)
+```
+
+These data are simulated, but represent individual student scores across seasonal benchmark screenings (administered in the fall, winter, and spring). The variables are as follows:
+
+* `sid`: student identifier
+* `cohort`: student cohort
+* `sped`: special education status of the student for the given time point
+* `ethnicity`: coded race/ethnicity of the student
+* `frl`: free or reduced price lunch eligibility for the student for the given time point
+* `ell`: English language learner status for the student for the given time point
+* `season`: season the assessment was administered
+* `reading`: student's reading score at the given time point
+* `math`: student's mathematics score at the given time point
+
+Recode season to wave with the following code
+
+```{r recode, message = FALSE, warning = FALSE}
+library(tidyverse)
+
+benchmarks <- benchmarks %>%
+	as_tibble() %>%
+	mutate(wave = case_when(season == "Fall" ~ 0,
+	                        season == "Winter" ~ 1,
+	                        TRUE ~ 2))
+```
+
+1. Fit a model of the form `lm(math ~ wave)` for each student. 
+
+2. Plot the distribution of slopes. Annotate the plot with a vertical line for the mean.
+
+```{r answer1, include = FALSE}
+slopes <- split(benchmarks, benchmarks$sid) %>%
+	map(~lm(math ~ wave, data = .x)) %>%
+	map(coef) %>%
+	map_dbl(2)
+
+
+split_df <- split(benchmarks, benchmarks$sid) 
+models <- map(split_df, ~ lm(math ~ wave, data = .x))
+coefs <- map(models, coef) # exactly the same as map(models, ~coef(.x))
+slopes <- map_dbl(coefs, ~.x["wave"])
+
+# also equivalent to line 68
+map_dbl(coefs, "wave")
+map_dbl(coefs, 2)
+
+to_plot <- tibble(sid = names(split_df),
+                  slope = slopes)
+
+theme_set(theme_minimal())
+ggplot(to_plot, aes(slopes)) +
+	geom_histogram(fill = "cornflowerblue",
+	               color = "white") +
+	geom_vline(xintercept = mean(slopes, na.rm = TRUE),
+	           color = "magenta",
+	           lwd = 2)
+```
+
+### Part B: Star Wars
+
+Install and load the {repurrrsive} package
+
+```{r starwars-data, eval = FALSE}
+install.packages("repurrrsive")
+library(repurrrsive)
+```
+
+You now should have access to all the data you'll need for the following.
+
+1. Use the `sw_films` list to identify how many characters were represented in each film.
+
+2. Use the `sw_species` list to (a) identify species that have known hair colors and (b) identify what those hair colors are.
+
+```{r starwars-answers, include = FALSE}
+library(repurrrsive)
+
+# str(sw_films)
+# film1 <- sw_films[[1]]
+# film1$title
+# map_chr(sw_films, ~.x$title)
+
+titles <- map_chr(sw_films, "title")
+n_char <- map(sw_films, "characters") %>%
+	map_dbl(length) %>%
+	setNames(titles)
+
+# Alternative approach
+tibble(film = titles, num_char = n_char)
+
+
+# str(sw_species)
+# first_species <- sw_species[[1]]
+# first_species$hair_colors
+# map_chr(sw_species, ~.x$hair_colors)
+
+tibble(species = map_chr(sw_species, "name"),
+       hair = map_chr(sw_species, "hair_colors")) %>%
+	filter(hair != "none" & hair != "n/a" & hair != "unknown")
+```
+
+
+### Part C: Some basic API calls
+
+Many of the list elements have urls for API calls. For example
+
+```{r people1}
+sw_films[[1]]$characters[1]
+```
+
+The above provides the url necessary to make an API call for all the information available on the first character in the first film. Unfortunately, this API has since been deprecated. However, we're going to use essentially equivalent API calls to instead obtain data about pokemon, via https://pokeapi.co/. Feel free to visit the website and look around.
+
+API's are a way to host databases on the web, and make the data accessible via API calls. We're going to look at abilities of pokemon. For example to obtain data on the first ability, we could run the following
+
+```{r char1}
+library(httr)
+ability1 <- GET("https://pokeapi.co/api/v2/ability/1") %>%
+	content("parsed") 
+```
+
+The last digit in `"https://pokeapi.co/api/v2/ability/1"` is just an index denoting that this is the first ability listed in the database. To obtain data on the third ability, we would instead change our call to `"https://pokeapi.co/api/v2/ability/3"`. 
+
+If you look at the parsed content (it comes in as JSON data) you will see it is a nested list, just like we worked with above for Star Wars. 
+
+We can identify what the specific ability is for ability 1 with
+
+```{r ability1-name}
+ability1$name
+```
+
+and the number of pokemon with this ability with
+
+```{r ability1-pokemon}
+length(ability1$pokemon)
+```
+
+1. Use {purrr} to write an API call to obtain data on the first five abilities (note, we're only using the first five to make the calls go fast, but the code would be essentially equivalent for any number of abilities you wanted to query). Make sure you parse the JSON data to a list.
+
+```{r 1c-answer, include = FALSE, eval = FALSE}
+abilities <- paste0("https://pokeapi.co/api/v2/ability/", 1:5)
+pokes_abilities <- map(abilities, GET) # equivalent to map(abilities, ~GET(.x))
+pokes <- map(pokes_abilities, content, "parsed") # equivalent to map(pokes_abilities, ~content(.x,"parsed"))
+```
+
+2. Use the parsed data to create a data frame that has the given ability, and the number of pokemon with that ability. 
+
+```{r 2c-answer, include = FALSE, eval = FALSE}
+pokes[[3]]$name
+map_chr(pokes, "name")
+map_int(pokes, ~length(.x$pokemon))
+
+pokemon_abilities <- tibble(ability = map_chr(pokes, "name"),
+                            n_pokemon = map_dbl(pokes, ~length(.x$pokemon)))
+
+```
+
+#### Bonus: Up to 1 point extra credit
+
+2. Create a new data frame that lists the names of the pokemon with these specific abilities. 
+
+**Hint**: Try to get the name for one pokemon first, then extend out the logic to get all pokemon names. Also, this is really freaking hard so don't spend too much time on it and don't worry if you can't figure it out. 
+
+```{r 3c-answer, include = FALSE, eval = FALSE}
+ability <- map_chr(pokes, "name")
+# p <- map(pokes, "pokemon")
+# p[[1]][[1]]$pokemon$name
+
+pokemon <- map(pokes, ~map_chr(.x$pokemon, ~.x$pokemon$name))
+
+tibble(pokemon, ability) %>% 
+  unnest(pokemon)
+```
+

@@ -45,9 +45,13 @@
   td {
     color: #fff;
   }
-  .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  .table-hover tbody tr:hover td, 
+  .table-hover tbody tr:hover th  {
     background-color: #EEF9F9;
     color: #373B41;
+  }
+  .table-hover tbody tr:hover td a {
+    color: #373B41 !important;
   }
 
   /*set global link style*/
@@ -270,7 +274,6 @@
     background-color: #e2deed;
     color: #373B41 !important;
   }
-
   .shiny {
     padding-top: .6rem;
     padding-bottom: .6rem;
@@ -356,7 +359,8 @@
       border-radius: 0;
       border: none;
     }
-    code {
+    code,
+    a > code {
       padding: 2px 4px;
       border: 1px solid #ccc;
       font-size: 90%;
