@@ -102,7 +102,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "04-12" >}}
   {{< description "Iteration 2" "Our second lecture on interaton will introduce [**{purrr}**](https://purrr.tidyverse.org) and contrast these functions with the base R versions. The concept of functional programming will also be discussed more explicitly." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w3p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
