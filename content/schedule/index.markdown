@@ -77,7 +77,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< /week-odd >}}
 
 {{< week-even "04-07" >}}
-  {{< description "Lab 1" "Our first lab will ask you to extract elements from deeply nested lists while also using base R loops to conduct basic opeations." >}}
+  {{< description "Lab 1" "Our first lab will ask you to extract elements from deeply nested lists while also using base R loops to conduct basic operations." >}}
   {{< wrap >}}
 {{< slides "" >}}
 {{< /wrap >}}
@@ -100,7 +100,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
  {{< schedule >}}
 
 {{< week-odd "04-12" >}}
-  {{< description "Iteration 2" "Our second lecture on interaton will introduce [**{purrr}**](https://purrr.tidyverse.org) and contrast these functions with the base R versions. The concept of functional programming will also be discussed more explicitly." >}}
+  {{< description "Iteration 2" "Our second lecture on iteration will introduce [**{purrr}**](https://purrr.tidyverse.org) and contrast these functions with the base R versions. The concept of functional programming will also be discussed more explicitly." >}}
   {{< wrap >}}
 {{< slides "w3p1" >}}
 {{< /wrap >}}
@@ -161,7 +161,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< /week-odd >}}
 
 {{< week-even "04-21" >}}
-  {{< description "list columns" "The concept of list columns will be introduced and contrasted with the `base::split()`. By the end of this lecture you should be able to fluently nest and unnest data frames and understand why this is such a powerful framework. The last 20 minutes will be devoted to an "in-class" quiz." >}}
+  {{< description "list columns" "The concept of list columns will be introduced and contrasted with the `base::split()`. By the end of this lecture you should be able to fluently nest and unnest data frames and understand why this is such a powerful framework. The last 20 minutes will be devoted to an "in-class" quiz." (why don't I see the last three words display here? Tried with Chrome and Safari...do the quotes maybe hide the text?) >}}
   {{< wrap >}}
 {{< slides "" >}}
 {{< /wrap >}}
@@ -288,7 +288,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< /week-odd >}}
 
 {{< week-even "05-12" >}}
-  {{< description "Writing functions 3" "Our final lecture on functions, we will discuss what makes a function "good" and what makes them fragile. In this spirit, we will create many small functions that build toward a single function. Additionally, we the concept of **non-standard evaluation** will be introduced, which is used prevalently throughout the tidyverse and can make programming with the tidyverse a bit more difficult." >}}
+  {{< description "Writing functions 3" "Our final lecture on functions, we will discuss what makes a function "good" and what makes them fragile. In this spirit, we will create many small functions that build toward a single function. Additionally, we the concept of **non-standard evaluation** will be introduced, which is used prevalently throughout the tidyverse and can make programming with the tidyverse a bit more difficult." (yup, it's the quotation marks...one got killed right after the word function, when you put "good" in quotes. I am sure there is a way to fix that, but I don't know it.) >}} 
   {{< wrap >}}
 {{< slides "" >}}
 {{< /wrap >}}
@@ -439,7 +439,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
  {{< schedule >}}
 
 {{< week-odd "06-09" >}}
-  {{< description "Finals Week" "Your final project is due before midnight" >}}
+  {{< description "Finals Week" "Your final project is due before midnight." >}}
   {{< wrap >}}
 {{< slides "" >}}
 {{< /wrap >}}
