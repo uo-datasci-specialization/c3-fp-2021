@@ -390,7 +390,7 @@ class:inverse-red middle
 
 * `map_dbl`
 * `map_int`
-* `map_char`
+* `map_chr`
 * `map_lgl`
 
 ---
