@@ -16,7 +16,7 @@ tags:
 
 
 # Setup
-This work should all be housed in a GitHub repo. Establish the repo and add collaborators if you have any. 
+This work should all be housed in a GitHub repo. Establish the repo and add your collaborators. 
 
 Loading the data takes a minute, so I would suggest you do it once and cache it. This just means including `knitr::opts_chunk$set(cache = TRUE)` in one of your chunk options.
 
@@ -41,8 +41,8 @@ one argument, `year`, which must be a two digit integer from 15 to 18 (represent
 
 ```r
 download_file <- function(year) {
-	link <- glue::glue("https://www.oregon.gov/ode/educator-resources/assessment/TestResults20{year}/pagr_schools_ela_raceethnicity_{year-1}{year}.xlsx")
-	rio::import(link, setclass = "tibble", na = c("-", "--", "*"))
+  link <- glue::glue("https://www.oregon.gov/ode/educator-resources/assessment/TestResults20{year}/pagr_schools_ela_raceethnicity_{year-1}{year}.xlsx")
+  rio::import(link, setclass = "tibble", na = c("-", "--", "*"))
 }
 ```
 
@@ -151,7 +151,7 @@ Reproduce the following plot to confirm that the estimates are equivalent across
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="1440" />
 
 
-3. (15 points) The plot below shows the achievement difference estimates for one school district across years. Produce a similar plot to the below for each of the first 100 school districts. Reproduce these same plots using an alternative method. Make sure you don't miss the caption noting the number of schools in the district. 
+3. (15 points) The plot below shows the achievement difference estimates for one school district across years. Produce a similar plot to the below for each of the first 100 school districts. Once you've created all the plots, **reproduce them again using an alternative method**. Make sure you don't miss the caption noting the number of schools in the district. 
 
 Hint: You need to select unique *districts*. You may want to try something like the following
 
