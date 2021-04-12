@@ -144,7 +144,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "04-19" >}}
   {{< description "Batch load data" "We'll discuss the take-home portion of the midterm and review Lab 1. We will then introduce `purrr::map_df()` and discuss how it can be used for batch loading data in combination with some functions from the [**{fs}**](https://fs.r-lib.org) package. This will include parsing data (as columns) from the file names. If we have time, we'll also introduce list columns." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w4p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< assigned "take-home-midterm" "Midterm" >}}
