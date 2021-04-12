@@ -114,7 +114,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "NA" "NA" "NA" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/pPQrLBPjHPc" >}}
 {{< /wrap >}}
 {{< /week-odd >}}
 
