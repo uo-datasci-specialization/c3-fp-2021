@@ -350,7 +350,7 @@ lapply(l, 2)
 ```
 
 --
-Instead, you have to apply an anoymous function
+Instead, you have to apply an anonymous function
 
 ```{r lapply-extract-success1}
 lapply(l, function(x) x[[2]])
@@ -390,7 +390,7 @@ class:inverse-red middle
 
 * `map_dbl`
 * `map_int`
-* `map_char`
+* `map_chr`
 * `map_lgl`
 
 ---
