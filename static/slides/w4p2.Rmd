@@ -1,0 +1,746 @@
+---
+title: "List columns"
+author: "Daniel Anderson "
+date: "Week 4, Class 2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: "load-feather.html"
+---
+
+```{r include = FALSE, results = "asis"}
+source(here::here("static", "slides", "slide-setup.R"))
+xaringanExtra::use_clipboard()
+knitr::opts_chunk$set(fig.width = 13, 
+                      message = FALSE, 
+                      warning = FALSE)
+
+library(tidyverse)
+theme_set(theme_minimal(20))
+update_geom_defaults("point", list(size = 3))
+```
+
+`r setup("w4p2")`
+
+---
+# Agenda
+* Review Lab 2
+
+* Introduce list columns
+
+* Contrast: 
+  + `group_by() %>% nest() %>% mutate() %>% map()` with 
+  + `nest_by() %>% summarize()`
+
+* In-class midterm (last 20 minutes)
+
+---
+# Learning objectives
+* Understand list columns and how they relate to `base::split`
+
+* Fluently nest/unnest data frames
+
+* Understand why `tidyr::nest` can be a powerful framework (data frames) and
+when `tidyr::unnest` can/should be used to move out of nested data frames and
+into a standard data frame.
+
+---
+class: inverse-red center middle
+# Review Lab 2
+
+---
+# Setup
+## Please follow along
+
+First import the data
+
+```{r import-data}
+library(tidyverse)
+library(fs)
+files <- dir_ls(here::here("data", "pfiles_sim"), 
+                glob = "*.csv")
+d <- files %>%
+	map_df(read_csv, .id = "file")
+```
+
+---
+# Parse file data
+```{r }
+d <- d %>%
+  mutate(
+    file = str_replace_all(
+	  file, 
+	  here::here("data", "pfiles_sim"), 
+	  ""
+    ),
+    grade = str_replace_all(file, "/g(\\d?\\d).+", "\\1"),
+    grade = as.integer(grade),
+    year = str_replace_all(
+      file, 
+      ".+files(\\d\\d)_sim.+", 
+      "\\1"
+    ),
+    year = as.integer(year),
+    content = str_replace_all(
+      file, 
+      "/g\\d?\\d(.+)pfiles.+", 
+      "\\1"
+    )
+)
+```
+
+---
+# Select variables
+
+```{r }
+d <- d %>% 
+	select(ssid, grade, year, content, testeventid, 
+	       asmtprmrydsbltycd, asmtscndrydsbltycd, Entry:WMLE)
+```
+
+---
+# Comparing models
+Let's say we wanted to fit/compare a set of models for each content area
+
+1. `lm(Theta ~ asmtprmrydsbltycd)`
+
+1. `lm(Theta ~ asmtprmrydsbltycd + asmtscndrydsbltycd)`
+
+1. `lm(Theta ~ asmtprmrydsbltycd * asmtscndrydsbltycd)`
+
+---
+# Data pre-processing
+* The disability variables are stored as numbers, we need them as factors
+* We'll make the names easier in the process
+
+```{r disab-recode}
+d <- d %>%
+	mutate(primary = as.factor(asmtprmrydsbltycd),
+	       secondary = as.factor(asmtscndrydsbltycd))
+```
+
+If you're interested in what the specific codes refer to, see [here](https://www.newberg.k12.or.us/district/eligibility-codes-and-requirements).
+
+---
+# Split the data
+
+The base method we've been using...
+
+```{r split}
+splt_content <- split(d, d$content)
+str(splt_content)
+```
+
+---
+# We could use this method
+
+```{r fit-models-split}
+m1 <- map(
+  splt_content, 
+  ~lm(Theta ~ asmtprmrydsbltycd, data = .x)
+)
+
+m2 <- map(
+  splt_content, 
+  ~lm(Theta ~ asmtprmrydsbltycd + asmtscndrydsbltycd, 
+      data = .x)
+)
+
+m3 <- map(
+  splt_content, 
+  ~lm(Theta ~ asmtprmrydsbltycd * asmtscndrydsbltycd, 
+      data = .x)
+)
+```
+
+* Then conduct tests to see which model fit better, etc.
+
+
+---
+# Alternative
+* Create a data frame with a list column
+
+```{r list-column}
+by_content <- d %>%
+  group_by(content) %>% 
+  nest()
+by_content
+```
+
+---
+# What's going on here?
+
+```{r list-column-listed}
+str(by_content$data)
+```
+
+---
+# Explore a bit
+
+```{r map-data1}
+map_dbl(by_content$data, nrow)
+map_dbl(by_content$data, ncol)
+map_dbl(by_content$data, ~mean(.x$Theta))
+```
+
+---
+# It's a data frame!
+
+We can add these summaries if we want
+
+```{r n-by-content}
+by_content %>%
+	mutate(n = map_dbl(data, nrow))
+```
+
+---
+# `map_*`
+* Note on the previous example we used `map_dbl` and we got a vector in return. 
+
+* What would happen if we just used `map`?
+
+--
+
+```{r n-by-content-list}
+by_content %>%
+	mutate(n = map(data, nrow))
+```
+
+---
+# Let's fit a model!
+
+```{r list-column-model}
+by_content %>%
+	mutate(m1 = map(data, ~lm(Theta ~ primary, data = .x)))
+```
+
+---
+# Extract the coefficients
+
+```{r }
+by_content %>%
+  mutate(
+    m1 = map(data, ~lm(Theta ~ primary, data = .x)),
+    coefs = map(m1, coef)
+)
+```
+
+---
+# Challenge
+
+* Continue with the above, but output a data frame with three columns:
+`content`, `intercept`, and `TBI` (which is code 74). 
+
+* In other words, output the
+mean score for students who were coded as not having a disability (code 0),
+along with students coded as having TBI.
+
+`r countdown::countdown(4)`
+
+---
+
+```{r coefs}
+by_content %>%
+  mutate(
+    m1 = map(data, ~lm(Theta ~ primary, data = .x)),
+    coefs = map(m1, coef),
+    no_disab = map_dbl(coefs, 1),
+    tbi = no_disab + map_dbl(coefs, "primary74")
+  ) %>%
+  select(content, no_disab, tbi)
+```
+
+--
+Note - I wouldn't have neccesarily expected you to add `no_disab` to the TBI coefficient.
+
+---
+# Compare models
+* Back to our original task - fit all three models
+
+### You try first
+
+1. `lm(Theta ~ primary)`
+
+1. `lm(Theta ~ primary + secondary)`
+
+1. `lm(Theta ~ primary + secondary + primary:secondary)`
+
+`r countdown::countdown(4)`
+
+---
+# Model fits
+
+```{r three-mods}
+mods <- by_content %>%
+  mutate(
+    m1 = map(data, ~lm(Theta ~ primary, data = .x)),
+    m2 = map(data, ~lm(Theta ~ primary + secondary, data = .x)),
+    m3 = map(data, ~lm(Theta ~ primary * secondary, data = .x))
+)
+mods
+```
+
+---
+# Brief foray into parallel iterations
+The `stats::anova` function can compare the fit of two models
+
+--
+### Pop Quiz
+
+How would we extract just ELA model 1 and 2?
+
+--
+
+.pull-left[
+```{r ela-mods1}
+mods$m1[[1]]
+```
+]
+
+.pull-right[
+```{r ela-mods2}
+mods$m2[[1]]
+```
+]
+
+---
+# Which fits better?
+
+```{r anova}
+compare <- anova(mods$m1[[1]], mods$m2[[1]])
+compare
+```
+
+---
+# `map2`
+
+* Works the same as `map` but iterates over two vectors concurrently
+
+* Let's compare model 1 and 2
+
+--
+```{r mod_compare1}
+mods %>%
+  mutate(comp12 = map2(m1, m2, anova))
+```
+
+--
+Perhaps not terrifically helpful
+
+
+---
+# Back to our `anova` object
+* Can we pull out  useful things?
+
+```{r str-comp}
+str(compare)
+```
+
+--
+Try pulling out the $p$ value
+
+---
+# Extract $p$ value
+* *Note - I'd recommend looking at more than just a p-value, but I do think this
+is useful for a quick glance*
+
+```{r extract-p1}
+compare$`Pr(>F)`
+compare[["Pr(>F)"]]
+```
+
+--
+
+```{r extract-p2}
+compare$`Pr(>F)`[2]
+compare[["Pr(>F)"]][2]
+```
+
+---
+# All p-values
+
+*Note - this is probably the most compact syntax, but that doesn't mean it's the
+most clear*
+
+```{r pull-pvals12}
+mods %>%
+  mutate(comp12 = map2(m1, m2, anova),
+         p12 = map_dbl(comp12, list("Pr(>F)", 2)))
+```
+
+---
+# Slight alternative
+* Write a function that pulls the p-value from model comparison objects
+
+```{r fun-compare}
+extract_p <- function(anova_ob) {
+  anova_ob[["Pr(>F)"]][2]
+}
+```
+
+
+--
+* Loop this function through the anova objects
+
+---
+```{r pull-pvals12-fun}
+mods %>%
+  mutate(comp12 = map2(m1, m2, anova),
+         p12 = map_dbl(comp12, extract_p))
+```
+
+---
+class: inverse-red middle
+# An alternative
+## Conducting operations by row
+
+---
+# Operations by row
+The `dplyr::rowwise()` function fundamentally changes the way a `tibble()` behaves
+
+```{r }
+df <- tibble(name = c("Me", "You"), x = 1:2, y = 3:4, z = 5:6)
+```
+
+.pull-left[
+```{r }
+df %>% 
+  mutate(m = mean(c(x, y, z)))
+```
+]
+
+.pull-right[
+```{r }
+df %>% 
+  rowwise() %>% 
+  mutate(m = mean(c(x, y, z)))
+```
+]
+
+---
+# Add a group & summarize
+
+```{r }
+df %>% 
+  rowwise(name) %>% 
+  summarize(m = mean(c(x, y, z)))
+```
+
+---
+# List columns
+If you apply rowwise operation with a list column, you don't have to loop
+
+```{r }
+df <- tibble(x = list(1, 2:3, 4:6))
+```
+
+.pull-left[
+```{r }
+df %>% 
+  mutate(
+    l = map_int(x, length)
+  )
+```
+]
+
+.pull-right[
+```{r }
+df %>% 
+  rowwise() %>% 
+  mutate(l = length(x))
+```
+]
+
+---
+# Creating list columns
+You can use the `dplyr::nest_by()` function to create a list column for each group, *and* convert it to a rowwise data frame.
+
+--
+```{r }
+d %>% 
+  nest_by(content)
+```
+
+---
+# Challenge
+Given what we just learned, can you fit a model of the form `Theta ~ primary` to each content area (i.e., *not* using **{purrr}**)?
+
+`r countdown::countdown(2)`
+
+--
+Wrap it in `list()` (should suggest this in the error reporting if you don't)
+
+```{r }
+d %>% 
+  nest_by(content) %>% 
+  mutate(m1 = list(lm(Theta ~ primary, data = data)))
+```
+
+---
+# Challenge 2
+Can you extend it further and extract the coefficients with `coef`? What about creating a new column that has the intercept values?
+
+`r countdown::countdown(2)`
+
+--
+```{r }
+d %>% 
+  nest_by(content) %>% 
+  mutate(m1 = list(lm(Theta ~ primary, data = data)),
+         coefs = list(coef(m1)))
+```
+
+---
+# Return atomic vectors
+
+```{r }
+d %>% 
+  nest_by(content) %>% 
+  mutate(m1 = list(lm(Theta ~ primary, data = data)),
+         intercept = coef(m1)[1])
+```
+
+---
+# Fit all models
+
+The below gets us the same results we got before
+
+```{r }
+mods2 <- d %>%
+  nest_by(content) %>% 
+  mutate(
+    m1 = list(lm(Theta ~ primary, data = data)),
+    m2 = list(lm(Theta ~ primary + secondary, data = data)),
+    m3 = list(lm(Theta ~ primary * secondary, data = data))
+)
+mods2
+```
+
+---
+# Look at all $R^2$
+### It's a normal data frame!
+
+```{r gather-models}
+mods %>%
+  pivot_longer(
+    m1:m3,
+    names_to = "model",
+    values_to = "output"
+)
+```
+
+---
+# Extract all $R^2$
+
+*Note - might want to write a function here again*
+
+```{r extract-r2}
+r2 <- mods %>%
+  pivot_longer(
+    m1:m3,
+    names_to = "model",
+    values_to = "output"
+  ) %>% 
+  mutate(r2 = map_dbl(output, ~summary(.x)$r.squared))
+r2
+```
+
+---
+# Plot
+
+```{r model-plot, fig.height = 6.5}
+ggplot(r2, aes(model, r2)) +
+	geom_col(aes(fill = model)) +
+	facet_wrap(~content) +
+	guides(fill = "none") +
+	scale_fill_brewer(palette = "Set2")
+```
+
+---
+# Unnesting
+
+* Sometimes you just want to `unnest`
+
+--
+
+* Imagine we want to plot the coefficients by model... how?
+
+--
+* `broom::tidy()` => `tidyr::unnest()`
+
+
+
+---
+# Tidy
+
+```{r}
+mods %>%
+	pivot_longer(
+	  m1:m3,
+	  names_to = "model", 
+	  values_to = "output"
+  ) %>%
+	mutate(tidied = map(output, broom::tidy))
+```
+
+---
+# Equivalently
+
+```{r}
+mods %>%
+	pivot_longer(
+	  m1:m3,
+	  names_to = "model", 
+	  values_to = "output"
+  ) %>%
+  rowwise() %>% 
+  mutate(tidied = list(broom::tidy(output)))
+```
+
+---
+# Select and unnest
+
+```{r tidied}
+tidied <- mods %>%
+	gather(model, output, m1:m3) %>%
+	mutate(tidied = map(output, broom::tidy)) %>%
+	select(content, model, tidied) %>%
+	unnest(tidied)
+tidied
+```
+
+---
+# Plot
+### Lets look how the primary coefficients change
+
+```{r coef-plot-echo, eval = FALSE}
+to_plot <- names(coef(mods$m1[[1]]))
+
+tidied %>%
+  filter(term %in% to_plot) %>%
+  ggplot(aes(estimate, term, color = model)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set2") +
+  facet_wrap(~content)
+```
+
+---
+```{r coef-plot-eval, echo = FALSE, fig.height = 11}
+to_plot <- names(coef(mods$m1[[1]]))
+
+tidied %>%
+	filter(term %in% to_plot) %>%
+  ggplot(aes(estimate, term, color = model)) +
+	geom_point() +
+	scale_color_brewer(palette = "Set2") +
+	facet_wrap(~content)
+```
+
+---
+# Last bit
+* We've kind of been running the wrong models this whole time
+
+* We forgot about grade!
+
+* No problem, just change the grouping factor
+
+---
+# By grade
+
+```{r by_grade}
+by_grade_content <- d %>%
+  group_by(content, grade) %>% 
+	nest()
+by_grade_content
+```
+
+---
+# Fit models
+
+```{r by_grade_mods}
+mods_grade <- by_grade_content %>%
+  mutate(
+    m1 = map(data, ~lm(Theta ~ primary, data = .x)),
+    m2 = map(data, ~lm(Theta ~ primary + secondary, 
+                       data = .x)),
+    m3 = map(data, ~lm(Theta ~ primary * secondary, 
+                       data = .x))
+)
+mods_grade
+```
+
+---
+# Look at $R^2$
+
+```{r by_grade_r2}
+mods_grade %>%
+	pivot_longer(
+    m1:m3, 
+    names_to = "model", 
+    values_to = "output"
+  ) %>% 
+	mutate(r2 = map_dbl(output, ~summary(.x)$r.squared))
+```
+
+---
+# Plot
+
+```{r by_grade_r2_plot-echo, eval = FALSE}
+mods_grade %>%
+  pivot_longer(
+    m1:m3, 
+    names_to = "model", 
+    values_to = "output"
+  ) %>% 
+  mutate(r2 = map_dbl(output, ~summary(.x)$r.squared)) %>%
+  ggplot(aes(model, r2)) +
+  geom_col(aes(fill = model)) +
+  facet_grid(grade ~ content) +
+  guides(fill = "none") +
+  scale_fill_brewer(palette = "Set2")
+```
+
+---
+```{r by_grade_r2_plot-eval, echo = FALSE, fig.height = 11.5}
+mods_grade %>%
+  pivot_longer(m1:m3, names_to = "model", values_to = "output") %>% 
+  mutate(r2 = map_dbl(output, ~summary(.x)$r.squared)) %>%
+  ggplot(aes(model, r2)) +
+  geom_col(aes(fill = model)) +
+  facet_grid(grade ~ content) +
+  guides(fill = "none") +
+  scale_fill_brewer(palette = "Set2")
+```
+
+---
+# Summary
+* List columns are really powerful and really flexible
+
+* Also help you stay organized
+
+* You can approach the problem either with **{purrr}** or `dplyr::rowwise()`. 
+
+  + **Important**: If you use `rowwise()`, remember to `ungroup()` when you want it to go back to being a normal data frame
+  
+  + I'm asking you to learn both - the row-wise approach might be a bit easier but is a little less general (only works with data frames)
+
+
+---
+class: inverse-blue middle
+
+# Questions?
+
+---
+class: inverse-green middle
+# In-class Midterm
+### Next time: Parallel iterations
+
+
