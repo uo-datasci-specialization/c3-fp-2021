@@ -1,0 +1,509 @@
+---
+title: "Looping Variants"
+author: "Daniel Anderson "
+date: "Week 5, Class 2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: "load-feather.html"
+---
+
+```{r include = FALSE, results = "asis"}
+source(here::here("static", "slides", "slide-setup.R"))
+xaringanExtra::use_clipboard()
+knitr::opts_chunk$set(fig.width = 13, 
+                      message = FALSE, 
+                      warning = FALSE)
+
+library(tidyverse)
+theme_set(theme_minimal(20))
+update_geom_defaults("point", list(size = 3))
+```
+
+`r setup("w5p2")`
+
+---
+# Agenda
+* `walk()` and friends
+
+* `modify()`
+
+* `safely()`
+
+* `reduce()`
+
+---
+# Learning Objectives
+
+* Know when to apply `walk` instead of `map`, and why it may be useful
+
+* Understand the parallels and differences between `map` and `modify`
+
+* Diagnose errors with `safely` and understand other situations where it may
+be helpful
+
+* Collapsing/reducing lists with `purrr::reduce()` or `base::Reduce()`
+
+
+
+---
+# Setup
+Let's go back to our plotting example from last class.
+
+--
+
+First we'll load our libraries
+
+```{r }
+library(tidyverse)
+library(fivethirtyeight)
+library(glue)
+library(english)
+```
+
+---
+# Prep the data
+
+```{r }
+pulitzer <- pulitzer %>%
+  select(newspaper, starts_with("num")) %>%
+  pivot_longer(
+    -newspaper,
+    names_to = "year_range",
+    values_to = "n",
+    names_prefix = "num_finals"
+  ) %>% 
+  mutate(year_range = str_replace_all(year_range, "_", "-")) %>%
+  filter(year_range != "1990-2014") %>% 
+	group_by(newspaper) %>%
+	mutate(
+	  tot = sum(n),
+	  label = glue(
+	    "{str_to_title(as.english(tot))} Total Pulitzer Awards"
+    )
+)
+```
+
+
+---
+# Produce plots
+```{r }
+final_plots <- pulitzer %>%
+	group_by(newspaper, label) %>%
+	nest() %>%
+	mutate(plots = pmap(list(newspaper, label, data), ~{
+    ggplot(..3, aes(n, year_range)) + 
+      geom_col(aes(fill = n)) +
+      scale_fill_distiller(type = "seq", 
+                           limits = c(0, max(pulitzer$n)),
+                           palette = "BuPu",
+                           direction = 1) +
+	    scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+	                       expand = c(0, 0)) +
+	    guides(fill = "none") +
+	    labs(title = glue("Pulitzer Prize winners: {..1}"),
+	         x = "Total number of winners",
+	         y = "",
+	         caption = ..2)
+	  })
+)
+```
+
+---
+# Saving
+* We saw last time that we could use `nest_by()`
+  + Required a bit of awkwardness with adding the paths to the data frame
+  
+--
+* Instead, we'll do it again but with the `walk()` family
+
+
+--
+Why `walk()` for saving instead of `map()`?
+
+> Walk is an alternative to map that you use when you want to call a function for its side effects, rather than for its return value. You typically do this because you want to render output to the screen or save files to disk - the important thing is the action, not the return value.
+
+\-[r4ds](https://r4ds.had.co.nz/iteration.html#walk)
+
+---
+class: inverse-red
+# More practical
+If you use `walk()`, nothing will get printed to the screent. This is particularly helpful for RMarkdown files.
+
+---
+# Example
+Please do the following
+* Create a new RMarkdown document
+* Paste the code you have for creating the plots in a code chunk there (along with the library loading, data cleaning, etc.)
+
+`r countdown::countdown(1)`
+
+---
+# Create a directory
+```{r create_dir}
+fs::dir_create(here::here("plots", "pulitzers"))
+```
+
+--
+### Create file paths
+```{r create_file-paths}
+newspapers <- str_replace_all(tolower(final_plots$newspaper), " ", "-")
+paths <- here::here("plots", "pulitzers", glue("{newspapers}.png"))
+```
+
+---
+# Challenge
+* Use a `map()` family function to loop through `paths` and `final_plots$plots` to save all plots. 
+
+* Render (knit) your file. What do you notice?
+
+`r countdown::countdown(3)`
+
+---
+# `walk()`
+Just like `map()`, we have parallel variants of `walk()`, including, `walk2()`, and `pwalk()`
+
+These work just like `map()` but don't print to the screen
+
+Try replacing your prior code with a `walk()` version. 
+
+How does the rendered output change?
+
+`r countdown::countdown(2)`
+
+
+---
+# Save plots
+
+```{r walk2, eval = FALSE}
+walk2(paths, final_plots$plots, ggsave,
+      width = 9.5, 
+      height = 6.5,
+      dpi = 500)
+```
+
+---
+class: inverse-red middle
+# modify
+
+---
+class: middle
+
+> Unlike `map()` and its variants which always return a fixed object type (list for `map()`, integer vector for `map_int()`, etc), the `modify()` family always returns the same type as the input object.
+
+---
+# `map` vs `modify`
+### map
+
+```{r map-mtcars}
+map(mtcars, ~as.numeric(scale(.x)))
+```
+
+---
+### modify
+
+```{r modify-mtcars}
+modify(mtcars, ~as.numeric(scale(.x)))
+```
+
+
+---
+
+```{r map-paste}
+modify2(LETTERS[1:3], letters[1:3], paste0)
+map2(LETTERS[1:3], letters[1:3], paste0)
+```
+
+---
+class: inverse-red middle
+# safely
+
+---
+## Iterating when errors are possible
+
+Sometimes a loop will work for most cases, but return an error on a few
+
+
+--
+Often, you want to return the output you can
+
+
+--
+Alternatively, you might want to diagnose *where* the error is occurring
+
+
+--
+`purrr::safely`
+
+
+---
+# Example
+```{r by_cyl}
+by_cyl <- mpg %>% 
+  group_by(cyl) %>% 
+  nest() 
+by_cyl
+```
+
+
+--
+
+```{r lm-fail, error = TRUE}
+by_cyl %>% 
+  mutate(mod = map(data, ~lm(hwy ~ displ + drv, data = .x)))
+```
+
+---
+# Safe return
+
+* First, define safe function - note that this will work for .ital[.b[any]] function
+```{r safe-lm}
+safe_lm <- safely(lm)
+```
+
+
+--
+
+* Next, loop the safe function, instead of the standard function
+
+
+--
+
+```{r loop-safe-lm}
+safe_models <- by_cyl %>% 
+  mutate(safe_mod = map(data, ~safe_lm(hwy ~ displ + drv, data = .x)))
+safe_models
+```
+
+---
+# What's returned?
+
+```{r safe-return}
+safe_models$safe_mod[[1]]
+safe_models$safe_mod[[4]]
+```
+
+
+---
+# Inspecting
+I often use `safely()` to help me de-bug. Why is it failing *there*.
+
+
+--
+First - create a new variable to filter for results with errors
+
+--
+```{r }
+safe_models %>% 
+  mutate(error = map_lgl(safe_mod, ~!is.null(.x$error)))
+```
+
+---
+# Inspecting the data
+```{r }
+safe_models %>% 
+  mutate(error = map_lgl(safe_mod, ~!is.null(.x$error))) %>% 
+  filter(error) %>% 
+  select(cyl, data) %>% 
+  unnest(data)
+```
+
+The `displ` and `drv` variables ar constant, so no relation can be estimated.
+
+
+---
+# Pull results that worked
+
+```{r results}
+safe_models %>% 
+  mutate(results = map(safe_mod, "result"))
+```
+
+--
+Now we can `broom::tidy()` or whatevs
+
+---
+
+Notice that there is no `cyl == 5`.
+
+```{r }
+safe_models %>% 
+  mutate(results = map(safe_mod, "result"),
+         tidied = map(results, broom::tidy)) %>% 
+  select(cyl, tidied) %>% 
+  unnest(tidied)
+```
+
+---
+# When else might we use this?
+
+--
+
+Any sort of web scraping - pages change and URLs don't always work
+
+---
+# Example
+
+```{r error = TRUE}
+library(rvest)
+links <- list(
+  "https://en.wikipedia.org/wiki/FC_Barcelona",
+  "https://nosuchpage",
+  "https://en.wikipedia.org/wiki/Rome"
+)
+pages <- map(links, ~{
+  Sys.sleep(0.1)
+  read_html(.x)
+})
+```
+
+---
+# The problem
+I can't connect to https://nosuchpage because it doesn't exist
+
+
+--
+.center[.blue[.realbig[BUT]]]
+
+
+--
+That also means I can't get *any* of my links because *one* page errored (imagine it was 1 in 1,000 instead of 1 in 3)
+
+
+--
+## `safely()` to the rescue
+
+---
+# Safe version
+
+```{r }
+safe_read_html <- safely(read_html)
+pages <- map(links, ~{
+  Sys.sleep(0.1)
+  safe_read_html(.x)
+})
+str(pages)
+```
+
+---
+# Non-results
+In a real example, we'd probably want to double-check the pages where we got no results
+
+--
+```{r }
+errors <- map_lgl(pages, ~!is.null(.x$error))
+links[errors]
+```
+
+
+---
+class: inverse-red
+# reduce
+
+---
+# Reducing a list
+The `map()` family of functions will always return a vector the same length as the input
+
+--
+`reduce()` will collapse or reduce the list to a single element
+
+---
+# Example
+
+```{r }
+l <- list(
+  c(1, 3),
+  c(1, 5, 7, 9),
+  3,
+  c(4, 8, 12, 2)
+)
+
+reduce(l, sum)
+```
+
+---
+# What's going on?
+The code `reduce(l, sum)` is the same as
+
+```{r }
+sum(l[[4]], sum(l[[3]], sum(l[[1]], l[[2]])))
+```
+
+Or slidghlty differently
+```{r }
+first_sum <- sum(l[[1]], l[[2]])
+second_sum <- sum(first_sum, l[[3]])
+final_sum <- sum(second_sum, l[[4]])
+final_sum
+```
+
+---
+# Why might you use this?
+What if you had a list of data frames like this
+
+```{r }
+l_df <- list(
+  tibble(id = 1:3, score = rnorm(3)),
+  tibble(id = 1:5, treatment = rbinom(5, 1, .5)),
+  tibble(id = c(1, 3, 5, 7), other_thing = rnorm(4))
+)
+```
+
+We can join these all together with a single loop - we want the output to be of length 1!
+
+---
+```{r }
+reduce(l_df, full_join)
+```
+
+--
+Note - you have to be careful on directionality
+
+.pull-left[
+```{r }
+reduce(l_df, left_join)
+```
+]
+
+.pull-left[
+```{r }
+reduce(l_df, right_join)
+```
+]
+
+---
+# More common
+You probably just want to `bind_rows()`
+
+```{r }
+l_df2 <- list(
+  tibble(id = 1:3, scid = 1, score = rnorm(3)),
+  tibble(id = 1:5, scid = 2, score = rnorm(5)),
+  tibble(id = c(1, 3, 5, 7), scid = 3, score = rnorm(4))
+)
+reduce(l_df2, bind_rows)
+```
+
+---
+# Wrap up
+* Lots more to `{purrr}` but we've covered a lot
+  
+* Functional programming can *really* help your efficiency, and even if it slows you down initially, I'd recommend always striving toward it, because it will ultimately be a huge help.
+
+
+.center[
+
+### Questions?
+
+]
+
+--
+If we have any time left - let's work on the homework

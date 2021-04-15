@@ -1,0 +1,687 @@
+---
+title: "Parallel Iterations"
+author: "Daniel Anderson "
+date: "Week 5, Class 1"
+output:
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: "load-feather.html"
+---
+
+```{r include = FALSE, results = "asis"}
+source(here::here("static", "slides", "slide-setup.R"))
+xaringanExtra::use_clipboard()
+knitr::opts_chunk$set(fig.width = 13, 
+                      message = FALSE, 
+                      warning = FALSE)
+
+library(tidyverse)
+theme_set(theme_minimal(20))
+update_geom_defaults("point", list(size = 3))
+```
+
+`r setup("w5p1")`
+
+---
+
+# Agenda
+* Finish up slides from last week
+
+* Discuss `map2_*` and `pmap_*`
+
+
+---
+# Learning objectives
+* Understand the differences between `map`, `map2`, and `pmap`
+
+
+---
+background-image:url(https://d33wubrfki0l68.cloudfront.net/7a545699ff7069a98329fcfbe6e42b734507eb16/211a5/diagrams/functionals/map2-arg.png)
+background-size:contain
+# `map2`
+
+---
+class: inverse-blue middle
+
+# A few Examples
+Basic simulations - iterating over two vectors
+
+Plots by month, changing the title
+
+---
+# Simulation
+* Simulate data from a normal distribution
+
+	+ Vary $n$ from 5 to 150 by increments of 5
+	
+--
+	
+	+ For each $n$, vary $mu$ from -2 to 2 by increments of 0.25
+
+
+--
+### How do we get all combinations
+
+--
+`expand.grid`
+
+---
+# Example `expand.grid`
+### Bonus: It turns it into a data frame!
+```{r expand.grid}
+ints <- 1:3
+lets <- c("a", "b", "c")
+expand.grid(ints, lets)
+```
+
+---
+# Set conditions
+
+Please follow along
+
+```{r sim-conditions}
+conditions <- expand.grid(n = seq(5, 150, 5),
+                          mu = seq(-2, 2, 0.25))
+head(conditions)
+tail(conditions)
+```
+
+---
+# Simulate!
+
+```{r sim1}
+sim1 <- map2(conditions$n, conditions$mu, ~{
+  rnorm(n = .x, mean = .y, sd = 10)
+})
+str(sim1)
+```
+
+---
+# More powerful
+### Add it as a list column!
+
+```{r list-column-sim1}
+sim2 <- conditions %>%
+  as_tibble() %>% # Not required, but definitely helpful
+  mutate(sim = map2(n, mu, ~rnorm(n = .x, mean = .y, sd = 10))) 
+sim2
+```
+
+---
+# Unnest
+
+```{r list-column-sim2}
+conditions %>%
+  as_tibble() %>% 
+  mutate(sim = map2(n, mu, ~rnorm(.x, .y, sd = 10))) %>%
+  unnest(sim)
+```
+
+---
+# Challenge
+
+Can you replicate what we just did, but using a `rowwise()` approach?
+
+`r countdown::countdown(3)`
+
+--
+```{r }
+conditions %>% 
+  rowwise() %>% 
+  mutate(sim = list(rnorm(n, mu, sd = 10))) %>% 
+  unnest(sim)
+```
+
+
+
+---
+class: inverse-orange middle
+# Vary the sd too?
+
+--
+### `pmap`
+Which we'll get to soon
+
+---
+class: inverse-blue middle
+# Varying the title of a plot
+
+---
+# The data
+Please follow along
+```{r pulitzer-data}
+library(fivethirtyeight)
+pulitzer
+```
+
+---
+# Prep data
+
+```{r pulitzer-prep}
+pulitzer<- pulitzer %>%
+  select(newspaper, starts_with("num")) %>%
+  pivot_longer(
+    -newspaper,
+    names_to = "year_range",
+    values_to = "n",
+    names_prefix = "num_finals"
+  ) %>% 
+  mutate(year_range = str_replace_all(year_range, "_", "-")) %>%
+  filter(year_range != "1990-2014")
+
+head(pulitzer)
+```
+
+---
+# One plot
+
+```{r one-plot-pulitzer, fig.height = 3.25}
+pulitzer%>%
+	filter(newspaper == "Wall Street Journal") %>%
+  ggplot(aes(n, year_range)) +
+  geom_col(aes(fill = n)) +
+  scale_fill_distiller(type = "seq", 
+                       limits = c(0, max(pulitzer$n)),
+                       palette = "BuPu",
+                       direction = 1) +
+  scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+                     expand = c(0, 0)) +
+  guides(fill = "none") +
+  labs(title = "Pulitzer Prize winners: Wall Street Journal",
+       x = "Total number of winners",
+       y = "") 
+```
+
+
+---
+# Nest data
+
+```{r pulitzer-nested}
+pulitzer%>%
+	group_by(newspaper) %>%
+	nest()
+```
+
+
+---
+# Produce all plots
+### You try first!
+Don't worry about the correct title yet, if you don't want
+
+`r countdown::countdown(3)`
+
+--
+
+```{r pulitzer-plots1, eval = FALSE}
+pulitzer%>%
+	group_by(newspaper) %>%
+	nest() %>%
+	mutate(plot = map(data, ~{
+	  ggplot(aes(n, year_range)) +
+      geom_col(aes(fill = n)) +
+      scale_fill_distiller(type = "seq", 
+                           limits = c(0, max(pulitzer$n)),
+                           palette = "BuPu",
+                           direction = 1) +
+      scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+                         expand = c(0, 0)) +
+      guides(fill = "none") +
+      labs(title = "Pulitzer Prize winners",
+           x = "Total number of winners",
+           y = "")
+    })
+)
+```
+
+---
+# Add title
+
+```{r pulitzer-plots2}
+library(glue)
+
+p <- pulitzer%>%
+	group_by(newspaper) %>%
+	nest() %>%
+	mutate(plot = map2(data, newspaper, ~{ #<<
+	  ggplot(.x, aes(n, year_range)) +
+      geom_col(aes(fill = n)) +
+      scale_fill_distiller(type = "seq", 
+                           limits = c(0, max(pulitzer$n)),
+                           palette = "BuPu",
+                           direction = 1) +
+      scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+                         expand = c(0, 0)) +
+      guides(fill = "none") +
+      labs(title = glue("Pulitzer Prize winners: {.y}"), #<<
+           x = "Total number of winners",
+           y = "")
+    })
+)
+```
+
+---
+```{r show-df}
+p
+```
+
+---
+# Look at a couple plots
+
+.pull-left[
+```{r p1, fig.height = 5.5}
+p$plot[[1]]
+p$plot[[3]]
+```
+]
+
+.pull-right[
+```{r p2, fig.height = 5.5}
+p$plot[[2]]
+p$plot[[4]]
+```
+]
+
+---
+# Challenge
+(You can probably guess where this is going)
+
+--
+
+## Can you reproduce the prior plots using a `rowwise()` approach?
+
+---
+```{r }
+pulitzer%>%
+	nest_by(newspaper) %>% #<<
+	mutate(
+	  plot = list(
+	    ggplot(data, aes(n, year_range)) + #<<
+        geom_col(aes(fill = n)) +
+        scale_fill_distiller(type = "seq", 
+                             limits = c(0, max(pulitzer$n)),
+                             palette = "BuPu",
+                             direction = 1) +
+        scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+                           expand = c(0, 0)) +
+        guides(fill = "none") +
+        labs(title = glue("Pulitzer Prize winners: {newspaper}"), #<<
+           x = "Total number of winners",
+           y = "")
+    )
+)
+```
+
+---
+class: inverse-red middle
+# Iterating over $n$ vectors
+### `pmap`
+
+
+---
+background-image:url(https://d33wubrfki0l68.cloudfront.net/e426c5755e2e65bdcc073d387775db79791f32fd/92902/diagrams/functionals/pmap.png)
+background-size:contain
+# `pmap`
+
+
+---
+# Simulation
+* Simulate data from a normal distribution
+
+	+ Vary $n$ from 5 to 150 by increments of 5
+
+--
+	+ For each $n$, vary $mu$ from -2 to 2 by increments of 0.25
+
+--
+	+ For each $\sigma$ from 1 to 3 by increments of 0.1
+
+
+---
+```{r full-conditions}
+full_conditions <- expand.grid(n = seq(5, 150, 5),
+                               mu = seq(-2, 2, 0.25),
+                               sd = seq(1, 3, .1))
+head(full_conditions)
+tail(full_conditions)
+```
+
+---
+# Full Simulation
+
+```{r full-sim1}
+fsim <- pmap(
+  list(number = full_conditions$n,
+       average = full_conditions$mu,
+       stdev = full_conditions$sd), 
+  function(number, average, stdev) {
+    rnorm(n = number, mean = average, sd = stdev)
+  }
+)
+str(fsim)
+```
+
+---
+# Alternative spec
+
+```{r full-sim2}
+fsim <- pmap(list(full_conditions$n,
+                  full_conditions$mu,
+                  full_conditions$sd),
+            ~rnorm(n = ..1, mean = ..2, sd = ..3))
+str(fsim)
+```
+
+---
+# Simpler
+### Maybe a little too clever
+* A data frame is a list so...
+
+```{r full-sim3}
+fsim <- pmap(
+  full_conditions,
+  ~rnorm(n = ..1, mean = ..2, sd = ..3)
+)
+str(fsim)
+```
+
+
+
+---
+# List column version
+
+```{r fsim-df1}
+full_conditions %>%
+	as_tibble() %>%
+	mutate(sim = pmap(list(n, mu, sd), ~rnorm(..1, ..2, ..3)))
+```
+
+---
+# Unnest
+
+```{r fsim-df2}
+full_conditions %>%
+	as_tibble() %>%
+	mutate(sim = pmap(list(n, mu, sd), ~rnorm(..1, ..2, ..3))) %>%
+	unnest(sim)
+```
+
+---
+# Replicate with `nest_by()`
+### You try first
+
+`r countdown::countdown(2)`
+
+--
+```{r }
+full_conditions %>% 
+  rowwise() %>% 
+  mutate(sim = list(rnorm(n, mu, sd))) %>% 
+  unnest(sim)
+```
+
+---
+class: inverse-blue middle
+# Plot
+Add a caption stating the total number of Pulitzer prize winners across years
+
+---
+# Add column for total
+
+```{r add-col}
+pulitzer<- pulitzer%>%
+	group_by(newspaper) %>%
+	mutate(tot = sum(n))
+pulitzer
+```
+
+---
+# Easiest way (imo)
+Create a column to represent exactly the label you want.
+
+```{r add-lab-col}
+#install.packages("english")
+library(english)
+pulitzer<- pulitzer%>%
+	mutate(
+	  label = glue(
+	    "{str_to_title(as.english(tot))} Total Pulitzer Awards"
+    )
+)
+```
+
+---
+```{r }
+select(pulitzer, newspaper, label)
+```
+
+---
+# Produce one plot
+
+```{r plot-cap1, eval = FALSE}
+tmp <- pulitzer%>%
+	filter(newspaper == "Wall Street Journal") 
+
+ggplot(tmp, aes(n, year_range)) +
+  geom_col(aes(fill = n)) +
+  scale_fill_distiller(type = "seq", 
+                       limits = c(0, max(pulitzer$n)),
+                       palette = "BuPu",
+                       direction = 1) +
+  scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+                     expand = c(0, 0)) +
+  guides(fill = "none") +
+  labs(
+    title = glue("Pulitzer Prize winners: Wall Street Journal"),
+    x = "Total number of winners",
+    y = "",
+    caption = unique(tmp$label)
+  )
+```
+
+---
+class: middle
+
+```{r plot-cap1-eval, echo = FALSE}
+tmp <- pulitzer%>%
+	filter(newspaper == "Wall Street Journal") 
+
+ggplot(tmp, aes(n, year_range)) +
+  geom_col(aes(fill = n)) +
+  scale_fill_distiller(type = "seq", 
+                       limits = c(0, max(pulitzer$n)),
+                       palette = "BuPu",
+                       direction = 1) +
+  scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+                     expand = c(0, 0)) +
+  guides(fill = "none") +
+  labs(
+    title = glue("Pulitzer Prize winners: Wall Street Journal"),
+    x = "Total number of winners",
+    y = "",
+    caption = unique(tmp$label)
+  ) +
+  theme_minimal(30)
+```
+
+---
+# Produce all plots
+### Nest first
+
+```{r nested}
+pulitzer%>%
+	group_by(newspaper, label) %>%
+	nest() 
+```
+
+---
+# Produce plots
+
+```{r plot-cap2}
+final_plots <- pulitzer%>%
+	group_by(newspaper, label) %>%
+	nest() %>%
+	mutate(plots = pmap(list(newspaper, label, data), ~{
+    ggplot(..3, aes(n, year_range)) + #<<
+      geom_col(aes(fill = n)) +
+      scale_fill_distiller(type = "seq", 
+                           limits = c(0, max(pulitzer$n)),
+                           palette = "BuPu",
+                           direction = 1) +
+	    scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+	                       expand = c(0, 0)) +
+	    guides(fill = "none") +
+	    labs(title = glue("Pulitzer Prize winners: {..1}"),#<<
+	         x = "Total number of winners",
+	         y = "",
+	         caption = ..2)#<<
+	  })
+)
+```
+
+---
+# Look at a couple plots
+
+.pull-left[
+```{r p3, fig.height = 5.5}
+final_plots$plots[[1]]
+final_plots$plots[[3]]
+```
+]
+
+.pull-right[
+```{r p4, fig.height = 5.5}
+final_plots$plots[[2]]
+final_plots$plots[[4]]
+```
+]
+
+---
+# Replicate with `nest_by()`
+You try first
+
+`r countdown::countdown(3)`
+
+---
+```{r }
+final_plots2 <- pulitzer%>%
+  ungroup() %>% 
+	nest_by(newspaper, label) %>%
+	mutate(
+	  plots = list(
+	    ggplot(data, aes(n, year_range)) + 
+	      geom_col(aes(fill = n)) +
+        scale_fill_distiller(type = "seq", 
+                             limits = c(0, max(pulitzer$n)),
+                             palette = "BuPu",
+                             direction = 1) +
+	      scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+	                         expand = c(0, 0)) +
+	      guides(fill = "none") +
+	      labs(title = glue("Pulitzer Prize winners: {newspaper}"),
+	           x = "Total number of winners",
+	           y = "",
+	           caption = label)
+	  )
+)
+```
+
+---
+```{r }
+final_plots2
+```
+
+---
+# Save all plots
+
+We'll have to iterate across at least two things: (a) file path/names, and (b)
+the plots themselves
+
+
+--
+We can do this with the `map()` family, but instead we'll use a different function, which we'll talk about more next week.
+
+
+--
+As an aside, what are the **steps** we would need to take to do this?
+
+
+--
+Could we use a `nest_by()` solution?
+
+---
+# Try with `nest_by()`
+
+You try first:
+* Create a vector of file paths
+* "loop" through the file paths and the plots to save them
+
+`r countdown::countdown(4)`
+
+---
+# Example
+
+### Create a directory
+```{r create_dir}
+fs::dir_create(here::here("plots", "pulitzers"))
+```
+
+--
+### Create file paths
+```{r create_file-paths}
+files <- str_replace_all(tolower(final_plots$newspaper), " ", "-")
+paths <- here::here("plots", "pulitzers", glue("{files}.png"))
+paths
+```
+
+---
+# Add paths to data frame
+```{r }
+final_plots %>% 
+  ungroup() %>% #<<
+  mutate(path = paths) %>% 
+  select(plots, path)
+```
+
+---
+# Save
+```{r }
+final_plots %>% 
+  ungroup() %>% #<<
+  mutate(path = paths) %>% 
+  rowwise() %>% #<<
+  summarize(
+    ggsave(
+      path, 
+      plots, 
+      width = 9.5, 
+      height = 6.5,
+      dpi = 500
+    )
+  )
+```
+
+---
+# Wrap-up
+* Parallel iterations greatly increase the things you can do - iterating through at least two things simultaneously is pretty common
+
+
+--
+* The `nest_by()` approach can regularly get you the same result as `group_by() %>% nest() %>% mutate() %>% map()`
+
+  + Caveat - must be in a data frame, which means working with list columns
+  
+--
+* My view - it's still worth learning both. Looping with **{purrr}** is super flexible and often safer than base versions (type safe). Doesn't have to be used within a data frame.
+
+---
+class: inverse-green middle
+# Next time
+### Looping variants 

@@ -163,7 +163,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-even "04-21" >}}
   {{< description "list columns" "The concept of list columns will be introduced and contrasted with the `base::split()`. By the end of this lecture you should be able to fluently nest and unnest data frames and understand why this is such a powerful framework. The last 20 minutes will be devoted to an \\"in-class\\" quiz." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w4p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< assigned "assignments" "Quiz" >}}
@@ -187,7 +187,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "04-26" >}}
   {{< description "Parallel iterations" "We will introduce parallel iterations (`purrr::map2()` and `purrr::pmap()`) and apply them within the context of list columns." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w5p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
@@ -206,7 +206,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-even "04-28" >}}
   {{< description "Looping variants" "We'll discuss the differences betweeen`purrr::map()` and `purrr::modify()` while introducing new functions, including `purrr::safely()`, and `purrr::walk()`. We will also discuss different types of loops, focusing mostly on `purrr::reduce()` (and noting the similarities with `base::Reduce()`)." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w5p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 

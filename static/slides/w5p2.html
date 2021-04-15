@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Looping Variants</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Daniel Anderson" />
+    <script src="libs/header-attrs-2.7.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Looping Variants
+### Daniel Anderson
+### Week 5, Class 2
+
+---
+
+
+
+
+layout: true
+
+  &lt;script&gt;
+    feather.replace()
+  &lt;/script&gt;
+  
+  &lt;div class="slides-footer"&gt;
+  &lt;span&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w5p2.pdf"&gt;
+    &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w5p2.html"&gt;
+    &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/"&gt;
+    &lt;i class = "footer-icon" data-feather="globe"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021"&gt;
+    &lt;i class = "footer-icon" data-feather="github"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;/span&gt;
+  &lt;/div&gt;
+  
+
+---
+# Agenda
+* `walk()` and friends
+
+* `modify()`
+
+* `safely()`
+
+* `reduce()`
+
+---
+# Learning Objectives
+
+* Know when to apply `walk` instead of `map`, and why it may be useful
+
+* Understand the parallels and differences between `map` and `modify`
+
+* Diagnose errors with `safely` and understand other situations where it may
+be helpful
+
+* Collapsing/reducing lists with `purrr::reduce()` or `base::Reduce()`
+
+
+
+---
+# Setup
+Let's go back to our plotting example from last class.
+
+--
+
+First we'll load our libraries
+
+
+```r
+library(tidyverse)
+library(fivethirtyeight)
+library(glue)
+library(english)
+```
+
+---
+# Prep the data
+
+
+```r
+pulitzer &lt;- pulitzer %&gt;%
+  select(newspaper, starts_with("num")) %&gt;%
+  pivot_longer(
+    -newspaper,
+    names_to = "year_range",
+    values_to = "n",
+    names_prefix = "num_finals"
+  ) %&gt;% 
+  mutate(year_range = str_replace_all(year_range, "_", "-")) %&gt;%
+  filter(year_range != "1990-2014") %&gt;% 
+	group_by(newspaper) %&gt;%
+	mutate(
+	  tot = sum(n),
+	  label = glue(
+	    "{str_to_title(as.english(tot))} Total Pulitzer Awards"
+    )
+)
+```
+
+
+---
+# Produce plots
+
+```r
+final_plots &lt;- pulitzer %&gt;%
+	group_by(newspaper, label) %&gt;%
+	nest() %&gt;%
+	mutate(plots = pmap(list(newspaper, label, data), ~{
+    ggplot(..3, aes(n, year_range)) + 
+      geom_col(aes(fill = n)) +
+      scale_fill_distiller(type = "seq", 
+                           limits = c(0, max(pulitzer$n)),
+                           palette = "BuPu",
+                           direction = 1) +
+	    scale_x_continuous(limits = c(0, max(pulitzer$n)), 
+	                       expand = c(0, 0)) +
+	    guides(fill = "none") +
+	    labs(title = glue("Pulitzer Prize winners: {..1}"),
+	         x = "Total number of winners",
+	         y = "",
+	         caption = ..2)
+	  })
+)
+```
+
+---
+# Saving
+* We saw last time that we could use `nest_by()`
+  + Required a bit of awkwardness with adding the paths to the data frame
+  
+--
+* Instead, we'll do it again but with the `walk()` family
+
+
+--
+Why `walk()` for saving instead of `map()`?
+
+&gt; Walk is an alternative to map that you use when you want to call a function for its side effects, rather than for its return value. You typically do this because you want to render output to the screen or save files to disk - the important thing is the action, not the return value.
+
+\-[r4ds](https://r4ds.had.co.nz/iteration.html#walk)
+
+---
+class: inverse-red
+# More practical
+If you use `walk()`, nothing will get printed to the screent. This is particularly helpful for RMarkdown files.
+
+---
+# Example
+Please do the following
+* Create a new RMarkdown document
+* Paste the code you have for creating the plots in a code chunk there (along with the library loading, data cleaning, etc.)
+
+<div class="countdown" id="timer_6078729c" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+# Create a directory
+
+```r
+fs::dir_create(here::here("plots", "pulitzers"))
+```
+
+--
+### Create file paths
+
+```r
+newspapers &lt;- str_replace_all(tolower(final_plots$newspaper), " ", "-")
+paths &lt;- here::here("plots", "pulitzers", glue("{newspapers}.png"))
+```
+
+---
+# Challenge
+* Use a `map()` family function to loop through `paths` and `final_plots$plots` to save all plots. 
+
+* Render (knit) your file. What do you notice?
+
+<div class="countdown" id="timer_60787376" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+# `walk()`
+Just like `map()`, we have parallel variants of `walk()`, including, `walk2()`, and `pwalk()`
+
+These work just like `map()` but don't print to the screen
+
+Try replacing your prior code with a `walk()` version. 
+
+How does the rendered output change?
+
+<div class="countdown" id="timer_607872ef" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+# Save plots
+
+
+```r
+walk2(paths, final_plots$plots, ggsave,
+      width = 9.5, 
+      height = 6.5,
+      dpi = 500)
+```
+
+---
+class: inverse-red middle
+# modify
+
+---
+class: middle
+
+&gt; Unlike `map()` and its variants which always return a fixed object type (list for `map()`, integer vector for `map_int()`, etc), the `modify()` family always returns the same type as the input object.
+
+---
+# `map` vs `modify`
+### map
+
+
+```r
+map(mtcars, ~as.numeric(scale(.x)))
+```
+
+```
+## $mpg
+##  [1]  0.15088482  0.15088482  0.44954345  0.21725341 -0.23073453 -0.33028740 -0.96078893
+##  [8]  0.71501778  0.44954345 -0.14777380 -0.38006384 -0.61235388 -0.46302456 -0.81145962
+## [15] -1.60788262 -1.60788262 -0.89442035  2.04238943  1.71054652  2.29127162  0.23384555
+## [22] -0.76168319 -0.81145962 -1.12671039 -0.14777380  1.19619000  0.98049211  1.71054652
+## [29] -0.71190675 -0.06481307 -0.84464392  0.21725341
+## 
+## $cyl
+##  [1] -0.1049878 -0.1049878 -1.2248578 -0.1049878  1.0148821 -0.1049878  1.0148821 -1.2248578
+##  [9] -1.2248578 -0.1049878 -0.1049878  1.0148821  1.0148821  1.0148821  1.0148821  1.0148821
+## [17]  1.0148821 -1.2248578 -1.2248578 -1.2248578 -1.2248578  1.0148821  1.0148821  1.0148821
+## [25]  1.0148821 -1.2248578 -1.2248578 -1.2248578  1.0148821 -0.1049878  1.0148821 -1.2248578
+## 
+## $disp
+##  [1] -0.57061982 -0.57061982 -0.99018209  0.22009369  1.04308123 -0.04616698  1.04308123
+##  [8] -0.67793094 -0.72553512 -0.50929918 -0.50929918  0.36371309  0.36371309  0.36371309
+## [15]  1.94675381  1.84993175  1.68856165 -1.22658929 -1.25079481 -1.28790993 -0.89255318
+## [22]  0.70420401  0.59124494  0.96239618  1.36582144 -1.22416874 -0.89093948 -1.09426581
+## [29]  0.97046468 -0.69164740  0.56703942 -0.88529152
+## 
+## $hp
+##  [1] -0.53509284 -0.53509284 -0.78304046 -0.53509284  0.41294217 -0.60801861  1.43390296
+##  [8] -1.23518023 -0.75387015 -0.34548584 -0.34548584  0.48586794  0.48586794  0.48586794
+## [15]  0.85049680  0.99634834  1.21512565 -1.17683962 -1.38103178 -1.19142477 -0.72469984
+## [22]  0.04831332  0.04831332  1.43390296  0.41294217 -1.17683962 -0.81221077 -0.49133738
+## [29]  1.71102089  0.41294217  2.74656682 -0.54967799
+## 
+## $drat
+##  [1]  0.56751369  0.56751369  0.47399959 -0.96611753 -0.83519779 -1.56460776 -0.72298087
+##  [8]  0.17475447  0.60491932  0.60491932  0.60491932 -0.98482035 -0.98482035 -0.98482035
+## [15] -1.24665983 -1.11574009 -0.68557523  0.90416444  2.49390411  1.16600392  0.19345729
+## [22] -1.56460776 -0.83519779  0.24956575 -0.96611753  0.90416444  1.55876313  0.32437703
+## [29]  1.16600392  0.04383473 -0.10578782  0.96027290
+## 
+## $wt
+##  [1] -0.610399567 -0.349785269 -0.917004624 -0.002299538  0.227654255  0.248094592  0.360516446
+##  [8] -0.027849959 -0.068730634  0.227654255  0.227654255  0.871524874  0.524039143  0.575139986
+## [15]  2.077504765  2.255335698  2.174596366 -1.039646647 -1.637526508 -1.412682800 -0.768812180
+## [22]  0.309415603  0.222544170  0.636460997  0.641571082 -1.310481114 -1.100967659 -1.741772228
+## [29] -0.048290296 -0.457097039  0.360516446 -0.446876870
+## 
+## $qsec
+##  [1] -0.77716515 -0.46378082  0.42600682  0.89048716 -0.46378082  1.32698675 -1.12412636
+##  [8]  1.20387148  2.82675459  0.25252621  0.58829513 -0.25112717 -0.13920420  0.08464175
+## [15]  0.07344945 -0.01608893 -0.23993487  0.90727560  0.37564148  1.14790999  1.20946763
+## [22] -0.54772305 -0.30708866 -1.36476075 -0.44699237  0.58829513 -0.64285758 -0.53093460
+## [29] -1.87401028 -1.31439542 -1.81804880  0.42041067
+## 
+## $vs
+##  [1] -0.8680278 -0.8680278  1.1160357  1.1160357 -0.8680278  1.1160357 -0.8680278  1.1160357
+##  [9]  1.1160357  1.1160357  1.1160357 -0.8680278 -0.8680278 -0.8680278 -0.8680278 -0.8680278
+## [17] -0.8680278  1.1160357  1.1160357  1.1160357  1.1160357 -0.8680278 -0.8680278 -0.8680278
+## [25] -0.8680278  1.1160357 -0.8680278  1.1160357 -0.8680278 -0.8680278 -0.8680278  1.1160357
+## 
+## $am
+##  [1]  1.1899014  1.1899014  1.1899014 -0.8141431 -0.8141431 -0.8141431 -0.8141431 -0.8141431
+##  [9] -0.8141431 -0.8141431 -0.8141431 -0.8141431 -0.8141431 -0.8141431 -0.8141431 -0.8141431
+## [17] -0.8141431  1.1899014  1.1899014  1.1899014 -0.8141431 -0.8141431 -0.8141431 -0.8141431
+## [25] -0.8141431  1.1899014  1.1899014  1.1899014  1.1899014  1.1899014  1.1899014  1.1899014
+## 
+## $gear
+##  [1]  0.4235542  0.4235542  0.4235542 -0.9318192 -0.9318192 -0.9318192 -0.9318192  0.4235542
+##  [9]  0.4235542  0.4235542  0.4235542 -0.9318192 -0.9318192 -0.9318192 -0.9318192 -0.9318192
+## [17] -0.9318192  0.4235542  0.4235542  0.4235542 -0.9318192 -0.9318192 -0.9318192 -0.9318192
+## [25] -0.9318192  0.4235542  1.7789276  1.7789276  1.7789276  1.7789276  1.7789276  0.4235542
+## 
+## $carb
+##  [1]  0.7352031  0.7352031 -1.1221521 -1.1221521 -0.5030337 -1.1221521  0.7352031 -0.5030337
+##  [9] -0.5030337  0.7352031  0.7352031  0.1160847  0.1160847  0.1160847  0.7352031  0.7352031
+## [17]  0.7352031 -1.1221521 -0.5030337 -1.1221521 -1.1221521 -0.5030337 -0.5030337  0.7352031
+## [25] -0.5030337 -1.1221521 -0.5030337 -0.5030337  0.7352031  1.9734398  3.2116766 -0.5030337
+```
+
+---
+### modify
+
+
+```r
+modify(mtcars, ~as.numeric(scale(.x)))
+```
+
+```
+##                             mpg        cyl        disp          hp        drat           wt
+## Mazda RX4            0.15088482 -0.1049878 -0.57061982 -0.53509284  0.56751369 -0.610399567
+## Mazda RX4 Wag        0.15088482 -0.1049878 -0.57061982 -0.53509284  0.56751369 -0.349785269
+## Datsun 710           0.44954345 -1.2248578 -0.99018209 -0.78304046  0.47399959 -0.917004624
+## Hornet 4 Drive       0.21725341 -0.1049878  0.22009369 -0.53509284 -0.96611753 -0.002299538
+## Hornet Sportabout   -0.23073453  1.0148821  1.04308123  0.41294217 -0.83519779  0.227654255
+## Valiant             -0.33028740 -0.1049878 -0.04616698 -0.60801861 -1.56460776  0.248094592
+## Duster 360          -0.96078893  1.0148821  1.04308123  1.43390296 -0.72298087  0.360516446
+## Merc 240D            0.71501778 -1.2248578 -0.67793094 -1.23518023  0.17475447 -0.027849959
+## Merc 230             0.44954345 -1.2248578 -0.72553512 -0.75387015  0.60491932 -0.068730634
+## Merc 280            -0.14777380 -0.1049878 -0.50929918 -0.34548584  0.60491932  0.227654255
+## Merc 280C           -0.38006384 -0.1049878 -0.50929918 -0.34548584  0.60491932  0.227654255
+## Merc 450SE          -0.61235388  1.0148821  0.36371309  0.48586794 -0.98482035  0.871524874
+## Merc 450SL          -0.46302456  1.0148821  0.36371309  0.48586794 -0.98482035  0.524039143
+## Merc 450SLC         -0.81145962  1.0148821  0.36371309  0.48586794 -0.98482035  0.575139986
+## Cadillac Fleetwood  -1.60788262  1.0148821  1.94675381  0.85049680 -1.24665983  2.077504765
+## Lincoln Continental -1.60788262  1.0148821  1.84993175  0.99634834 -1.11574009  2.255335698
+## Chrysler Imperial   -0.89442035  1.0148821  1.68856165  1.21512565 -0.68557523  2.174596366
+## Fiat 128             2.04238943 -1.2248578 -1.22658929 -1.17683962  0.90416444 -1.039646647
+## Honda Civic          1.71054652 -1.2248578 -1.25079481 -1.38103178  2.49390411 -1.637526508
+## Toyota Corolla       2.29127162 -1.2248578 -1.28790993 -1.19142477  1.16600392 -1.412682800
+## Toyota Corona        0.23384555 -1.2248578 -0.89255318 -0.72469984  0.19345729 -0.768812180
+## Dodge Challenger    -0.76168319  1.0148821  0.70420401  0.04831332 -1.56460776  0.309415603
+## AMC Javelin         -0.81145962  1.0148821  0.59124494  0.04831332 -0.83519779  0.222544170
+## Camaro Z28          -1.12671039  1.0148821  0.96239618  1.43390296  0.24956575  0.636460997
+## Pontiac Firebird    -0.14777380  1.0148821  1.36582144  0.41294217 -0.96611753  0.641571082
+## Fiat X1-9            1.19619000 -1.2248578 -1.22416874 -1.17683962  0.90416444 -1.310481114
+## Porsche 914-2        0.98049211 -1.2248578 -0.89093948 -0.81221077  1.55876313 -1.100967659
+## Lotus Europa         1.71054652 -1.2248578 -1.09426581 -0.49133738  0.32437703 -1.741772228
+## Ford Pantera L      -0.71190675  1.0148821  0.97046468  1.71102089  1.16600392 -0.048290296
+## Ferrari Dino        -0.06481307 -0.1049878 -0.69164740  0.41294217  0.04383473 -0.457097039
+## Maserati Bora       -0.84464392  1.0148821  0.56703942  2.74656682 -0.10578782  0.360516446
+## Volvo 142E           0.21725341 -1.2248578 -0.88529152 -0.54967799  0.96027290 -0.446876870
+##                            qsec         vs         am       gear       carb
+## Mazda RX4           -0.77716515 -0.8680278  1.1899014  0.4235542  0.7352031
+## Mazda RX4 Wag       -0.46378082 -0.8680278  1.1899014  0.4235542  0.7352031
+## Datsun 710           0.42600682  1.1160357  1.1899014  0.4235542 -1.1221521
+## Hornet 4 Drive       0.89048716  1.1160357 -0.8141431 -0.9318192 -1.1221521
+## Hornet Sportabout   -0.46378082 -0.8680278 -0.8141431 -0.9318192 -0.5030337
+## Valiant              1.32698675  1.1160357 -0.8141431 -0.9318192 -1.1221521
+## Duster 360          -1.12412636 -0.8680278 -0.8141431 -0.9318192  0.7352031
+## Merc 240D            1.20387148  1.1160357 -0.8141431  0.4235542 -0.5030337
+## Merc 230             2.82675459  1.1160357 -0.8141431  0.4235542 -0.5030337
+## Merc 280             0.25252621  1.1160357 -0.8141431  0.4235542  0.7352031
+## Merc 280C            0.58829513  1.1160357 -0.8141431  0.4235542  0.7352031
+## Merc 450SE          -0.25112717 -0.8680278 -0.8141431 -0.9318192  0.1160847
+## Merc 450SL          -0.13920420 -0.8680278 -0.8141431 -0.9318192  0.1160847
+## Merc 450SLC          0.08464175 -0.8680278 -0.8141431 -0.9318192  0.1160847
+## Cadillac Fleetwood   0.07344945 -0.8680278 -0.8141431 -0.9318192  0.7352031
+## Lincoln Continental -0.01608893 -0.8680278 -0.8141431 -0.9318192  0.7352031
+## Chrysler Imperial   -0.23993487 -0.8680278 -0.8141431 -0.9318192  0.7352031
+## Fiat 128             0.90727560  1.1160357  1.1899014  0.4235542 -1.1221521
+## Honda Civic          0.37564148  1.1160357  1.1899014  0.4235542 -0.5030337
+## Toyota Corolla       1.14790999  1.1160357  1.1899014  0.4235542 -1.1221521
+## Toyota Corona        1.20946763  1.1160357 -0.8141431 -0.9318192 -1.1221521
+## Dodge Challenger    -0.54772305 -0.8680278 -0.8141431 -0.9318192 -0.5030337
+## AMC Javelin         -0.30708866 -0.8680278 -0.8141431 -0.9318192 -0.5030337
+## Camaro Z28          -1.36476075 -0.8680278 -0.8141431 -0.9318192  0.7352031
+## Pontiac Firebird    -0.44699237 -0.8680278 -0.8141431 -0.9318192 -0.5030337
+## Fiat X1-9            0.58829513  1.1160357  1.1899014  0.4235542 -1.1221521
+## Porsche 914-2       -0.64285758 -0.8680278  1.1899014  1.7789276 -0.5030337
+## Lotus Europa        -0.53093460  1.1160357  1.1899014  1.7789276 -0.5030337
+## Ford Pantera L      -1.87401028 -0.8680278  1.1899014  1.7789276  0.7352031
+## Ferrari Dino        -1.31439542 -0.8680278  1.1899014  1.7789276  1.9734398
+## Maserati Bora       -1.81804880 -0.8680278  1.1899014  1.7789276  3.2116766
+## Volvo 142E           0.42041067  1.1160357  1.1899014  0.4235542 -0.5030337
+```
+
+
+---
+
+
+```r
+modify2(LETTERS[1:3], letters[1:3], paste0)
+```
+
+```
+## [1] "Aa" "Bb" "Cc"
+```
+
+```r
+map2(LETTERS[1:3], letters[1:3], paste0)
+```
+
+```
+## [[1]]
+## [1] "Aa"
+## 
+## [[2]]
+## [1] "Bb"
+## 
+## [[3]]
+## [1] "Cc"
+```
+
+---
+class: inverse-red middle
+# safely
+
+---
+## Iterating when errors are possible
+
+Sometimes a loop will work for most cases, but return an error on a few
+
+
+--
+Often, you want to return the output you can
+
+
+--
+Alternatively, you might want to diagnose *where* the error is occurring
+
+
+--
+`purrr::safely`
+
+
+---
+# Example
+
+```r
+by_cyl &lt;- mpg %&gt;% 
+  group_by(cyl) %&gt;% 
+  nest() 
+by_cyl
+```
+
+```
+## # A tibble: 4 x 2
+## # Groups:   cyl [4]
+##     cyl data                   
+##   &lt;int&gt; &lt;list&gt;                 
+## 1     4 &lt;tibble[,10] [81 × 10]&gt;
+## 2     6 &lt;tibble[,10] [79 × 10]&gt;
+## 3     8 &lt;tibble[,10] [70 × 10]&gt;
+## 4     5 &lt;tibble[,10] [4 × 10]&gt;
+```
+
+
+--
+
+
+```r
+by_cyl %&gt;% 
+  mutate(mod = map(data, ~lm(hwy ~ displ + drv, data = .x)))
+```
+
+```
+## Error: Problem with `mutate()` input `mod`.
+## x contrasts can be applied only to factors with 2 or more levels
+## ℹ Input `mod` is `map(data, ~lm(hwy ~ displ + drv, data = .x))`.
+## ℹ The error occurred in group 2: cyl = 5.
+```
+
+---
+# Safe return
+
+* First, define safe function - note that this will work for .ital[.b[any]] function
+
+```r
+safe_lm &lt;- safely(lm)
+```
+
+
+--
+
+* Next, loop the safe function, instead of the standard function
+
+
+--
+
+
+```r
+safe_models &lt;- by_cyl %&gt;% 
+  mutate(safe_mod = map(data, ~safe_lm(hwy ~ displ + drv, data = .x)))
+safe_models
+```
+
+```
+## # A tibble: 4 x 3
+## # Groups:   cyl [4]
+##     cyl data                    safe_mod        
+##   &lt;int&gt; &lt;list&gt;                  &lt;list&gt;          
+## 1     4 &lt;tibble[,10] [81 × 10]&gt; &lt;named list [2]&gt;
+## 2     6 &lt;tibble[,10] [79 × 10]&gt; &lt;named list [2]&gt;
+## 3     8 &lt;tibble[,10] [70 × 10]&gt; &lt;named list [2]&gt;
+## 4     5 &lt;tibble[,10] [4 × 10]&gt;  &lt;named list [2]&gt;
+```
+
+---
+# What's returned?
+
+
+```r
+safe_models$safe_mod[[1]]
+```
+
+```
+## $result
+## 
+## Call:
+## .f(formula = ..1, data = ..2)
+## 
+## Coefficients:
+## (Intercept)        displ         drvf  
+##      37.370       -5.289        3.882  
+## 
+## 
+## $error
+## NULL
+```
+
+```r
+safe_models$safe_mod[[4]]
+```
+
+```
+## $result
+## NULL
+## 
+## $error
+## &lt;simpleError in `contrasts&lt;-`(`*tmp*`, value = contr.funs[1 + isOF[nn]]): contrasts can be applied only to factors with 2 or more levels&gt;
+```
+
+
+---
+# Inspecting
+I often use `safely()` to help me de-bug. Why is it failing *there*.
+
+
+--
+First - create a new variable to filter for results with errors
+
+--
+
+```r
+safe_models %&gt;% 
+  mutate(error = map_lgl(safe_mod, ~!is.null(.x$error)))
+```
+
+```
+## # A tibble: 4 x 4
+## # Groups:   cyl [4]
+##     cyl data                    safe_mod         error
+##   &lt;int&gt; &lt;list&gt;                  &lt;list&gt;           &lt;lgl&gt;
+## 1     4 &lt;tibble[,10] [81 × 10]&gt; &lt;named list [2]&gt; FALSE
+## 2     6 &lt;tibble[,10] [79 × 10]&gt; &lt;named list [2]&gt; FALSE
+## 3     8 &lt;tibble[,10] [70 × 10]&gt; &lt;named list [2]&gt; FALSE
+## 4     5 &lt;tibble[,10] [4 × 10]&gt;  &lt;named list [2]&gt; TRUE
+```
+
+---
+# Inspecting the data
+
+```r
+safe_models %&gt;% 
+  mutate(error = map_lgl(safe_mod, ~!is.null(.x$error))) %&gt;% 
+  filter(error) %&gt;% 
+  select(cyl, data) %&gt;% 
+  unnest(data)
+```
+
+```
+## # A tibble: 4 x 11
+## # Groups:   cyl [1]
+##     cyl manufacturer model      displ  year trans      drv     cty   hwy fl    class     
+##   &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;     
+## 1     5 volkswagen   jetta        2.5  2008 auto(s6)   f        21    29 r     compact   
+## 2     5 volkswagen   jetta        2.5  2008 manual(m5) f        21    29 r     compact   
+## 3     5 volkswagen   new beetle   2.5  2008 manual(m5) f        20    28 r     subcompact
+## 4     5 volkswagen   new beetle   2.5  2008 auto(s6)   f        20    29 r     subcompact
+```
+
+The `displ` and `drv` variables ar constant, so no relation can be estimated.
+
+
+---
+# Pull results that worked
+
+
+```r
+safe_models %&gt;% 
+  mutate(results = map(safe_mod, "result"))
+```
+
+```
+## # A tibble: 4 x 4
+## # Groups:   cyl [4]
+##     cyl data                    safe_mod         results
+##   &lt;int&gt; &lt;list&gt;                  &lt;list&gt;           &lt;list&gt; 
+## 1     4 &lt;tibble[,10] [81 × 10]&gt; &lt;named list [2]&gt; &lt;lm&gt;   
+## 2     6 &lt;tibble[,10] [79 × 10]&gt; &lt;named list [2]&gt; &lt;lm&gt;   
+## 3     8 &lt;tibble[,10] [70 × 10]&gt; &lt;named list [2]&gt; &lt;lm&gt;   
+## 4     5 &lt;tibble[,10] [4 × 10]&gt;  &lt;named list [2]&gt; &lt;NULL&gt;
+```
+
+--
+Now we can `broom::tidy()` or whatevs
+
+---
+
+Notice that there is no `cyl == 5`.
+
+
+```r
+safe_models %&gt;% 
+  mutate(results = map(safe_mod, "result"),
+         tidied = map(results, broom::tidy)) %&gt;% 
+  select(cyl, tidied) %&gt;% 
+  unnest(tidied)
+```
+
+```
+## # A tibble: 11 x 6
+## # Groups:   cyl [3]
+##      cyl term          estimate std.error  statistic      p.value
+##    &lt;int&gt; &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;
+##  1     4 (Intercept) 37.37023   3.537572  10.56381   1.052943e-16
+##  2     4 displ       -5.288562  1.436068  -3.682668  4.235795e- 4
+##  3     4 drvf         3.882134  0.9971876  3.893083  2.073699e- 4
+##  4     6 (Intercept) 27.96536   2.347630  11.91217   5.718039e-19
+##  5     6 displ       -2.333261  0.6373304 -3.660991  4.651570e- 4
+##  6     6 drvf         4.570840  0.6012367  7.602397  6.789988e-11
+##  7     6 drvr         6.384355  1.229277   5.193585  1.713129e- 6
+##  8     8 (Intercept) 14.82265   2.887289   5.133759  2.708515e- 6
+##  9     8 displ        0.3060487 0.5719058  0.5351383 5.943528e- 1
+## 10     8 drvf         8.555294  2.679129   3.193311  2.156229e- 3
+## 11     8 drvr         3.709336  0.7319048  5.068058  3.473594e- 6
+```
+
+---
+# When else might we use this?
+
+--
+
+Any sort of web scraping - pages change and URLs don't always work
+
+---
+# Example
+
+
+```r
+library(rvest)
+links &lt;- list(
+  "https://en.wikipedia.org/wiki/FC_Barcelona",
+  "https://nosuchpage",
+  "https://en.wikipedia.org/wiki/Rome"
+)
+pages &lt;- map(links, ~{
+  Sys.sleep(0.1)
+  read_html(.x)
+})
+```
+
+```
+## Error in open.connection(x, "rb"): Failed to connect to nosuchpage port 443: Operation timed out
+```
+
+---
+# The problem
+I can't connect to https://nosuchpage because it doesn't exist
+
+
+--
+.center[.blue[.realbig[BUT]]]
+
+
+--
+That also means I can't get *any* of my links because *one* page errored (imagine it was 1 in 1,000 instead of 1 in 3)
+
+
+--
+## `safely()` to the rescue
+
+---
+# Safe version
+
+
+```r
+safe_read_html &lt;- safely(read_html)
+pages &lt;- map(links, ~{
+  Sys.sleep(0.1)
+  safe_read_html(.x)
+})
+str(pages)
+```
+
+```
+## List of 3
+##  $ :List of 2
+##   ..$ result:List of 2
+##   .. ..$ node:&lt;externalptr&gt; 
+##   .. ..$ doc :&lt;externalptr&gt; 
+##   .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
+##   ..$ error : NULL
+##  $ :List of 2
+##   ..$ result: NULL
+##   ..$ error :List of 2
+##   .. ..$ message: chr "Failed to connect to nosuchpage port 443: Operation timed out"
+##   .. ..$ call   : language open.connection(x, "rb")
+##   .. ..- attr(*, "class")= chr [1:3] "simpleError" "error" "condition"
+##  $ :List of 2
+##   ..$ result:List of 2
+##   .. ..$ node:&lt;externalptr&gt; 
+##   .. ..$ doc :&lt;externalptr&gt; 
+##   .. ..- attr(*, "class")= chr [1:2] "xml_document" "xml_node"
+##   ..$ error : NULL
+```
+
+---
+# Non-results
+In a real example, we'd probably want to double-check the pages where we got no results
+
+--
+
+```r
+errors &lt;- map_lgl(pages, ~!is.null(.x$error))
+links[errors]
+```
+
+```
+## [[1]]
+## [1] "https://nosuchpage"
+```
+
+
+---
+class: inverse-red
+# reduce
+
+---
+# Reducing a list
+The `map()` family of functions will always return a vector the same length as the input
+
+--
+`reduce()` will collapse or reduce the list to a single element
+
+---
+# Example
+
+
+```r
+l &lt;- list(
+  c(1, 3),
+  c(1, 5, 7, 9),
+  3,
+  c(4, 8, 12, 2)
+)
+
+reduce(l, sum)
+```
+
+```
+## [1] 55
+```
+
+---
+# What's going on?
+The code `reduce(l, sum)` is the same as
+
+
+```r
+sum(l[[4]], sum(l[[3]], sum(l[[1]], l[[2]])))
+```
+
+```
+## [1] 55
+```
+
+Or slidghlty differently
+
+```r
+first_sum &lt;- sum(l[[1]], l[[2]])
+second_sum &lt;- sum(first_sum, l[[3]])
+final_sum &lt;- sum(second_sum, l[[4]])
+final_sum
+```
+
+```
+## [1] 55
+```
+
+---
+# Why might you use this?
+What if you had a list of data frames like this
+
+
+```r
+l_df &lt;- list(
+  tibble(id = 1:3, score = rnorm(3)),
+  tibble(id = 1:5, treatment = rbinom(5, 1, .5)),
+  tibble(id = c(1, 3, 5, 7), other_thing = rnorm(4))
+)
+```
+
+We can join these all together with a single loop - we want the output to be of length 1!
+
+---
+
+```r
+reduce(l_df, full_join)
+```
+
+```
+## # A tibble: 6 x 4
+##      id       score treatment other_thing
+##   &lt;dbl&gt;       &lt;dbl&gt;     &lt;int&gt;       &lt;dbl&gt;
+## 1     1 -0.3782499          1   0.1678145
+## 2     2 -0.02004990         0  NA        
+## 3     3 -1.763696           0   1.260830 
+## 4     4 NA                  1  NA        
+## 5     5 NA                  0   0.2522675
+## 6     7 NA                 NA   0.3740336
+```
+
+--
+Note - you have to be careful on directionality
+
+.pull-left[
+
+```r
+reduce(l_df, left_join)
+```
+
+```
+## # A tibble: 3 x 4
+##      id       score treatment other_thing
+##   &lt;dbl&gt;       &lt;dbl&gt;     &lt;int&gt;       &lt;dbl&gt;
+## 1     1 -0.3782499          1   0.1678145
+## 2     2 -0.02004990         0  NA        
+## 3     3 -1.763696           0   1.260830
+```
+]
+
+.pull-left[
+
+```r
+reduce(l_df, right_join)
+```
+
+```
+## # A tibble: 4 x 4
+##      id      score treatment other_thing
+##   &lt;dbl&gt;      &lt;dbl&gt;     &lt;int&gt;       &lt;dbl&gt;
+## 1     1 -0.3782499         1   0.1678145
+## 2     3 -1.763696          0   1.260830 
+## 3     5 NA                 0   0.2522675
+## 4     7 NA                NA   0.3740336
+```
+]
+
+---
+# More common
+You probably just want to `bind_rows()`
+
+
+```r
+l_df2 &lt;- list(
+  tibble(id = 1:3, scid = 1, score = rnorm(3)),
+  tibble(id = 1:5, scid = 2, score = rnorm(5)),
+  tibble(id = c(1, 3, 5, 7), scid = 3, score = rnorm(4))
+)
+reduce(l_df2, bind_rows)
+```
+
+```
+## # A tibble: 12 x 3
+##       id  scid       score
+##    &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;
+##  1     1     1  0.8564613 
+##  2     2     1 -0.7238976 
+##  3     3     1 -0.2668617 
+##  4     1     2  1.358469  
+##  5     2     2 -1.181592  
+##  6     3     2  0.5089259 
+##  7     4     2 -0.4892010 
+##  8     5     2 -0.2350173 
+##  9     1     3  0.01672748
+## 10     3     3  0.2884129 
+## 11     5     3 -0.01951237
+## 12     7     3 -1.682676
+```
+
+---
+# Wrap up
+* Lots more to `{purrr}` but we've covered a lot
+  
+* Functional programming can *really* help your efficiency, and even if it slows you down initially, I'd recommend always striving toward it, because it will ultimately be a huge help.
+
+
+.center[
+
+### Questions?
+
+]
+
+--
+If we have any time left - let's work on the homework
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
