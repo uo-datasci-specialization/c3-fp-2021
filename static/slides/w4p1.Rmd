@@ -486,10 +486,31 @@ dir_ls(here::here("data", "pfiles_sim"), regexp = "Math")
 # Only Grade 5
 ### You try
 
+`r countdown::countdown(2)`
+
 --
 ```{r g5}
-dir_ls(here::here("data", "pfiles_sim"), regexp = "g5")
+g5_paths <- dir_ls(
+  here::here("data", "pfiles_sim"), 
+  regexp = "g5" #<<
+)
 ```
+
+---
+# The rest is the same
+
+```{r }
+g5 <- map_dfr(g5_paths, read_csv, .id = "file") %>%
+  mutate(
+	  file = str_replace_all(
+	    file, 
+	    here::here("data", "pfiles_sim"), 
+	    ""
+	  )
+	)
+g5
+```
+
 
 ---
 # Base equivalents

@@ -166,7 +166,7 @@ simulate(5, -10, 1.5)
 --
 ### Try with `purrr::map`
 
-<div class="countdown" id="timer_6075f904" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_607d807e" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -234,7 +234,7 @@ sims[2]
 # Swap for `map_dfr`
 ### Try it - what happens?
 
-<div class="countdown" id="timer_6075f6a6" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_607d7d95" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">01</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -339,8 +339,8 @@ sample_size
 ```
 
 ```
-##  [1]  10  15  20  25  30  35  40  45  50  55  60  65  70  75  80  85  90  95 100 105 110
-## [22] 115 120 125 130 135 140 145 150
+##  [1]  10  15  20  25  30  35  40  45  50  55  60  65  70  75  80  85  90  95 100
+## [20] 105 110 115 120 125 130 135 140 145 150
 ```
 
 ```r
@@ -600,22 +600,22 @@ batch
 
 ```
 ## # A tibble: 15,945 x 22
-##    Entry   Theta Status Count RawScore     SE Infit Infit_Z  Outfit Outfit_Z Displacement
-##    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;
-##  1   123  1.2687      1    36       23 0.3713  0.93   -0.34 0.82       -0.62  0.0018     
-##  2    88  1.5541      1    36       25 0.3852  0.95   -0.37 0.81       -0.56  0.0019     
-##  3   105  3.2773      1    36       33 0.6187  0.9    -0.04 1.63000     1.03  0.0022     
-##  4   153  4.4752      1    36       35 1.0234  0.93    0.23 0.35       -0.16  0.0023     
-##  5   437  2.6655      1    36       31 0.5008  0.92   -0.18 0.88       -0.12  0.0021     
-##  6   307  5.7137      0    36       36 1.8371  1       0    1           0     0.002400000
-##  7   305  3.7326      1    36       34 0.7408  1.06    0.31 0.86        0.17  0.0022     
-##  8    42  0.609       1    36       18 0.36    1.55    2.56 1.74        3.31  0.0017     
-##  9    59 -2.623       1    36        3 1.0344  0.85    0.06 0.17       -0.37  0.0009     
-## 10   304  5.7137      0    36       36 1.8371  1       0    1           0     0.002400000
-## # … with 15,935 more rows, and 11 more variables: PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;,
-## #   ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;, RMSR &lt;dbl&gt;,
-## #   WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;, asmtprmrydsbltycd &lt;dbl&gt;,
-## #   asmtscndrydsbltycd &lt;dbl&gt;
+##    Entry   Theta Status Count RawScore     SE Infit Infit_Z  Outfit Outfit_Z
+##    &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+##  1   123  1.2687      1    36       23 0.3713  0.93   -0.34 0.82       -0.62
+##  2    88  1.5541      1    36       25 0.3852  0.95   -0.37 0.81       -0.56
+##  3   105  3.2773      1    36       33 0.6187  0.9    -0.04 1.63000     1.03
+##  4   153  4.4752      1    36       35 1.0234  0.93    0.23 0.35       -0.16
+##  5   437  2.6655      1    36       31 0.5008  0.92   -0.18 0.88       -0.12
+##  6   307  5.7137      0    36       36 1.8371  1       0    1           0   
+##  7   305  3.7326      1    36       34 0.7408  1.06    0.31 0.86        0.17
+##  8    42  0.609       1    36       18 0.36    1.55    2.56 1.74        3.31
+##  9    59 -2.623       1    36        3 1.0344  0.85    0.06 0.17       -0.37
+## 10   304  5.7137      0    36       36 1.8371  1       0    1           0   
+## # … with 15,935 more rows, and 12 more variables: Displacement &lt;dbl&gt;,
+## #   PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;, ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;,
+## #   PointMeasureExpected &lt;dbl&gt;, RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;,
+## #   ssid &lt;dbl&gt;, asmtprmrydsbltycd &lt;dbl&gt;, asmtscndrydsbltycd &lt;dbl&gt;
 ```
 
 ---
@@ -624,7 +624,7 @@ batch
 
 ### Try to fix it!
 
-<div class="countdown" id="timer_6075f6b2" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_607d8039" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 ---
@@ -638,12 +638,13 @@ batch2
 
 ```
 ## # A tibble: 15,945 x 23
-## # … with 15,935 more rows, and 23 more variables: file &lt;chr&gt;, Entry &lt;dbl&gt;, Theta &lt;dbl&gt;,
-## #   Status &lt;dbl&gt;, Count &lt;dbl&gt;, RawScore &lt;dbl&gt;, SE &lt;dbl&gt;, Infit &lt;dbl&gt;, Infit_Z &lt;dbl&gt;,
-## #   Outfit &lt;dbl&gt;, Outfit_Z &lt;dbl&gt;, Displacement &lt;dbl&gt;, PointMeasureCorr &lt;dbl&gt;,
-## #   Weight &lt;dbl&gt;, ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;,
-## #   RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;, asmtprmrydsbltycd &lt;dbl&gt;,
-## #   asmtscndrydsbltycd &lt;dbl&gt;
+## # … with 15,935 more rows, and 23 more variables: file &lt;chr&gt;, Entry &lt;dbl&gt;,
+## #   Theta &lt;dbl&gt;, Status &lt;dbl&gt;, Count &lt;dbl&gt;, RawScore &lt;dbl&gt;, SE &lt;dbl&gt;,
+## #   Infit &lt;dbl&gt;, Infit_Z &lt;dbl&gt;, Outfit &lt;dbl&gt;, Outfit_Z &lt;dbl&gt;,
+## #   Displacement &lt;dbl&gt;, PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;,
+## #   ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;,
+## #   RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;,
+## #   asmtprmrydsbltycd &lt;dbl&gt;, asmtscndrydsbltycd &lt;dbl&gt;
 ```
 
 Note - the `file` column contains the full path, which is so long it makes no rows print
@@ -964,23 +965,23 @@ d
 
 ```
 ## # A tibble: 15,945 x 25
-##        ssid grade  year content testeventid asmtprmrydsbltycd asmtscndrydsbltycd Entry
-##       &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;         &lt;dbl&gt;             &lt;dbl&gt;              &lt;dbl&gt; &lt;dbl&gt;
-##  1  9466908    11    11 ELA          148933                 0                  0   123
-##  2  7683685    11    11 ELA          147875                10                  0    88
-##  3  9025693    11    11 ELA          143699                40                 20   105
-##  4 10099824    11    11 ELA          143962                82                  0   153
-##  5 18886078    11    11 ELA          150680                10                  0   437
-##  6 10606750    11    11 ELA          144583                80                 80   307
-##  7 10541306    11    11 ELA          145204                50                  0   305
-##  8  7632967    11    11 ELA          148926                10                  0    42
-##  9  7661118    11    11 ELA          148893                50                  0    59
-## 10 10547177    11    11 ELA          144583                82                  0   304
-## # … with 15,935 more rows, and 17 more variables: Theta &lt;dbl&gt;, Status &lt;dbl&gt;,
-## #   Count &lt;dbl&gt;, RawScore &lt;dbl&gt;, SE &lt;dbl&gt;, Infit &lt;dbl&gt;, Infit_Z &lt;dbl&gt;, Outfit &lt;dbl&gt;,
-## #   Outfit_Z &lt;dbl&gt;, Displacement &lt;dbl&gt;, PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;,
-## #   ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;, RMSR &lt;dbl&gt;,
-## #   WMLE &lt;dbl&gt;
+##        ssid grade  year content testeventid asmtprmrydsbltycd asmtscndrydsbltycd
+##       &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;         &lt;dbl&gt;             &lt;dbl&gt;              &lt;dbl&gt;
+##  1  9466908    11    11 ELA          148933                 0                  0
+##  2  7683685    11    11 ELA          147875                10                  0
+##  3  9025693    11    11 ELA          143699                40                 20
+##  4 10099824    11    11 ELA          143962                82                  0
+##  5 18886078    11    11 ELA          150680                10                  0
+##  6 10606750    11    11 ELA          144583                80                 80
+##  7 10541306    11    11 ELA          145204                50                  0
+##  8  7632967    11    11 ELA          148926                10                  0
+##  9  7661118    11    11 ELA          148893                50                  0
+## 10 10547177    11    11 ELA          144583                82                  0
+## # … with 15,935 more rows, and 18 more variables: Entry &lt;dbl&gt;, Theta &lt;dbl&gt;,
+## #   Status &lt;dbl&gt;, Count &lt;dbl&gt;, RawScore &lt;dbl&gt;, SE &lt;dbl&gt;, Infit &lt;dbl&gt;,
+## #   Infit_Z &lt;dbl&gt;, Outfit &lt;dbl&gt;, Outfit_Z &lt;dbl&gt;, Displacement &lt;dbl&gt;,
+## #   PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;, ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;,
+## #   PointMeasureExpected &lt;dbl&gt;, RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;
 ```
 
 ---
@@ -1042,19 +1043,56 @@ dir_ls(here::here("data", "pfiles_sim"), regexp = "Math")
 # Only Grade 5
 ### You try
 
+<div class="countdown" id="timer_607d7ce9" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
 --
 
 ```r
-dir_ls(here::here("data", "pfiles_sim"), regexp = "g5")
+g5_paths &lt;- dir_ls(
+  here::here("data", "pfiles_sim"), 
+* regexp = "g5"
+)
+```
+
+---
+# The rest is the same
+
+
+```r
+g5 &lt;- map_dfr(g5_paths, read_csv, .id = "file") %&gt;%
+  mutate(
+	  file = str_replace_all(
+	    file, 
+	    here::here("data", "pfiles_sim"), 
+	    ""
+	  )
+	)
+g5
 ```
 
 ```
-## /Users/daniel/Teaching/data_sci_specialization/2020-21/c3-fp-2021/data/pfiles_sim/g5ELApfiles18_sim.csv
-## /Users/daniel/Teaching/data_sci_specialization/2020-21/c3-fp-2021/data/pfiles_sim/g5Mathpfiles18_sim.csv
-## /Users/daniel/Teaching/data_sci_specialization/2020-21/c3-fp-2021/data/pfiles_sim/g5Rdgpfiles18_sim.csv
-## /Users/daniel/Teaching/data_sci_specialization/2020-21/c3-fp-2021/data/pfiles_sim/g5Sciencepfiles18_sim.csv
-## /Users/daniel/Teaching/data_sci_specialization/2020-21/c3-fp-2021/data/pfiles_sim/g5Wripfiles18_sim.csv
+## # A tibble: 2,632 x 23
+##    file                   Entry   Theta Status Count RawScore     SE    Infit
+##    &lt;chr&gt;                  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+##  1 /g5ELApfiles18_sim.csv   375  3.154       1    36       32 0.551  1.22    
+##  2 /g5ELApfiles18_sim.csv   305  0.3662      1    36       16 0.3894 0.94    
+##  3 /g5ELApfiles18_sim.csv   163 -4.9547     -1    36        0 1.8495 1       
+##  4 /g5ELApfiles18_sim.csv   524 -4.9547     -1    36        0 1.8495 1       
+##  5 /g5ELApfiles18_sim.csv    81  3.154       1    36       32 0.551  0.96    
+##  6 /g5ELApfiles18_sim.csv   325  1.7156      1    36       25 0.3997 1.140000
+##  7 /g5ELApfiles18_sim.csv   163  1.8786      1    36       26 0.4078 0.82    
+##  8 /g5ELApfiles18_sim.csv   116  5.9323      0    36       36 1.8373 1       
+##  9 /g5ELApfiles18_sim.csv   273  1.4052      1    36       23 0.3891 1.08    
+## 10 /g5ELApfiles18_sim.csv   202  1.8786      1    36       26 0.4078 0.79    
+## # … with 2,622 more rows, and 15 more variables: Infit_Z &lt;dbl&gt;, Outfit &lt;dbl&gt;,
+## #   Outfit_Z &lt;dbl&gt;, Displacement &lt;dbl&gt;, PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;,
+## #   ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;,
+## #   RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;,
+## #   asmtprmrydsbltycd &lt;dbl&gt;, asmtscndrydsbltycd &lt;dbl&gt;
 ```
+
 
 ---
 # Base equivalents
@@ -1228,21 +1266,22 @@ batch3
 
 ```
 ## # A tibble: 15,945 x 23
-##    file  Entry   Theta Status Count RawScore     SE Infit Infit_Z  Outfit Outfit_Z
-##    &lt;chr&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
-##  1 1       123  1.2687      1    36       23 0.3713  0.93   -0.34 0.82       -0.62
-##  2 1        88  1.5541      1    36       25 0.3852  0.95   -0.37 0.81       -0.56
-##  3 1       105  3.2773      1    36       33 0.6187  0.9    -0.04 1.63000     1.03
-##  4 1       153  4.4752      1    36       35 1.0234  0.93    0.23 0.35       -0.16
-##  5 1       437  2.6655      1    36       31 0.5008  0.92   -0.18 0.88       -0.12
-##  6 1       307  5.7137      0    36       36 1.8371  1       0    1           0   
-##  7 1       305  3.7326      1    36       34 0.7408  1.06    0.31 0.86        0.17
-##  8 1        42  0.609       1    36       18 0.36    1.55    2.56 1.74        3.31
-##  9 1        59 -2.623       1    36        3 1.0344  0.85    0.06 0.17       -0.37
-## 10 1       304  5.7137      0    36       36 1.8371  1       0    1           0   
-## # … with 15,935 more rows, and 12 more variables: Displacement &lt;dbl&gt;,
-## #   PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;, ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;,
-## #   PointMeasureExpected &lt;dbl&gt;, RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;,
+##    file  Entry   Theta Status Count RawScore     SE Infit Infit_Z  Outfit
+##    &lt;chr&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1 1       123  1.2687      1    36       23 0.3713  0.93   -0.34 0.82   
+##  2 1        88  1.5541      1    36       25 0.3852  0.95   -0.37 0.81   
+##  3 1       105  3.2773      1    36       33 0.6187  0.9    -0.04 1.63000
+##  4 1       153  4.4752      1    36       35 1.0234  0.93    0.23 0.35   
+##  5 1       437  2.6655      1    36       31 0.5008  0.92   -0.18 0.88   
+##  6 1       307  5.7137      0    36       36 1.8371  1       0    1      
+##  7 1       305  3.7326      1    36       34 0.7408  1.06    0.31 0.86   
+##  8 1        42  0.609       1    36       18 0.36    1.55    2.56 1.74   
+##  9 1        59 -2.623       1    36        3 1.0344  0.85    0.06 0.17   
+## 10 1       304  5.7137      0    36       36 1.8371  1       0    1      
+## # … with 15,935 more rows, and 13 more variables: Outfit_Z &lt;dbl&gt;,
+## #   Displacement &lt;dbl&gt;, PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;,
+## #   ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;,
+## #   RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;,
 ## #   asmtprmrydsbltycd &lt;dbl&gt;, asmtscndrydsbltycd &lt;dbl&gt;
 ```
 
@@ -1280,12 +1319,13 @@ batch4
 
 ```
 ## # A tibble: 15,945 x 23
-## # … with 15,935 more rows, and 23 more variables: file &lt;chr&gt;, Entry &lt;dbl&gt;, Theta &lt;dbl&gt;,
-## #   Status &lt;dbl&gt;, Count &lt;dbl&gt;, RawScore &lt;dbl&gt;, SE &lt;dbl&gt;, Infit &lt;dbl&gt;, Infit_Z &lt;dbl&gt;,
-## #   Outfit &lt;dbl&gt;, Outfit_Z &lt;dbl&gt;, Displacement &lt;dbl&gt;, PointMeasureCorr &lt;dbl&gt;,
-## #   Weight &lt;dbl&gt;, ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;,
-## #   RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;, asmtprmrydsbltycd &lt;dbl&gt;,
-## #   asmtscndrydsbltycd &lt;dbl&gt;
+## # … with 15,935 more rows, and 23 more variables: file &lt;chr&gt;, Entry &lt;dbl&gt;,
+## #   Theta &lt;dbl&gt;, Status &lt;dbl&gt;, Count &lt;dbl&gt;, RawScore &lt;dbl&gt;, SE &lt;dbl&gt;,
+## #   Infit &lt;dbl&gt;, Infit_Z &lt;dbl&gt;, Outfit &lt;dbl&gt;, Outfit_Z &lt;dbl&gt;,
+## #   Displacement &lt;dbl&gt;, PointMeasureCorr &lt;dbl&gt;, Weight &lt;dbl&gt;,
+## #   ObservMatch &lt;dbl&gt;, ExpectMatch &lt;dbl&gt;, PointMeasureExpected &lt;dbl&gt;,
+## #   RMSR &lt;dbl&gt;, WMLE &lt;dbl&gt;, testeventid &lt;dbl&gt;, ssid &lt;dbl&gt;,
+## #   asmtprmrydsbltycd &lt;dbl&gt;, asmtscndrydsbltycd &lt;dbl&gt;
 ```
 
 ---
