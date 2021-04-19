@@ -156,7 +156,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "other" "https://www.tidyverse.org/articles/2018/01/fs-1.0.0/" "1" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/jSJxvjJ0PNk" >}}
 {{< /wrap >}}
 {{< /week-odd >}}
 
