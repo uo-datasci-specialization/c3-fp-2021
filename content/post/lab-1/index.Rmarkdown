@@ -1,0 +1,161 @@
+---
+title: Lab 1
+subtitle: 
+author: Daniel Anderson
+date: '2021-03-09'
+assigned: '2021-04-07'
+due: '2021-04-14'
+slug: lab-1
+categories:
+  - Assignments
+tags:
+  - Labs
+  - Assignments
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The purpose of this lab is to get you working with base R looping functions
+while also being careful about data types. Your are welcome to work with a
+partner or in a small group of 3-4 people.
+
+## Data structures
+```{r lm, eval = FALSE}
+set.seed(123) # Set random number generation
+
+m <- lm(mpg ~ hp + cyl + drat, mtcars)
+
+l <- list(a = list(m = matrix(1:12, ncol = 3),
+              	   v = 1:7),
+          b = data.frame(student = 1:15,
+                         score = rnorm(15, 100, 10)))
+```
+
+Run the above code
+
+1. From the model results:
+	* Extract the qr tolerance (`tol`).
+	* Extract the term labels from the model.
+		+ hint: Use `str` to inspect the list. This one is tricky and involves
+		pulling an attribute from an attribute.
+
+2. From the list
+	+ Use at least two different methods to extract `m`.
+	+ Extract the third column of `m`. Maintain the dimensions (matrix structure).
+	+ Extract the score for student 7.
+
+
+```{r answers-data-structures, include = FALSE}
+# 1
+m <- lm(mpg ~ hp + cyl + drat, mtcars)
+str(m)
+
+## A
+m$qr$tol # qr tolerance
+
+## B
+term_attributes <- attr(m$model, "terms")
+attr(term_attributes, "term.labels")
+
+# 2
+
+set.seed(123)
+l <- list(a = list(m = matrix(1:12, ncol = 3),
+              	 	 v = 1:7),
+		  		b = data.frame(student = 1:15,
+			             			 score = rnorm(15, 100, 10)))
+
+## A
+### Method 1
+l$a$m
+
+### Method 2
+l[[1]][[1]]
+
+## B
+l$a$m[ ,3, drop = FALSE]
+
+## C
+### Method 1
+l$b[7, ]
+
+### Method 2
+l[["b"]][ l[["b"]]$student == 7, ]
+l[["b"]][7, ]
+
+stu <- l[["b"]]$student # these two lines are
+l[["b"]][stu == 7, ]    # equivalent to line 80
+```
+
+## Loops
+3. Use the "airquality" dataset, which is part of base R. Split it by `Month`
+
+4. Use a `for` loop to calculate the mean `Ozone` by month (remember to remove
+missing data from the calculation)
+
+5. Replicate this calculation with `lapply`, `sapply`, and `vapply`
+
+6. Produce separate plots showing the relation between `Ozone` and `Solar.R` for each
+month (with a single loop).
+
+7. Use a `for` loop to save the plots to a folder on your computer
+
+
+```{r answers-loops, include = FALSE}
+# 3
+by_month <- split(airquality, airquality$Month)
+
+# 4
+mean_ozone1 <- rep(NA, length(by_month))
+
+# vector("list", length(by_month)) # create an empty list instead of an atomic vector
+
+for(i in seq_along(by_month)) {
+	mean_ozone1[i] <- mean(by_month[[i]]$Ozone, na.rm = TRUE)
+}
+
+# mean_ozone1[1] <- mean(by_month[[1]]$Ozone, na.rm = TRUE)
+# mean_ozone1[2] <- mean(by_month[[2]]$Ozone, na.rm = TRUE)
+# mean_ozone1[3] <- mean(by_month[[3]]$Ozone, na.rm = TRUE)
+# mean_ozone1[4] <- mean(by_month[[4]]$Ozone, na.rm = TRUE)
+# mean_ozone1[5] <- mean(by_month[[5]]$Ozone, na.rm = TRUE)
+
+# 5
+## lapply
+mean_ozone2 <- lapply(by_month, function(x) mean(x$Ozone, na.rm = TRUE))
+
+## sapply
+mean_ozone3 <- sapply(by_month, function(x) mean(x$Ozone, na.rm = TRUE))
+
+## vapply
+mean_ozone4 <- vapply(by_month, function(x) mean(x$Ozone, na.rm = TRUE),
+                      FUN.VALUE = double(1))
+
+# 6
+library(ggplot2)
+theme_set(theme_minimal())
+
+plots <- lapply(by_month, function(x) {
+	ggplot(x, aes(Ozone, Solar.R)) +
+		geom_point(color = "gray80") +
+		geom_smooth()
+})
+```
+
+```{r seven, eval = FALSE, include = FALSE}
+# 7
+dir.create(here::here("plots"))
+filenames <- paste0(here::here("plots", "month"), names(by_month), ".png")
+
+for(i in seq_along(plots)) {
+	ggsave(filenames[i],
+	       plots[[i]],
+	       device = "png",
+	       width = 6.5,
+	       height = 8)
+}
+```
+
