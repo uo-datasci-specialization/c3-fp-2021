@@ -166,7 +166,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< slides "w4p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< assigned "assignments" "Quiz" >}}
+{{< assigned "assignments/#quiz" "Quiz" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< due "assignments" "Lab 2" >}}

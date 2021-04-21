@@ -10,7 +10,7 @@ This course includes three labs at 10 points each, a midterm quiz (10 points), a
 I would like to, as much a possible, stick to the deadlines below so we can go over them together as a group *after* everyone has submitted their assignment. However, **if you need additional time for any reason** please just send me a note letting me know. You do not need to justify why. I would just ask that you not attend class during the time we are going over the assignment (but please attend the rest of the class if you are able).
 
 ## Labs
-Each lab is worth 10 points and is scored on a best-honest-effort bases. Please do not turn in partial work. Instead, please ask for help and, if needed, an extension on the deadline. Each lab will include dedicated in-class time, but it is expected that most labs will require additional time outside of class. 
+Each lab is worth 10 points and is scored on a best-honest-effort basis. Please do not turn in partial work. Instead, please ask for help and, if needed, an extension on the deadline. Each lab will include dedicated in-class time, but it is expected that most labs will require additional time outside of class. 
 
 {{< bootstrap-table "table table-hover" >}}
 
@@ -32,13 +32,15 @@ in some provided code.
 
 The quiz must be completed independently.
 
+[Take the quiz now](https://canvas.uoregon.edu/courses/180867/quizzes/214885)
+
 ### Take-home
 
 **60 points, Assigned April 19th, Due by midnight on May 5th**
 
 The take-home portion will be similar to labs with two exceptions: (a) there 
 will be no time in class devoted to the midterm, and (b) responses will be
-scored on a correct/incorrect bases (rather than a best-honest-effort basis). 
+scored on a correct/incorrect basis (rather than a best-honest-effort basis). 
 The take-home portion is worth 60 points, or 30% of your grade. It will 
 primarily cover working with and subsetting lists, as well as iterating with
 [**{purrr}**](https://purrr.tidyverse.org).
