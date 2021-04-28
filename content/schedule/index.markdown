@@ -218,7 +218,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "NA" "NA" "NA" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/BQ7PX5AAA4Y" >}}
 {{< /wrap >}}
 {{< /week-even >}}
 
@@ -229,7 +229,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "05-03" >}}
   {{< description "Writing functions 1" "This is lecture is on the very basics of functions - understanding that everything in R is a function, the components of a function, when to write a function, and how to go about it (e.g., development and informal testing)." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w6p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
@@ -248,7 +248,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-even "05-05" >}}
   {{< description "Writing functions 2" "Making the internals of a function more complicated! But also keeping functions as simple as possible. Functions within functions!" >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w6p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
