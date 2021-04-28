@@ -144,7 +144,7 @@ Please do the following
 * Create a new RMarkdown document
 * Paste the code you have for creating the plots in a code chunk there (along with the library loading, data cleaning, etc.)
 
-`r countdown::countdown(1)`
+`r countdown::countdown(2)`
 
 ---
 # Create a directory
@@ -218,8 +218,8 @@ modify(mtcars, ~as.numeric(scale(.x)))
 ---
 
 ```{r map-paste}
-modify2(LETTERS[1:3], letters[1:3], paste0)
 map2(LETTERS[1:3], letters[1:3], paste0)
+modify2(LETTERS[1:3], letters[1:3], paste0)
 ```
 
 ---
@@ -316,7 +316,7 @@ safe_models %>%
   unnest(data)
 ```
 
-The `displ` and `drv` variables ar constant, so no relation can be estimated.
+The `displ` and `drv` variables are constant, so no relation can be estimated.
 
 
 ---
@@ -405,12 +405,13 @@ links[errors]
 
 
 ---
-class: inverse-red
+class: inverse-red middle
 # reduce
 
 ---
 # Reducing a list
 The `map()` family of functions will always return a vector the same length as the input
+
 
 --
 `reduce()` will collapse or reduce the list to a single element
@@ -507,3 +508,9 @@ reduce(l_df2, bind_rows)
 
 --
 If we have any time left - let's work on the homework
+
+---
+class: inverse-green middle
+# Next time
+## Functions
+Beginning next class, the focus of the course will shift
