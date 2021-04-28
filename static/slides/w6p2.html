@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Functions: Part 2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Daniel Anderson" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Functions: Part 2
+### Daniel Anderson
+### Week 6, Class 2
+
+---
+
+
+
+
+layout: true
+
+  &lt;script&gt;
+    feather.replace()
+  &lt;/script&gt;
+  
+  &lt;div class="slides-footer"&gt;
+  &lt;span&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w6p2.pdf"&gt;
+    &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w6p2.html"&gt;
+    &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/"&gt;
+    &lt;i class = "footer-icon" data-feather="globe"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021"&gt;
+    &lt;i class = "footer-icon" data-feather="github"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;/span&gt;
+  &lt;/div&gt;
+  
+
+---
+# Agenda
+* Review take-home midterm (quickly)
+
+* Purity (quickly)
+
+* Function conditionals
+	+ `if (condition) {}`
+	+ embedding warnings, messages, and errors
+
+* Return values
+
+---
+# Learning objectives
+* Understand the concept of purity, and why it is often desirable
+	+ And be able to define a side effect
+
+* Be able to change the behavior of a function based on the input
+
+* Be able to embed warnings/messages/errors
+
+
+---
+class: inverse-red middle
+# Take-home midterm review
+
+---
+# Purity
+A function is pure if
+
+1. Its output depends *only* on its inputs
+
+2. It makes no changes to the state of the world
+
+
+--
+Any behavior that changes the state of the world is referred to as a *side-effect*
+
+
+--
+Note - state of the world is not a technical term, just the way I think of it
+
+---
+# Common side effect functions
+* We've talked about a few... what are they?
+
+
+--
+### A couple examples
+* `print`
+* `plot`
+* `write.csv`
+* `read.csv`
+* `Sys.time`
+* `options`
+* `library`
+* `install.packages`
+
+---
+class: inverse-blue middle
+# Conditionals
+
+---
+# Example 
+From an old lab:
+
+&gt; Write a function that takes two vectors of the same length and returns
+the total number of instances where the value is `NA` for both vectors. For
+example, given the following two vectors
+
+
+```r
+c(1, NA, NA, 3, 3, 9, NA)
+c(NA, 3, NA, 4, NA, NA, NA)
+```
+
+&gt; The function should return a value of `2`, because the vectors are both `NA` at
+the third and seventh locations. Provide at least one additional test that the function works as expected.
+
+---
+# How do you *start* to solve this problem?
+
+--
+
+&lt;span style = "text-decoration: line-through"&gt; 
+Start with writing a function
+&lt;/span&gt;
+
+
+--
+Solve it on a test case, then generalize!
+
+
+--
+### Use the vectors to solve!
+
+
+```r
+a &lt;- c(1, NA, NA, 3, 3, 9, NA)
+b &lt;- c(NA, 3, NA, 4, NA, NA, NA)
+```
+
+---
+# One approach
+
+
+```r
+is.na(a) 
+```
+
+```
+## [1] FALSE  TRUE  TRUE FALSE FALSE FALSE  TRUE
+```
+
+```r
+is.na(b)
+```
+
+```
+## [1]  TRUE FALSE  TRUE FALSE  TRUE  TRUE  TRUE
+```
+
+```r
+is.na(a) &amp; is.na(b)
+```
+
+```
+## [1] FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE
+```
+
+```r
+sum(is.na(a) &amp; is.na(b))
+```
+
+```
+## [1] 2
+```
+
+---
+# Generalize to function
+
+
+```r
+both_na &lt;- function(x, y) {
+	sum(is.na(x) &amp; is.na(y))
+}
+```
+
+--
+### What happens if not same length?
+
+---
+# Test it
+
+
+```r
+both_na(a, b)
+```
+
+```
+## [1] 2
+```
+
+```r
+both_na(c(a, a), c(b, b))
+```
+
+```
+## [1] 4
+```
+
+```r
+both_na(a, c(b, b)) # ???
+```
+
+```
+## [1] 4
+```
+
+--
+### What's going on here?
+
+---
+# Recycling
+* R will *recycle* vectors if they are divisible
+
+
+```r
+data.frame(nums = 1:4,
+           lets = c("a", "b"))
+```
+
+```
+##   nums lets
+## 1    1    a
+## 2    2    b
+## 3    3    a
+## 4    4    b
+```
+
+--
+* This will not work if they are not divisible
+
+
+```r
+data.frame(nums = 1:3,
+           lets = c("a", "b"))
+```
+
+```
+## Error in data.frame(nums = 1:3, lets = c("a", "b")): arguments imply differing number of rows: 3, 2
+```
+
+---
+# Unexpected results
+* In the `both_na` function, recycling can lead to unexpected results, as we saw
+
+* What should we do?
+
+--
+* Check that they are the same length, return an error if not
+
+---
+# Check lengths
+* Stop the evaluation of a function and return an error message with `stop`,
+but only if a condition has been met.
+
+
+--
+### Basic structure
+
+```r
+both_na &lt;- function(x, y) {
+	if(condition) {
+		stop("message")
+	}
+	sum(is.na(x) &amp; is.na(y))
+}
+```
+
+---
+# Challenge
+
+<div class="countdown" id="timer_6089944a" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Modify the code below to check that the vectors are of the same length. Return
+a *meaningful* error message if not. Test it out to make sure it works!
+
+
+```r
+both_na &lt;- function(x, y) {
+	if(condition) {
+		stop("message")
+	}
+	sum(is.na(x) &amp; is.na(y))
+}
+```
+
+
+---
+# Attempt 1
+* Did yours look something like this?
+
+
+```r
+both_na &lt;- function(x, y) {
+	if(length(x) != length(y)) {
+		stop("Vectors are of different lengths")
+	}
+	sum(is.na(x) &amp; is.na(y))
+}
+both_na(a, b)
+```
+
+```
+## [1] 2
+```
+
+```r
+both_na(a, c(b, b))
+```
+
+```
+## Error in both_na(a, c(b, b)): Vectors are of different lengths
+```
+
+---
+# More meaningful error message?
+### What would make it more meaningful?
+
+--
+State the lengths of each
+
+--
+
+
+```r
+both_na &lt;- function(x, y) {
+	if(length(x) != length(y)) {
+		v_lngths &lt;- paste0("x = ", length(x), 
+		                   ", y = ", length(y))
+		stop("Vectors are of different lengths:", v_lngths)
+	}
+	sum(is.na(x) &amp; is.na(y))
+}
+both_na(a, c(b, b))
+```
+
+```
+## Error in both_na(a, c(b, b)): Vectors are of different lengths:x = 7, y = 14
+```
+
+---
+# Quick error messages
+* For quick checks, with usually less than optimal messages, use `stopifnot`
+
+* Often useful if the function is just for you
+
+--
+
+```r
+z_score &lt;- function(x) {
+  stopifnot(is.numeric(x))
+  x &lt;- x[!is.na(x)]
+  (x - mean(x)) / sd(x)
+}
+z_score(c("a", "b", "c"))
+```
+
+```
+## Error in z_score(c("a", "b", "c")): is.numeric(x) is not TRUE
+```
+
+```r
+z_score(c(100, 115, 112))
+```
+
+```
+## [1] -1.1338934  0.7559289  0.3779645
+```
+
+---
+# warnings
+If you want to embed a warning, just swap out `stop` for `warning`
+
+---
+# Challenge
+### This is a tricky one
+
+<div class="countdown" id="timer_60899379" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">06</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+Modify your prior code to so it runs, but returns a warning, if the vectors are
+recyclable, and  returns a meaningful error message if they're different lengths and *not* recylable.
+
+Hint 1: You'll need two conditions
+
+Hint 2: Check if a number is fractional with `%%`, which returns the remainder
+in a division problem. So `8 %% 2` and `8 %% 4` both return zero (because
+there is no remainder), while and `7 %% 2` returns 1 and `7 %% 4` returns 3.
+
+---
+# One approach
+
+
+```r
+both_na &lt;- function(x, y) {
+	if(length(x) != length(y)) {
+		lx &lt;- length(x)
+		ly &lt;- length(y)
+		
+		v_lngths &lt;- paste0("x = ", lx, ", y = ", ly)
+
+		if(lx %% ly == 0 | ly %% lx == 0) {
+			warning("Vectors were recycled (", v_lngths, ")")
+		}
+		else {
+			stop("Vectors are of different lengths and are not recyclable:",
+			     v_lngths)	
+		}
+	}
+	sum(is.na(x) &amp; is.na(y))
+}
+```
+
+---
+# Test it
+
+
+```r
+both_na(a, c(b, b))
+```
+
+```
+## Warning in both_na(a, c(b, b)): Vectors were recycled (x = 7, y = 14)
+```
+
+```
+## [1] 4
+```
+
+```r
+both_na(a, c(b, b)[-1])
+```
+
+```
+## Error in both_na(a, c(b, b)[-1]): Vectors are of different lengths and are not recyclable:x = 7, y = 13
+```
+
+---
+class: inverse-red bottom
+background-image: url(https://i.gifer.com/Bbo5.gif)
+background-size: contain
+
+# Step back from the ledge
+
+---
+# How important is this?
+
+* For most of the work you do? Not very
+
+* Develop a package? Very!
+
+* Develop functions that others use, even if not through a function? Sort of.
+
+---
+class: inverse-blue middle
+# Return values
+
+---
+# Thinking more about return values
+* By default the function will return the last thing that is evaluated
+
+* Override this behavior with `return`
+
+* This allows the return of your function to be conditional
+
+* Generally the last thing evaluated should be the "default", or most common return value
+
+---
+# Pop quiz
+
+* What will the following return?
+
+
+```r
+add_two &lt;- function(x) {
+	result &lt;- x + 2
+}
+```
+
+--
+### Answer: Nothing! Why?
+
+```r
+add_two(7)
+add_two(5)
+```
+
+---
+# Specify the return value
+
+The below are all equivalent, and all result in the same function behavior
+
+.pull-left[
+
+```r
+add_two.1 &lt;- function(x) {
+	result &lt;- x + 2
+	result
+}
+add_two.2 &lt;- function(x) {
+	x + 2
+}
+```
+]
+
+.pull-right[
+
+```r
+add_two.3 &lt;- function(x) {
+	result &lt;- x + 2
+	return(result)
+}
+```
+]
+
+---
+# When to use `return`?
+Generally reserve `return` for you're returning a value prior to the full
+evaluation of the function. Otherwise, use `.1` or `.2` methods from prior slide.
+
+---
+# Thinking about function names
+
+Which of these is most intuitive?
+
+
+```r
+f &lt;- function(x) {
+	x &lt;- sort(x)
+	data.frame(value = x, 
+	           p = ecdf(x)(x))
+}
+
+ptile &lt;- function(x) {
+	x &lt;- sort(x)
+	data.frame(value = x, 
+	           ptile = ecdf(x)(x))
+}
+percentile_df &lt;- function(x) {
+	x &lt;- sort(x)
+	data.frame(value = x, 
+	           percentile = ecdf(x)(x))
+}
+```
+
+---
+# Output
+* The descriptive nature of the output can also help
+
+* Maybe a little too tricky but...
+
+
+```r
+percentile_df &lt;- function(x) {
+	arg &lt;- as.list(match.call())
+	x &lt;- sort(x)
+	d &lt;- data.frame(value = x, 
+	                percentile = ecdf(x)(x))
+	
+	names(d)[1] &lt;- paste0(as.character(arg$x), collapse = "_")
+	d
+}
+```
+
+---
+
+```r
+random_vector &lt;- rnorm(100)
+tail(percentile_df(random_vector))
+```
+
+```
+##     random_vector percentile
+## 95       1.951452       0.95
+## 96       1.958863       0.96
+## 97       2.002071       0.97
+## 98       2.003271       0.98
+## 99       2.151006       0.99
+## 100      2.673912       1.00
+```
+
+```r
+head(percentile_df(rnorm(50)))
+```
+
+```
+##    rnorm_50 percentile
+## 1 -1.549645       0.02
+## 2 -1.409034       0.04
+## 3 -1.357726       0.06
+## 4 -1.293475       0.08
+## 5 -1.227892       0.10
+## 6 -1.155356       0.12
+```
+
+---
+# How do we do this?
+
+* I often debug functions and/or figure out how to do something within the function by changing the return value &amp; re-running the function multiple times
+
+
+.b[[demo]]
+
+
+---
+# Thinking about dependencies
+* What's the purpose of the function?
+
+	+ Just your use? Never needed again? Don't worry about it at all.
+
+	+ Mass scale? Worry a fair bit, but make informed decisions.
+
+* What's the likelihood of needing to reproduce the results in the future?
+
+	+ If high, worry more.
+
+* Consider using name spacing (`::`)
+
+
+---
+class: inverse-green middle
+# Next time
+### Lab 3
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
