@@ -241,7 +241,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "other" "https://swcarpentry.github.io/r-novice-inflammation/02-func-R/" "NA" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/UMKFBFteKiI" >}}
 {{< /wrap >}}
 {{< /week-odd >}}
 
@@ -254,7 +254,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 
 {{< /wrap >}}
   {{< wrap >}}
-{{< due "assignments" "Midterm" >}}
+{{< due "take-home-midterm" "Midterm" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "adv-r" "functions.html" "6.1-6.4" >}}
@@ -274,7 +274,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< slides "" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< assigned "assignments" "Lab 3" >}}
+{{< assigned "lab-3" "Lab 3" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
@@ -320,7 +320,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 
 {{< /wrap >}}
   {{< wrap >}}
-{{< due "assignments" "Lab 3" >}}
+{{< due "lab-3" "Lab 3" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< readings "shiny" "https://mastering-shiny.org/basic-app.html" "NA" >}}

@@ -18,7 +18,7 @@ Each lab is worth 10 points and is scored on a best-honest-effort basis. Please 
 |---:|:-------------|:-------------|:----------------------------------------------------------|
 |   1|Wed, April 07 |Wed, April 14 |[Subsetting lists and base R `for()` loops](../lab-1)      |
 |   2|Wed, April 14 |Wed, April 21 |[Multiple models and API calls with **{purrr}**](../lab-2) |
-|   3|Mon, May 10   |Mon, May 17   |Create and apply functions                                 |
+|   3|Mon, May 10   |Mon, May 17   |[Create and apply functions](../lab-3)                     |
 
 {{< /bootstrap-table >}}
 
