@@ -196,7 +196,7 @@ table(map2_dbl(1:500, 1:500, `+`) &gt; 0)
 ```
 ## 
 ## FALSE  TRUE 
-##     5   495
+##     9   491
 ```
 
 ```r
@@ -206,8 +206,8 @@ table(map2_dbl(1:500, 1:500, `+`) &gt; 0)
 
 ```
 ## 
-## FALSE  TRUE 
-##     6   494
+## TRUE 
+##  500
 ```
 
 
@@ -360,6 +360,29 @@ background-image:url(https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b101
 
 
 
+&lt;code class ='r hljs remark-code'&gt;map_df(smry, ~.x(mtcars$&lt;span style="color:#4f8dde"&gt;mpg&lt;/span&gt;))&lt;/code&gt;
+
+```
+
+## # A tibble: 1 x 5
+##       n n_miss n_valid     mean       sd
+##   &lt;int&gt;  &lt;int&gt;   &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1    32      0      32 20.09062 6.026948
+
+```
+
+
+
+&lt;code class ='r hljs remark-code'&gt;map_df(smry, ~.x(mtcars$&lt;span style="color:#b54fde"&gt;cyl&lt;/span&gt;))&lt;/code&gt;
+
+```
+
+## # A tibble: 1 x 5
+##       n n_miss n_valid   mean       sd
+##   &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+## 1    32      0      32 6.1875 1.785922
+
+```
 
 --
 ### What if we wanted this for all columns?
@@ -369,7 +392,7 @@ background-image:url(https://d33wubrfki0l68.cloudfront.net/f0494d020aa517ae7b101
 * Can you extend the previous looping to supply the summary for every column?
 .b[Hint]: You'll need to make a nested loop (loop each function through each column)
 
-<div class="countdown" id="timer_609028dc" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60903a9f" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -416,6 +439,26 @@ Now we can just loop this function through each column
 
 
 
+&lt;code class ='r hljs remark-code'&gt;map_df(mtcars, &lt;span style="color:#4f8dde;text-weight:bold"&gt;summarize_col&lt;/span&gt;, .id = "column")&lt;/code&gt;
+
+```
+
+## # A tibble: 11 x 6
+##    column     n n_miss n_valid       mean          sd
+##    &lt;chr&gt;  &lt;int&gt;  &lt;int&gt;   &lt;int&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+##  1 mpg       32      0      32  20.09062    6.026948 
+##  2 cyl       32      0      32   6.1875     1.785922 
+##  3 disp      32      0      32 230.7219   123.9387   
+##  4 hp        32      0      32 146.6875    68.56287  
+##  5 drat      32      0      32   3.596562   0.5346787
+##  6 wt        32      0      32   3.21725    0.9784574
+##  7 qsec      32      0      32  17.84875    1.786943 
+##  8 vs        32      0      32   0.4375     0.5040161
+##  9 am        32      0      32   0.40625    0.4989909
+## 10 gear      32      0      32   3.6875     0.7378041
+## 11 carb      32      0      32   2.8125     1.615200
+
+```
 
 ---
 # Wrap the whole thing in a function
@@ -631,7 +674,7 @@ environment(double)
 ```
 
 ```
-## &lt;environment: 0x7f9d88883008&gt;
+## &lt;environment: R_GlobalEnv&gt;
 ```
 
 ```r
@@ -841,6 +884,7 @@ coef(m)["(Intercept)"]
 
 
 
+&lt;code class ='r hljs remark-code'&gt;pull_coef &lt;- function(&lt;span style="color:#b54fde"&gt;model&lt;/span&gt;, &lt;span style="color:#4f8dde"&gt;coef_name&lt;/span&gt;) {&lt;br&gt;&amp;nbsp;&amp;nbsp;coef(&lt;span style="color:#b54fde"&gt;model&lt;/span&gt;)[&lt;span style="color:#4f8dde"&gt;coef_name&lt;/span&gt;]&lt;br&gt;}&lt;/code&gt;
 
 --
 
@@ -856,11 +900,11 @@ mods %&gt;%
 ```
 ## # A tibble: 3 x 7
 ## # Groups:   cyl [3]
-##     cyl data                    model  intercept        disp           hp       drat
-##   &lt;dbl&gt; &lt;list&gt;                  &lt;list&gt;     &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
-## 1     6 &lt;tibble[,10] [7 × 10]&gt;  &lt;lm&gt;    6.284507  0.02635410  0.006229086  2.193577 
-## 2     4 &lt;tibble[,10] [11 × 10]&gt; &lt;lm&gt;   46.08662  -0.1225361  -0.04937771  -0.6041857
-## 3     8 &lt;tibble[,10] [14 × 10]&gt; &lt;lm&gt;   19.00162  -0.01671461 -0.02140236   2.006011
+##     cyl data                 model intercept        disp           hp       drat
+##   &lt;dbl&gt; &lt;list&gt;               &lt;lis&gt;     &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;
+## 1     6 &lt;tibble[,10] [7 × 1… &lt;lm&gt;   6.284507  0.02635410  0.006229086  2.193577 
+## 2     4 &lt;tibble[,10] [11 × … &lt;lm&gt;  46.08662  -0.1225361  -0.04937771  -0.6041857
+## 3     8 &lt;tibble[,10] [14 × … &lt;lm&gt;  19.00162  -0.01671461 -0.02140236   2.006011
 ```
 
 
@@ -1134,7 +1178,7 @@ map_df(df, ~(.x - min(.x, na.rm = TRUE)) /
 # Body
 * You try first
 
-<div class="countdown" id="timer_609028e2" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60903b38" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1152,6 +1196,7 @@ map_df(df, ~(.x - min(.x, na.rm = TRUE)) /
 
 
 
+&lt;code class ='r hljs remark-code'&gt;rescale01 &lt;- &lt;span style="color:#B854D4"&gt;function&lt;/span&gt;(&lt;span style="color:#4f8dde"&gt;x&lt;/span&gt;) {&lt;br&gt;&amp;nbsp;&amp;nbsp;(&lt;span style="color:#4f8dde"&gt;x&lt;/span&gt; - min(&lt;span style="color:#4f8dde"&gt;x&lt;/span&gt;, na.rm = &lt;span style="color:#B65610"&gt;TRUE&lt;/span&gt;)) / &lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;(ma&lt;span style="color:#4f8dde"&gt;x&lt;/span&gt;(&lt;span style="color:#4f8dde"&gt;x&lt;/span&gt;, na.rm = &lt;span style="color:#B65610"&gt;TRUE&lt;/span&gt;) - min(&lt;span style="color:#4f8dde"&gt;x&lt;/span&gt;, na.rm = &lt;span style="color:#B65610"&gt;TRUE&lt;/span&gt;))&lt;br&gt;}&lt;/code&gt;
 
 --
 ### Test it!
