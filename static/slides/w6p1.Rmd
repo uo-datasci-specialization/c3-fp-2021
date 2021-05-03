@@ -182,7 +182,7 @@ funs <- list(
 ```
 
 --
-.r[.ital[This is kind of weird...]]
+.red[*This is kind of weird...*]
 
 ---
 ```{r fun-list-eval}
@@ -272,7 +272,7 @@ summarize_col <- function(column) {
 Now we can just loop this function through each column
 
 ---
-```{r all-cols, include = FALSE}
+```{r all-cols, echo = FALSE, eval = FALSE}
 map_df(mtcars, summarize_col, .id = "column")
 ```
 
