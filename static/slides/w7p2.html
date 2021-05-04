@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Functions: Part 3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Daniel Anderson" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Functions: Part 3
+### Daniel Anderson
+### Week 7, Class 2
+
+---
+
+
+
+
+layout: true
+
+  &lt;script&gt;
+    feather.replace()
+  &lt;/script&gt;
+  
+  &lt;div class="slides-footer"&gt;
+  &lt;span&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w7p2.pdf"&gt;
+    &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w7p2.html"&gt;
+    &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/"&gt;
+    &lt;i class = "footer-icon" data-feather="globe"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021"&gt;
+    &lt;i class = "footer-icon" data-feather="github"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;/span&gt;
+  &lt;/div&gt;
+  
+
+---
+# Agenda
+* What makes functions "good"
+
+* Building up functions
+
+* Non-standard evaluation
+
+---
+# Learning objectives
+* Understand how functions build on top of each other and why "only do one
+thing" is a good mantra
+
+* Understand non-standard evaluation is, even if you aren't able to fully work
+with it
+
+---
+class: inverse-red middle
+# Brainstorm
+What makes a function "good" or "bad"
+
+<div class="countdown" id="timer_6091ce41" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: bottom right
+background-image:url(img/hadley-tensions.png)
+background-size: contain
+
+Slide from Hadley Master R training
+
+---
+class: bottom right
+background-image:url(img/hadley-errors.png)
+background-size: contain
+
+Slide from Hadley Master R training
+
+---
+class: bottom left
+background-image:url(img/hadley-continuum.png)
+background-size: contain
+
+Slide from 
+
+Hadley Master 
+
+R training
+
+---
+# What does this mean operationally?
+* Your function should do ONE thing (and do it well)
+
+* Careful when naming functions - be as clear as possible
+
+* Embed useful error messages and warnings
+	+ Particularly if you're working on a package or set of functions or others
+	are using your functions
+
+* Refactor your code to be more clear after initial drafts (it's okay to be
+messy on a first draft)
+
+
+---
+# Example 1
+* Anything we can do to clean this up?
+
+
+```r
+both_na &lt;- function(x, y) {
+	if(length(x) != length(y)) {
+		lx &lt;- length(x)
+		ly &lt;- length(y)
+		
+		v_lngths &lt;- paste0("x = ", lx, ", y = ", ly)
+
+		if(lx %% ly == 0 | ly %% lx == 0) {
+			warning("Vectors were recycled (", v_lngths, ")")
+		}
+		else {
+			stop("Vectors are of different lengths and are not recyclable:",
+			     v_lngths)	
+		}
+	}
+	sum(is.na(x) &amp; is.na(y))
+}
+```
+
+---
+# Calculate if recyclable
+
+
+```r
+recyclable &lt;- function(x, y) {
+	test1 &lt;- length(x) %% length(y)
+	test2 &lt;- length(y) %% length(x)
+
+	any(c(test1, test2) == 0)
+}
+```
+
+---
+# Test it
+
+
+```r
+a &lt;- c(1, NA, NA, 3, 3, 9, NA)
+b &lt;- c(NA, 3, NA, 4, NA, NA, NA)
+
+recyclable(a, b)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+recyclable(a, c(b, b))
+```
+
+```
+## [1] TRUE
+```
+
+```r
+recyclable(a, c(b, b, b))
+```
+
+```
+## [1] TRUE
+```
+
+```r
+recyclable(c(a, a), c(b, b, b))
+```
+
+```
+## [1] FALSE
+```
+
+---
+# Revision
+
+
+```r
+both_na &lt;- function(x, y) {
+
+	if(!recyclable(x, y)) {
+		stop("Vectors are of different lengths and are not recyclable: ",
+		     "(x = ", length(x),
+		     ", y = ", length(y), ")")	
+	}
+
+	if(length(x) == length(y)) {
+		return(sum(is.na(x) &amp; is.na(y)))
+	}
+	
+	if(recyclable(x, y)) {
+		warning("Vectors were recycled (", 
+		        "x = ", length(x), 
+		        ", y = ", length(y), ")")
+		return(sum(is.na(x) &amp; is.na(y)))
+	}
+}
+```
+
+---
+# Test it
+
+
+```r
+both_na(a, b)
+```
+
+```
+## [1] 2
+```
+
+```r
+both_na(a, c(b, b))
+```
+
+```
+## Warning in both_na(a, c(b, b)): Vectors were recycled (x = 7, y = 14)
+```
+
+```
+## [1] 4
+```
+
+```r
+both_na(c(a, b), c(b, b, b))
+```
+
+```
+## Error in both_na(c(a, b), c(b, b, b)): Vectors are of different lengths and are not recyclable: (x = 14, y = 21)
+```
+
+```r
+both_na(c(a, a), b)
+```
+
+```
+## Warning in both_na(c(a, a), b): Vectors were recycled (x = 14, y = 7)
+```
+
+```
+## [1] 4
+```
+
+---
+# Anything else?
+
+--
+### Make errors/warnings a function
+
+--
+
+```r
+check_lengths &lt;- function(x, y) {
+	if(!length(x) == length(y)) {
+		if(recyclable(x, y)) {
+			warning("Vectors were recycled (", 
+			        "x = ", length(x), 
+			        ", y = ", length(y), ")")
+		}
+		else {
+			stop("Vectors are of different lengths and are not recyclable: ",
+		     "(x = ", length(x),
+		     ", y = ", length(y), ")")
+		}
+	}
+}
+```
+
+---
+# Revision 2
+
+
+```r
+both_na &lt;- function(x, y) {
+	check_lengths(x, y)
+	sum(is.na(x) &amp; is.na(y))
+}
+```
+
+
+---
+# Test it
+
+
+```r
+both_na(a, b)
+```
+
+```
+## [1] 2
+```
+
+```r
+both_na(a, c(b, b))
+```
+
+```
+## Warning in check_lengths(x, y): Vectors were recycled (x = 7, y = 14)
+```
+
+```
+## [1] 4
+```
+
+```r
+both_na(c(a, b), c(b, b, b))
+```
+
+```
+## Error in check_lengths(x, y): Vectors are of different lengths and are not recyclable: (x = 14, y = 21)
+```
+
+```r
+both_na(c(a, a), b)
+```
+
+```
+## Warning in check_lengths(x, y): Vectors were recycled (x = 14, y = 7)
+```
+
+```
+## [1] 4
+```
+
+
+---
+# Why would we do this?
+* In this case - more readable code
+
+* We might re-use the `recyclable` or `check_lengths` functions in other/new
+functions
+
+* Helps make de-bugging easier
+
+---
+# Quick de-bugging example
+
+
+```r
+f &lt;- function(a) g(a)
+g &lt;- function(b) h(b)
+h &lt;- function(c) i(c)
+i &lt;- function(d) {
+  if (!is.numeric(d)) {
+    stop("`d` must be numeric", call. = FALSE)
+  }
+  d + 10
+}
+```
+
+---
+# traceback
+
+
+```r
+f("a")
+traceback()
+```
+![](img/traceback.png)
+
+
+---
+class: inverse-blue middle
+# Non-standard evaluation (NSE)
+### A high-level look
+
+---
+# Note
+* Were it not for the tidyverse, I would not even mention NSE
+
+* Generally, it's not an incredibly important topic
+
+* But, NSE is ubiquitous in the tidyverse - literally just about everything uses
+NSE, which makes programming with tidyverse functions more difficult
+
+
+---
+# What is NSE
+* Implementation of different scoping rules
+
+* In dplyr and many others, arguments are evaluated inside the specified data
+frames, rather than the current or global environment.
+
+
+--
+### How?
+(a) Capture an expression (quote it)
+(b) Use the expression within the correct context (evaluate it)
+
+So, `x` is evaluated as, e.g., `df$x` rather than `globalenv()$x`. 
+
+
+---
+# Example
+Using the `percentile_df` function we created previously
+* Here `base::substitute`
+
+
+```r
+percentile_df &lt;- function(x) {
+	sorted &lt;- sort(x)
+	d &lt;- data.frame(sorted, percentile = ecdf(sorted)(sorted))
+	names(d)[1] &lt;- paste0(substitute(x), collapse = "_")
+	d
+}
+percentile_df(rnorm(100, 5, 0.2)) %&gt;%
+	head()
+```
+
+```
+##   rnorm_100_5_0.2 percentile
+## 1        4.418671       0.01
+## 2        4.486699       0.02
+## 3        4.591151       0.03
+## 4        4.656127       0.04
+## 5        4.669653       0.05
+## 6        4.684359       0.06
+```
+
+---
+# Confusing
+* Outside of a function, `substitute` operates just like `quote` - it quotes the
+input. 
+
+* Inside of a function, `substitute` does as its name implies - it substitutes
+the input for the name.
+
+---
+# Example
+
+
+```r
+quote(subset(df, select = var))
+```
+
+```
+## subset(df, select = var)
+```
+
+```r
+substitute(subset(df, select = var))
+```
+
+```
+## subset(df, select = var)
+```
+
+```r
+extract_var &lt;- function(df, var) {
+	substitute(df)
+}
+extract_var(mtcars)
+```
+
+```
+## mtcars
+```
+
+---
+# Actually getting this thing to work
+
+
+```r
+extract_var &lt;- function(df, var) {
+	subset(eval(substitute(df)), 
+	       select = var)
+}
+extract_var(mtcars, "mpg")
+```
+
+```
+##                      mpg
+## Mazda RX4           21.0
+## Mazda RX4 Wag       21.0
+## Datsun 710          22.8
+## Hornet 4 Drive      21.4
+## Hornet Sportabout   18.7
+## Valiant             18.1
+## Duster 360          14.3
+## Merc 240D           24.4
+## Merc 230            22.8
+## Merc 280            19.2
+## Merc 280C           17.8
+## Merc 450SE          16.4
+## Merc 450SL          17.3
+## Merc 450SLC         15.2
+## Cadillac Fleetwood  10.4
+## Lincoln Continental 10.4
+## Chrysler Imperial   14.7
+## Fiat 128            32.4
+## Honda Civic         30.4
+## Toyota Corolla      33.9
+## Toyota Corona       21.5
+## Dodge Challenger    15.5
+## AMC Javelin         15.2
+## Camaro Z28          13.3
+## Pontiac Firebird    19.2
+## Fiat X1-9           27.3
+## Porsche 914-2       26.0
+## Lotus Europa        30.4
+## Ford Pantera L      15.8
+## Ferrari Dino        19.7
+## Maserati Bora       15.0
+## Volvo 142E          21.4
+```
+
+
+---
+# Why `eval`
+* `substitute` is quoting the input, but we then need to evaluate it.
+
+* All of this is rather confusing
+
+* The tidyverse uses it so frequently, they've decided to implement their own
+version, called `tidyeval`, which we'll get to in a minute.
+
+
+---
+# Better
+Use NSE for both arguments
+
+
+```r
+extract_var &lt;- function(df, var) {
+	eval(substitute(var), envir = df)
+}
+extract_var(mtcars, mpg)
+```
+
+```
+##  [1] 21.0 21.0 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4
+## [16] 10.4 14.7 32.4 30.4 33.9 21.5 15.5 15.2 13.3 19.2 27.3 26.0 30.4 15.8 19.7
+## [31] 15.0 21.4
+```
+
+--
+* The above is equivalent to `df$var` but where both `df` and `var` can be swapped programmatically.
+
+* The `var` argument is being .ital[substituted] in for whatever the user supplies, and is being .ital[evaluated] within the `df` environment
+
+---
+# Maybe more simply
+
+
+```r
+extract_var &lt;- function(df, var) {
+	df[ ,as.character(substitute(var))]
+}
+extract_var(mtcars, mpg)
+```
+
+```
+##  [1] 21.0 21.0 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4
+## [16] 10.4 14.7 32.4 30.4 33.9 21.5 15.5 15.2 13.3 19.2 27.3 26.0 30.4 15.8 19.7
+## [31] 15.0 21.4
+```
+
+* Why `as.character`? Otherwise it is a symbol, which won't work.
+
+* Note we could add `drop = FALSE` to this if we wanted to maintain the data frame structure
+
+---
+# Taking this even further
+
+
+```r
+extract_vars &lt;- function(df, ...) {
+  vars &lt;- substitute(alist(...))
+	df[ ,as.character(vars)[-1]]
+}
+head(extract_vars(mtcars, mpg, cyl, disp))
+```
+
+```
+##                    mpg cyl disp
+## Mazda RX4         21.0   6  160
+## Mazda RX4 Wag     21.0   6  160
+## Datsun 710        22.8   4  108
+## Hornet 4 Drive    21.4   6  258
+## Hornet Sportabout 18.7   8  360
+## Valiant           18.1   6  225
+```
+
+* We've now basically replicated `dplyr::select`
+
+* Notice the use of `[-1]`, because calling `as.character` on `vars` always returns `alist` as the first element in the vector
+
+---
+# Why is NSE used so frequently in the tidyverse?
+
+
+```r
+mpg %&gt;% 
+  select(manufacturer, model, hwy)
+```
+
+```
+## # A tibble: 234 x 3
+##    manufacturer model        hwy
+##    &lt;chr&gt;        &lt;chr&gt;      &lt;int&gt;
+##  1 audi         a4            29
+##  2 audi         a4            29
+##  3 audi         a4            31
+##  4 audi         a4            30
+##  5 audi         a4            26
+##  6 audi         a4            26
+##  7 audi         a4            27
+##  8 audi         a4 quattro    26
+##  9 audi         a4 quattro    25
+## 10 audi         a4 quattro    28
+## # … with 224 more rows
+```
+
+---
+# Interactive work!
+
+* It makes interactive work easier!
+
+* But this make programming with these functions harder...
+
+* Without NSE, `select` and similar functions would not know where `manufacturer`, `model`, or `hwy` "live". It would be looking for objects in the global environment with these names.
+
+
+---
+# dplyr programming fail
+
+* Let's say we wanted a function that returned means in a nice table-y format
+for a variable by two groups (e.g., cross-tab sort of format)
+
+
+--
+* Typically, we would start by solving this problem for a single situation, then
+we'd generalize it to a function.
+
+
+--
+* Let's do it!
+
+
+---
+
+```r
+mtcars %&gt;%
+	group_by(cyl, gear) %&gt;%
+	summarize(mean = mean(mpg, na.rm = TRUE)) %&gt;%
+	pivot_wider(names_from = cyl, values_from = mean)
+```
+
+```
+## # A tibble: 3 x 4
+##    gear    `4`   `6`   `8`
+##   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     3 21.5   19.75 15.05
+## 2     4 26.925 19.75 NA   
+## 3     5 28.2   19.7  15.4
+```
+
+* Try generalizing the above code into a function
+
+<div class="countdown" id="timer_6091cec1" style="right:0;bottom:1;left:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+# Generalize to a function
+
+Typically, we would expect something like this to work
+
+
+```r
+group_means &lt;- function(data, outcome, group_1, group_2) {
+	data %&gt;%
+		group_by(group_1, group_2) %&gt;%
+		summarize(mean = mean(outcome, na.rm = TRUE)) %&gt;%
+		pivot_wider(names_from = group_1, values_from = mean)
+}
+```
+
+---
+# But it doesn't...
+
+
+```r
+group_means(mtcars, mpg, cyl, gear)
+```
+
+```
+## Error: Must group by variables found in `.data`.
+## * Column `group_1` is not found.
+## * Column `group_2` is not found.
+```
+
+```r
+group_means(diamonds, price, cut, clarity)
+```
+
+```
+## Error: Must group by variables found in `.data`.
+## * Column `group_1` is not found.
+## * Column `group_2` is not found.
+```
+
+--
+### Why?
+* It's looking for an object called `group_1` that doesn't exist inside the function or in the global workspace!
+
+
+---
+class: inverse-orange middle
+# Solution
+Quote it, and evaluate it in the correct place
+
+---
+# The {rlang} version
+
+
+```r
+group_means &lt;- function(data, outcome, group_1, group_2) {
+	out &lt;- enquo(outcome) # Quote the inputs
+	g1 &lt;- enquo(group_1)
+	g2 &lt;- enquo(group_2)
+
+	data %&gt;%
+		group_by(!!g1, !!g2) %&gt;% # !! to evaluate (bang-bang)
+		summarize(mean = mean(!!out, na.rm = TRUE)) %&gt;%
+		pivot_wider(names_from = !!g1, values_from = mean)
+}
+```
+
+---
+
+
+```r
+group_means(mtcars, mpg, cyl, gear)
+```
+
+```
+## # A tibble: 3 x 4
+##    gear    `4`   `6`   `8`
+##   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     3 21.5   19.75 15.05
+## 2     4 26.925 19.75 NA   
+## 3     5 28.2   19.7  15.4
+```
+
+```r
+group_means(diamonds, price, cut, clarity)
+```
+
+```
+## # A tibble: 8 x 6
+##   clarity     Fair     Good `Very Good`  Premium    Ideal
+##   &lt;ord&gt;      &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1 I1      3703.533 3596.635    4078.226 3947.332 4335.726
+## 2 SI2     5173.916 4580.261    4988.688 5545.937 4755.953
+## 3 SI1     4208.279 3689.533    3932.391 4455.269 3752.118
+## 4 VS2     4174.724 4262.236    4215.760 4550.331 3284.550
+## 5 VS1     4165.141 3801.446    3805.353 4485.462 3489.744
+## 6 VVS2    3349.768 3079.108    3037.765 3795.123 3250.290
+## 7 VVS1    3871.353 2254.774    2459.441 2831.206 2468.129
+## 8 IF      1912.333 4098.324    4396.216 3856.143 2272.913
+```
+
+
+---
+# Alternative: Pass the dots!
+* Note, I've made the function a bit simpler here by removing the spread
+
+
+```r
+group_means2 &lt;- function(data, outcome, ...) {
+	out &lt;- enquo(outcome) # Still have to quote the outcome
+
+	data %&gt;%
+		group_by(...) %&gt;% 
+		summarize(mean = mean(!!out, na.rm = TRUE)) 
+}
+
+group_means2(mtcars, mpg, cyl, gear)
+```
+
+```
+## # A tibble: 8 x 3
+## # Groups:   cyl [3]
+##     cyl  gear   mean
+##   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+## 1     4     3 21.5  
+## 2     4     4 26.925
+## 3     4     5 28.2  
+## 4     6     3 19.75 
+## 5     6     4 19.75 
+## 6     6     5 19.7  
+## 7     8     3 15.05 
+## 8     8     5 15.4
+```
+
+```r
+group_means2(diamonds, price, cut, clarity)
+```
+
+```
+## # A tibble: 40 x 3
+## # Groups:   cut [5]
+##    cut   clarity     mean
+##    &lt;ord&gt; &lt;ord&gt;      &lt;dbl&gt;
+##  1 Fair  I1      3703.533
+##  2 Fair  SI2     5173.916
+##  3 Fair  SI1     4208.279
+##  4 Fair  VS2     4174.724
+##  5 Fair  VS1     4165.141
+##  6 Fair  VVS2    3349.768
+##  7 Fair  VVS1    3871.353
+##  8 Fair  IF      1912.333
+##  9 Good  I1      3596.635
+## 10 Good  SI2     4580.261
+## # … with 30 more rows
+```
+
+
+---
+# Added benefit
+I can now also pass as many columns as I want, and it will still work!
+
+
+```r
+group_means2(diamonds, price, cut, clarity, color)
+```
+
+```
+## # A tibble: 276 x 4
+## # Groups:   cut, clarity [40]
+##    cut   clarity color     mean
+##    &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt;    &lt;dbl&gt;
+##  1 Fair  I1      D     7383    
+##  2 Fair  I1      E     2095.222
+##  3 Fair  I1      F     2543.514
+##  4 Fair  I1      G     3187.472
+##  5 Fair  I1      H     4212.962
+##  6 Fair  I1      I     3501    
+##  7 Fair  I1      J     5795.043
+##  8 Fair  SI2     D     4355.143
+##  9 Fair  SI2     E     4172.385
+## 10 Fair  SI2     F     4520.112
+## # … with 266 more rows
+```
+
+---
+# Wait a minute!
+* This isn't the same thing
+
+
+--
+### Correct
+So in this case passing the dots won't fully fix our problem, but there .blue[is] another alternative
+
+
+
+---
+# Alternative syntax
+
+
+
+
+&lt;code class ='r hljs remark-code'&gt;group_means3 &lt;- &lt;span style="color:#B854D4"&gt;function&lt;/span&gt;(data, outcome, group_1, group_2) {&lt;br&gt;	&amp;nbsp;&amp;nbsp;data %&gt;%&lt;br&gt;		&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;group_by(&lt;span style="color:#4f8dde"&gt;{{&lt;/span&gt;group_1&lt;span style="color:#4f8dde"&gt;}}&lt;/span&gt;, &lt;span style="color:#4f8dde"&gt;{{&lt;/span&gt;group_2&lt;span style="color:#4f8dde"&gt;}}&lt;/span&gt;) %&gt;% &lt;br&gt;		&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;summarize(mean = mean(&lt;span style="color:#4f8dde"&gt;{{&lt;/span&gt;outcome&lt;span style="color:#4f8dde"&gt;}}&lt;/span&gt;, na.rm = &lt;span style="color:#B65610"&gt;TRUE&lt;/span&gt;)) %&gt;%&lt;br&gt;		&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;pivot_wider(names_from = &lt;span style="color:#4f8dde"&gt;{{&lt;/span&gt;group_1&lt;span style="color:#4f8dde"&gt;}}&lt;/span&gt;, values_from = mean)&lt;br&gt;}&lt;br&gt;&lt;br&gt;group_means3(mtcars, mpg, cyl, gear)&lt;/code&gt;
+
+```
+
+## # A tibble: 3 x 4
+##    gear    `4`   `6`   `8`
+##   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     3 21.5   19.75 15.05
+## 2     4 26.925 19.75 NA   
+## 3     5 28.2   19.7  15.4
+
+```
+
+
+---
+# Pipe-centric
+* Because the `data` argument comes first, this function works just like any other in the tidyverse, e.g., 
+
+--
+
+```r
+diamonds %&gt;% 
+  filter(color == "E") %&gt;% 
+  select(carat, cut, clarity) %&gt;% 
+  group_means3(carat, cut, clarity)
+```
+
+```
+## # A tibble: 8 x 6
+##   clarity       Fair      Good `Very Good`   Premium     Ideal
+##   &lt;ord&gt;        &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 I1       0.9688889 1.330870    1.069545  1.043     1.037778 
+## 2 SI2      1.015641  0.8825743   0.9304045 0.9576686 0.8744136
+## 3 SI1      0.8670769 0.7238592   0.7230831 0.7262866 0.6706266
+## 4 VS2      0.6902381 0.739375    0.6644135 0.6189348 0.5211356
+## 5 VS1      0.6328571 0.6806742   0.6097952 0.6431507 0.5035919
+## 6 VVS2     0.6007692 0.5601923   0.4267114 0.5115702 0.4839053
+## 7 VVS1     0.64      0.4181395   0.4000588 0.4622857 0.4265075
+## 8 IF      NA         0.3733333   0.5793023 0.5762963 0.4577215
+```
+
+---
+# Syntax note
+
+* The `{{}}` syntax is obviously *much* easier to apply
+
+* It gets you out of tidyeval complications maybe 80% of the time
+
+* If you start doing a lot of programming w/the tidyverse, you'll probably want to read up more no tidyeval and get comfy with quoting/unquoting
+
+---
+# Challenge
+
+* Write a function that summarizes any numeric columns by returning the mean, 
+standard deviation, min, and max values. 
+
+* For bonus points, embed a meaningful error message if the columns supplied are
+not numeric.
+
+Example
+
+
+
+
+```r
+summarize_cols(diamonds, depth, table, price)
+```
+
+```
+## # A tibble: 3 x 5
+##   var         mean          sd   min   max
+##   &lt;chr&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 depth   61.74940    1.432621    43    79
+## 2 price 3932.800   3989.440      326 18823
+## 3 table   57.45718    2.234491    43    95
+```
+
+<div class="countdown" id="timer_6091ce76" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+# Pass the dots!
+
+
+```r
+summarize_cols &lt;- function(data, ...) {
+	data %&gt;%
+		select(...) %&gt;%
+		pivot_longer(everything(), 
+		             names_to = "var", 
+		             values_to = "val") %&gt;%
+		group_by(var) %&gt;%
+		summarize(mean = mean(val, na.rm = TRUE),
+	          	sd = sd(val, na.rm = TRUE),
+	          	min = min(val, na.rm = TRUE),
+	          	max = max(val, na.rm = TRUE))
+}
+```
+
+---
+# Pipe-centric again
+Just putting data as the first argument leads to a lot of benefits
+
+
+```r
+library(palmerpenguins)
+penguins %&gt;% 
+  select_if(is.numeric) %&gt;% 
+  summarize_cols(everything())
+```
+
+```
+## # A tibble: 5 x 5
+##   var                     mean          sd    min    max
+##   &lt;chr&gt;                  &lt;dbl&gt;       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 bill_depth_mm       17.15117   1.974793    13.1   21.5
+## 2 bill_length_mm      43.92193   5.459584    32.1   59.6
+## 3 body_mass_g       4201.754   801.9545    2700   6300  
+## 4 flipper_length_mm  200.9152   14.06171    172    231  
+## 5 year              2008.029     0.8183559 2007   2009
+```
+
+---
+class: inverse-blue middle
+# Example with plotting
+
+---
+# Linearity
+* We want to check if an x/y relation is linear
+
+
+--
+* Function should produce linear and non-linear relations
+
+
+--
+* Optionally show the data
+
+---
+# Maybe this?
+
+```r
+check_linear &lt;- function(data, x, y, se = TRUE, 
+                         points = FALSE) {
+	p &lt;- ggplot(data, aes(x, y)) 
+           
+	if(points) {
+	  p &lt;- p + geom_point(color = "gray80")
+	}
+  if(se) {
+  	p &lt;- p +
+  	  geom_smooth(method = "lm") +
+  	  geom_smooth() 
+  }
+  else {
+  	p &lt;- p +
+  	  geom_smooth(method = "lm", se = FALSE) +
+  	  geom_smooth(se = FALSE)	
+  }
+  p
+}
+```
+
+---
+# Nope
+
+
+```r
+check_linear(penguins, bill_length_mm, bill_depth_mm)
+```
+
+```
+## Error in FUN(X[[i]], ...): object 'bill_length_mm' not found
+```
+
+![](w7p2_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+
+---
+# Use tidyeval
+Note - there are other approaches too, but they are soft deprecated
+
+
+```r
+check_linear &lt;- function(data, x, y, points = FALSE, ...) {
+	p &lt;- ggplot(data, aes({{x}}, {{y}})) 
+	if (points) {
+	  p &lt;- p + geom_point(color = "gray80")
+	}   
+	p + 
+	  geom_smooth(method = "lm",
+		            color = "magenta", 
+			          ...) +
+	  geom_smooth(...)
+}
+```
+
+---
+
+
+```r
+check_linear(penguins, bill_length_mm, bill_depth_mm)
+```
+
+![](w7p2_files/figure-html/scatter-tidyeval-1.png)&lt;!-- --&gt;
+
+---
+# Add points
+
+
+```r
+check_linear(penguins, bill_length_mm, bill_depth_mm,
+             points = TRUE)
+```
+
+![](w7p2_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+
+---
+# Add ggplot functions
+
+```r
+check_linear(mtcars, disp, mpg, se = FALSE) +
+	labs(title = "Checking linearity",
+	     subtitle = "Linear vs LOESS fits",
+	     x = "Engine Displacement",
+	     y = "Miles Per gallon") +
+	theme_dark(20)
+```
+
+![](w7p2_files/figure-html/ggplot-extend-1.png)&lt;!-- --&gt;
+
+---
+# Building up plots
+* Let's create a function that calculates means and standard errors for every numeric column in a data frame
+
+* We'll then use this function to create a plotting function
+
+---
+# Means/SE's
+* First figure it out for a single example
+
+* Note there's not built-in function for the standard error of the mean, which is `\(\frac{\sigma}{\sqrt{n}}\)`
+
+--
+
+
+```r
+# SE function
+se &lt;- function(x) {
+  x &lt;- x[!is.na(x)]
+  sd(x)/sqrt(length(x))
+}
+```
+
+---
+# Full means/SEs
+
+
+```r
+penguins %&gt;% 
+  select_if(is.numeric) %&gt;% 
+  pivot_longer(everything(),
+               names_to = "var",
+               values_to = "val") %&gt;% 
+  group_by(var) %&gt;% 
+  summarize(mean = mean(val, na.rm = TRUE),
+            se = se(val))
+```
+
+```
+## # A tibble: 5 x 3
+##   var                     mean          se
+##   &lt;chr&gt;                  &lt;dbl&gt;       &lt;dbl&gt;
+## 1 bill_depth_mm       17.15117  0.1067846 
+## 2 bill_length_mm      43.92193  0.2952205 
+## 3 body_mass_g       4201.754   43.36473   
+## 4 flipper_length_mm  200.9152   0.7603704 
+## 5 year              2008.029    0.04412279
+```
+
+---
+# Challenge
+Try to generalize the code on the previous slide into a  function. Test it on the `forcats::gss_cat` data.
+
+<div class="countdown" id="timer_6091cc5c" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+
+---
+# Translate to a function
+
+
+```r
+estimate_means &lt;- function(df) {
+* df %&gt;%
+    select_if(is.numeric) %&gt;% 
+    pivot_longer(everything(),
+                 names_to = "var",
+                 values_to = "val") %&gt;% 
+    group_by(var) %&gt;% 
+    summarize(mean = mean(val, na.rm = TRUE),
+              se = se(val)) 
+}
+estimate_means(forcats::gss_cat)
+```
+
+```
+## # A tibble: 3 x 3
+##   var            mean         se
+##   &lt;chr&gt;         &lt;dbl&gt;      &lt;dbl&gt;
+## 1 age       47.18008  0.1181556 
+## 2 tvhours    2.980771 0.02429812
+## 3 year    2006.502    0.03037436
+```
+
+---
+# Plot
+
+
+```r
+ggplot(estimate_means(forcats::gss_cat), 
+       aes(var, mean)) +
+    geom_errorbar(aes(ymin = mean + qnorm(0.025)*se,
+                      ymax = mean + qnorm(0.975)*se),
+                  width = 0.4,
+                  color = "gray40") +
+    geom_point() +
+    coord_flip()
+```
+
+![](w7p2_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+# Create plot function
+
+
+```r
+plot_means &lt;- function(df) {
+  means &lt;- estimate_means(df) %&gt;% 
+    mutate(var = reorder(factor(var), mean))
+  
+  ggplot(means, aes(var, mean)) +
+    geom_errorbar(aes(ymin = mean + qnorm(0.025)*se,
+                      ymax = mean + qnorm(0.975)*se),
+                  width = 0.4,
+                  color = "gray40") +
+    geom_point() +
+    coord_flip()
+}
+```
+
+--
+Notice we've successfully avoided tideval entirely in both examples!
+
+---
+# Examples
+
+```r
+plot_means(penguins)
+```
+
+![](w7p2_files/figure-html/plot-means-ex1-1.png)&lt;!-- --&gt;
+
+---
+
+```r
+plot_means(diamonds)
+```
+
+![](w7p2_files/figure-html/plot-means-ex2-1.png)&lt;!-- --&gt;
+---
+# Overall takeaway
+* Non-standard evaluation is confusing but kind of neat
+
+* Programming with the tidyverse can be a bit more difficult, but not always
+
+* Good to think about multiple ways to approach the same problem (and when programming, perhaps think outside the tidyverse at times)
+
+---
+class: inverse-green middle
+# Next time
+## Intro to shiny
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
