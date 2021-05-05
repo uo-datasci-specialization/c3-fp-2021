@@ -130,6 +130,10 @@ a <- c(1, NA, NA, 3, 3, 9, NA)
 b <- c(NA, 3, NA, 4, NA, NA, NA)
 ```
 
+You try first. See if you can use these vectors to find how many elements are `NA` in both (should be 2).
+
+`r countdown::countdown(3)`
+
 ---
 # One approach
 
@@ -342,7 +346,7 @@ background-size: contain
 
 * Develop a package? Very!
 
-* Develop functions that others use, even if not through a function? Sort of.
+* Develop functions that others use, even if not through a package? Sort of.
 
 ---
 class: inverse-blue middle

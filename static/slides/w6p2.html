@@ -159,6 +159,12 @@ a &lt;- c(1, NA, NA, 3, 3, 9, NA)
 b &lt;- c(NA, 3, NA, 4, NA, NA, NA)
 ```
 
+You try first. See if you can use these vectors to find how many elements are `NA` in both (should be 2).
+
+<div class="countdown" id="timer_6092cc25" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
 ---
 # One approach
 
@@ -300,7 +306,7 @@ both_na &lt;- function(x, y) {
 ---
 # Challenge
 
-<div class="countdown" id="timer_6089944a" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6092cd29" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -408,7 +414,7 @@ If you want to embed a warning, just swap out `stop` for `warning`
 # Challenge
 ### This is a tricky one
 
-<div class="countdown" id="timer_60899379" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_6092ca17" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">06</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -483,7 +489,7 @@ background-size: contain
 
 * Develop a package? Very!
 
-* Develop functions that others use, even if not through a function? Sort of.
+* Develop functions that others use, even if not through a package? Sort of.
 
 ---
 class: inverse-blue middle
@@ -605,12 +611,12 @@ tail(percentile_df(random_vector))
 
 ```
 ##     random_vector percentile
-## 95       1.951452       0.95
-## 96       1.958863       0.96
-## 97       2.002071       0.97
-## 98       2.003271       0.98
-## 99       2.151006       0.99
-## 100      2.673912       1.00
+## 95       1.821268       0.95
+## 96       1.857752       0.96
+## 97       1.872896       0.97
+## 98       2.080044       0.98
+## 99       2.085509       0.99
+## 100      2.550323       1.00
 ```
 
 ```r
@@ -619,12 +625,12 @@ head(percentile_df(rnorm(50)))
 
 ```
 ##    rnorm_50 percentile
-## 1 -1.549645       0.02
-## 2 -1.409034       0.04
-## 3 -1.357726       0.06
-## 4 -1.293475       0.08
-## 5 -1.227892       0.10
-## 6 -1.155356       0.12
+## 1 -2.320176       0.02
+## 2 -2.121005       0.04
+## 3 -1.803052       0.06
+## 4 -1.521140       0.08
+## 5 -1.413990       0.10
+## 6 -1.179056       0.12
 ```
 
 ---
