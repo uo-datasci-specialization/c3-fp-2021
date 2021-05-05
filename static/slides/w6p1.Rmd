@@ -893,7 +893,7 @@ mean2 <- function(x, ...) {
 ```
 
 ---
-# Reefine means_df
+# Redefine means_df
 
 ```{r df-mean-redefined}
 means_df <- function(df, ...) {
