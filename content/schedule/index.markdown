@@ -283,7 +283,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "adv-r" "functions.html" "6.5-6.8" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/rV9QMh0wBcw" >}}
 {{< /wrap >}}
 {{< /week-odd >}}
 
