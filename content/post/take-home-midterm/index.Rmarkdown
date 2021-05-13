@@ -1,0 +1,351 @@
+---
+title: Take Home Midterm
+author: Daniel Anderson
+date: '2021-03-08'
+assigned: '2021-04-19'
+due: '2021-05-05'
+slug: take-home-midterm
+categories:
+  - Assignments
+tags:
+  - Midterm
+  - Assignments
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      cache = TRUE,
+                      dev.args = list(bg = "transparent"))
+
+library(tidyverse)
+library(ggtext)
+options(dplyr.summarise.inform = FALSE)
+theme_set(
+  theme_minimal(30) +
+    theme( 
+      plot.title.position = "plot",
+      axis.text = element_text(color = "aliceblue"), 
+      axis.title = element_text(color = "aliceblue"),
+      axis.text.x = element_text(color = "aliceblue"), 
+      axis.text.y = element_text(color = "aliceblue"),
+      plot.subtitle = element_markdown(color = "aliceblue", size = 25), 
+      plot.caption = element_text(color = "aliceblue"), 
+      panel.grid.major = element_line(color = "gray20"), 
+      panel.grid.minor = element_line(linetype = "blank"), 
+      plot.title = element_text(colour = "aliceblue"),
+      legend.position = c(0.64, -0.15),
+      legend.direction = "horizontal",
+      legend.key.size = unit(5, 'cm'),
+      legend.key.height = unit(1.2,"cm"),
+      legend.title = element_blank(),
+      legend.text = element_text(color = "aliceblue",
+                                 margin = margin(t = 10)),
+      plot.margin = margin(b = 4, r = 2, unit = "cm")
+    )
+)
+```
+
+# Setup
+This work should all be housed in a GitHub repo. Establish the repo and add your collaborators. 
+
+Loading the data takes a minute, so I would suggest you do it once and cache it. This just means including `knitr::opts_chunk$set(cache = TRUE)` in one of your chunk options.
+
+The problem with caching is that sometimes results of a later chunk depend upon earlier ones and things can get out of sync. If you make a change and it doesn't have the result you expect, try clearing the cache and knitting again.
+
+![](../slides/img/clear_cache.png)
+
+If this is confusing, don't worry about it. Either check in with me or ignore this part and don't use caching. It will just take a little longer to render your file each time you click "knit".
+
+I would also recommend not tracking the cache files. This means adding the cache folder to your `.gitignore` file. If you initialized your repo with the R `.gitignore` file this is actually already taken care of for you. If not, add `/*_cache/` to your `.gitignore`.
+
+# Part A: Data 
+### 20 points
+
+The following function downloads data from the Oregon Department of education
+website on the number of students who scored in each performance category on the
+statewide assessment by race/ethnicity for every school in the state. It takes
+one argument, `year`, which must be a two digit integer from 15 to 18 (representing the 2014-15 to 2017-18 school years). It actually won't work on later years because the file structure changed and I wanted to keep the function simple.
+
+**NOTE:** This function uses the `glue` function from the package of the same name. If you do not already have this package installed, please first install it with `install.packages("glue")`. It also uses `{rio}` for the import, which you should already have installed, but if not, install that first too.
+
+```{r data-links, echo = TRUE}
+download_file <- function(year) {
+  link <- glue::glue("https://www.oregon.gov/ode/educator-resources/assessment/TestResults20{year}/pagr_schools_ela_raceethnicity_{year-1}{year}.xlsx")
+  rio::import(link, setclass = "tibble", na = c("-", "--", "*"))
+}
+```
+
+1. (10 points) Use the function above to download *all* of the data from the 2014-15 to 2017-18 school years and bind it into a single data frame, **using a single function** (i.e., one line of code). Note, this may take a minute or two to run, depending on your Internet speed.
+
+```{r answer-1a, message = FALSE, warning = FALSE}
+library(tidyverse)
+d <- map_dfr(15:18, download_file) 
+d
+```
+
+Conduct some basic data cleaning to make your data file look like the following. 
+
+* Filter for only student groups coded as `"White"` or `"Hispanic/Latino"`. 
+* Select variables related to the number of students in each of the levels (1:4), and not percentages or collapsed levels.
+* Remove any row that has missing data in any of the *n* variables
+
+```{r clean-up}
+d <- d %>%
+	janitor::clean_names() %>%
+	select(academic_year, district, school, student_group, grade_level,
+	       number_level_1, number_level_2, number_level_3, number_level_4) %>%
+	filter(student_group == "White" |
+	       student_group == "Hispanic/Latino") %>%
+	drop_na(number_level_1) %>%
+	pivot_longer(starts_with("number"),
+		           names_to = "level",
+		           names_prefix = "number_level_", 
+		           values_to = "n",
+		           values_ptypes = list(n = integer())) %>%
+	arrange(academic_year, district, school, student_group, grade_level, level)
+
+print(d, width = Inf)
+```
+
+2. (10 points) Sum the *n* across grades and school for each district within each academic year, student group, and level. Calculate the number of schools (unique schools listed) for each district. Also move your data to a wider format where the student groups become new columns, filled by the district n. Remove districts that did not report numbers for one or both student groups (i.e., drop missing data from the new columns). Your data frame should look like the below
+
+```{r answer-2a}
+d <- d %>%
+  group_by(district) %>% 
+  mutate(n_schools = length(unique(school))) %>% 
+	count(academic_year, district, student_group, level, n_schools, 
+	      wt = n) %>%
+	pivot_wider(names_from = "student_group",
+		          values_from = "n") %>%
+	janitor::clean_names() %>%
+	drop_na(hispanic_latino, white) %>%
+	ungroup() %>% 
+  select(academic_year, district, n_schools, level, everything())
+
+d
+```
+
+
+# Part B: Achievement gaps
+### 40 points
+
+If you have not already done so, please install the [{gapr}](https://github.com/datalorax/gapr) package using the following code
+
+```{r gapr-install, eval = FALSE, echo = TRUE}
+remotes::install_github("datalorax/gapr")
+```
+
+The {gapr} package includes, at the moment, one function, `estimate_v()`, which estimates the average difference between two distributions in terms of an effect size when the only data available are counts within bins (for more information, see [Ho & Reardon, 2012](https://journals.sagepub.com/doi/10.3102/1076998611411918)). The nice thing about this approach is that we're able to obtain the effect size of average differences in achievement between two groups of students *as if we had the full, student level data* even though we just have counts within bins (performance levels).
+
+The `estimate_v` function takes 3 arguments in the following order: (1) the data frame including the counts for each group, (2) a character string stating the name of the column with the counts for the reference group, and (3) a character string stating the name of the column with the counts for the focal group.
+
+To estimate the average achievement difference between students coded Hispanic/Latino versus White for the first school district in the first year in our data, we would run the following
+
+```{r gap-example, echo = TRUE}
+library(gapr)
+d[1:4, ] %>% # data source - just first four rows for first district
+  estimate_v("white", "hispanic_latino") # columns for reference/focal groups
+```
+
+We can see that students coded Hispanic/Latino scored, on average, about 0.81 
+standard deviations below students coded White within this school district for this year.
+
+1. (10 points) Estimate the average achievement differences in terms of an effect size for every school district in the state that reported data on both student groups (i.e., using the data we created above), for each academic year. Conduct this analysis twice, once using `group_by() %>% nest() map()` and once using `nest_by() %>% summarize()`.
+
+```{r 1-answersb, warning = FALSE}
+library(gapr)
+
+by_district <- d %>%
+	group_by(academic_year, district, n_schools) %>%
+	nest() 
+
+library(tictoc)
+
+tic()
+mods <- by_district %>% 
+	mutate(models = map(data, estimate_v, "white", "hispanic_latino")) %>% 
+  select(-data) %>% 
+  unnest(models)
+toc()
+
+tic()
+mods_nestby <- d %>%
+	nest_by(academic_year, district, n_schools) %>%
+  summarize(models = estimate_v(data, "white", "hispanic_latino")) %>% 
+  mutate(v_nestby = models$v) %>% 
+  select(-models)
+toc()
+```
+
+Note, on my computer these took about 40 seconds per analysis. It will likely take a bit longer for you, but shouldn't take *too* long. You may get a warning. Just go ahead and ignore that for now.
+
+2. (5 points)
+
+Reproduce the following plot to confirm that the estimates are equivalent across methods.
+
+```{r message = FALSE, fig.width = 15, fig.height = 16}
+left_join(mods_nestby, mods) %>% 
+  ggplot(aes(v_nestby, v)) +
+  geom_point(size = 7,
+             color = "gray50") +
+  geom_line(color = "#6EC9F7",
+            size = 3) +
+  labs(x = "V (`nest_by() %>% summarize()`)",
+       y = "V (`group_by() %>% nest() %>% mutate() %>% map()`)") +
+  scale_y_continuous(expand = c(.1, .1))
+```
+
+
+3. (15 points) The plot below shows the achievement difference estimates for one school district across years. Produce a similar plot to the below for each of the first 100 school districts. Once you've created all the plots, **reproduce them again using an alternative method**. Make sure you don't miss the caption noting the number of schools in the district. 
+
+Hint: You need to select unique *districts*. You may want to try something like the following
+
+
+
+```{r dist-unique, eval = FALSE, echo = TRUE}
+dists <- unique(v$district)[1:100]
+
+model_list_object %>% 
+  filter(district %in% dists)
+```
+
+<br/>
+
+```{r bandon, fig.width = 15, fig.height = 16}
+v <- mods %>%
+	mutate(district = str_replace_all(district, " SD ", " School District "),
+	       district = str_replace_all(district, "District.+", "District"),
+	       directionality = ifelse(v > 0, "#5ca3ff", "#d35cff")) 
+
+library(ggtext)
+
+bandon <- filter(v, district == "Bandon School District") 
+
+ggplot(bandon, aes(as.numeric(as.factor(academic_year)), v)) +
+  geom_hline(yintercept = 0, 
+	           size = 1.2,
+	           color = "#e25a5a") +
+  geom_line(color = "gray70") +
+  geom_errorbar(aes(ymin = v + qnorm(0.025)*v_se,
+                    ymax = v + qnorm(0.975)*v_se),
+                width = 0.3,
+                color = "gray60",
+                size = 1.5) +
+  geom_point(aes(color = directionality),
+             size = 5) +
+  scale_color_identity() +
+  scale_x_continuous(breaks = 1:4, labels = unique(d$academic_year)) +
+	labs(title = "Achievement Gap Estimates: Bandon School District",
+	     subtitle = "Negative values indicate <span style='color:#d35cff'>**White**</span> students have higher average achievement <br/>Positive values indicate <span style='color:#5ca3ff'>**Hispanic/Latino**</span> students have higher average achievement",
+	     caption = glue::glue("Note: District included {bandon$n_schools} schools."),
+	     x = "School year",
+	     y = "Average achievement difference (SD units)") +
+  theme(plot.subtitle = element_markdown())
+```
+
+```{r answer2b, eval = FALSE}
+# method 1: `pmap()`
+
+dists <- unique(v$district)[1:100]
+
+plots <- v %>% 
+  filter(district %in% dists) %>% 
+  group_by(district, n_schools) %>% 
+  nest() %>% 
+  mutate(plot = pmap(list(data, district, n_schools), 
+                     function(.d, .district, .n_schools)
+    ggplot(.d, aes(as.numeric(as.factor(academic_year)), v)) +
+      geom_hline(yintercept = 0, 
+                 size = 1.2,
+	               color = "#e25a5a") +
+      geom_line(color = "gray70") +
+      geom_errorbar(aes(ymin = v + qnorm(0.025)*v_se,
+                        ymax = v + qnorm(0.975)*v_se),
+                    width = 0.3,
+                    color = "gray60",
+                    size = 1.5) +
+      geom_point(aes(color = directionality),
+                 size = 5) +
+      scale_color_identity() +
+      scale_x_continuous(breaks = as.numeric(as.factor(.d$academic_year)), 
+                         labels = .d$academic_year) +
+      labs(title = glue::glue("Achievement Gap Estimates: {.district}"),
+           subtitle = "Negative values indicate <span style='color:#d35cff'>White</span> students have higher average achievement <br/>Positive values indicate <span style='color:#5ca3ff'>Hispanic/Latino</span> students have higher average achievement",
+           caption = glue::glue("Note: District included {.n_schools} schools."),
+           x = "School year",
+           y = "Average achievement difference (SD units)") + 
+      theme_minimal(12) +
+      theme( 
+        plot.title.position = "plot",
+        plot.subtitle = element_markdown()
+      )
+    )
+  )
+
+### Method 2: nest_by() %>%  summarize()
+plots2 <- v %>% 
+  ungroup() %>% 
+  filter(district %in% dists) %>% 
+  nest_by(district) %>% 
+  summarize(plot = list(
+    ggplot(data, aes(as.numeric(as.factor(academic_year)), v)) +
+      geom_hline(yintercept = 0, 
+                 size = 1.2,
+	               color = "#e25a5a") +
+      geom_line(color = "gray70") +
+      geom_errorbar(aes(ymin = v + qnorm(0.025)*v_se,
+                        ymax = v + qnorm(0.975)*v_se),
+                    width = 0.3,
+                    color = "gray60",
+                    size = 1.5) +
+      geom_point(aes(color = directionality),
+                 size = 5) +
+      scale_color_identity() +
+      scale_x_continuous(
+        breaks = 1:4,
+        labels = c("2014-2015", "2015-2016", "2016-2017", "2017-2018")
+      ) +
+      labs(title = glue::glue("Achievement Gap Estimates: {district}"),
+           subtitle = "Negative values indicate <span style='color:#d35cff'>White</span> students have higher average achievement <br/>Positive values indicate <span style='color:#5ca3ff'>Hispanic/Latino</span> students have higher average achievement",
+           caption = glue::glue("Note: District included {unique(data$n_schools)} schools."),
+           x = "School year",
+           y = "Average achievement difference (SD units)") + 
+      theme_minimal(12) +
+      theme( 
+        plot.title.position = "plot",
+        plot.subtitle = element_markdown()
+      )
+    )
+  )
+)
+
+# Extra credit
+
+library(patchwork)
+ec_plots <- map2(plots$plot, plots2$plot, `+`)
+# ec_plots[[4]]
+# ec_plots[[24]] 
+# ec_plots[[32]]
+# ec_plots[[67]]
+```
+
+**Extra Credit:** For up to one point extra credit, create a third set that "staples together" each of the preceding pairs of plots (i.e., to confirm that the plots were produced identically by both methods).
+
+4. (10 points) Save the plots into a "plots" directory. Make sure the file names are meaningful.
+
+**HINTS**
+
+* You don't have to use a loop to create the file names (maybe give `{glue}` a try? Otherwise `paste` or `paste0` will work fine).
+* When working with the code, limit the number of plots you're saving to, say, the first five to make sure it works before running it on all plots.
+
+```{r answer3b, eval = FALSE}
+dir.create(here::here("content", "post", "take-home-midterm", "plots"))
+dists <- map_chr(strsplit(plots$district, " SD"), 1)
+dists <- tolower(gsub(" ", "_", dists))
+
+files <- glue::glue("achievement-gaps_{dists}.png")
+files <- here::here("content", "post", "take-home-midterm", "plots", files)
+
+walk2(files, plots$plot, ggsave, width = 6.5, height = 9)
+```
