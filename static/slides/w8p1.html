@@ -96,7 +96,7 @@ Do the following:
 * What's going on here? Talk with your neighbor and see if you can deduce the
 basic functionality.
 
-<div class="countdown" id="timer_609c8d60" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60a2a10d" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -152,7 +152,7 @@ Does it work now?
 
 * Reminder, the data are called `faithful`, and you'll be showing the distribution of `waiting`
 
-<div class="countdown" id="timer_609c8d25" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60a2a067" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -176,7 +176,7 @@ class: inverse-red middle
 --
 ### Try it out!
 
-<div class="countdown" id="timer_609c8fa7" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60a2a015" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -192,7 +192,9 @@ class: inverse-red middle
 
 * Use `radioButtons` for the variables, and `sliderInput` for the bins.
 
-* You'll need to create a second entry to your `ui`
+* You'll need to create a second entry to your `ui` 
+
+* Use the `mpg` dataset (from **ggplot2**)
 
 
 [demo]
@@ -235,7 +237,6 @@ class: inverse-red middle
 --
 * Just create a `tabsetPanel` within the `mainPanel`, then put the output for each tab within `tabPanel`.
 
-
 --
 [demo]
 
@@ -255,10 +256,10 @@ class: inverse-red middle
 
 
 --
-* Consider pulling pieces out as a refactoring method to try to make code more readable/less buggy.
+* Make sure to move your title so it's like `navbarPage("App title",` or the rest of the pages won't look right
 
 
-[example]
+[demo, if we have time]
 
 
 ---
@@ -268,6 +269,11 @@ class: inverse-red middle
 * The new [Mastering Shiny](https://mastering-shiny.org) book should be your guide for going deeper
 
 * Great for building interactive plots, but you can use it for all sorts of other things too (including text and tables)
+
+* Apps get complicated quickly
+
+  + Consider pulling pieces out as a refactoring method to try to make code more readable/less buggy, or using [shiny modules](https://mastering-shiny.org/scaling-modules.html)
+
 
 * Next time we'll talk about {shinydashboard} for, basically, an alternative layout.
 
