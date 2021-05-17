@@ -4,26 +4,35 @@ author: "Daniel Anderson "
 date: "Week 8, Class 2"
 output:
   xaringan::moon_reader:
-    css: ["default", "uo", "uo-fonts", "custom.css"]
+    css: ["default", "new.css"]
     lib_dir: libs
     nature:
-      highlightStyle: atelier-dune-light
+      navigation:
+        scroll: false
       highlightLines: true
       countIncrementalSlides: false
       beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: "load-feather.html"
 ---
 
-```{r setup, include = FALSE}
-library(tidyverse)
-theme_set(theme_minimal(20))
-update_geom_defaults("point", list(size = 3))
+```{r include = FALSE, results = "asis"}
+source(here::here("static", "slides", "slide-setup.R"))
+xaringanExtra::use_clipboard()
 knitr::opts_chunk$set(fig.width = 13, 
                       message = FALSE, 
                       warning = FALSE)
+
+library(tidyverse)
+theme_set(theme_minimal(20))
+update_geom_defaults("point", list(size = 3))
 ```
 
+`r setup("w8p2")`
+
+---
 # Agenda
-* Review Lab 4
+* Review Lab 3
 
 * Review shiny basics
 
@@ -42,8 +51,8 @@ knitr::opts_chunk$set(fig.width = 13,
 * Be able to create basic shiny dashboards
 
 ---
-class: inverse center middle
-# Review lab
+class: inverse-blue middle
+# Review Lab 3
 
 
 ---
@@ -51,12 +60,7 @@ class: inverse center middle
 
 Create a basic shiny template, as we did before.
 
-`r countdown::countdown(minutes = 3, 
-                        left = 0, 
-                        right = 0,
-                        bottom = 0.5,
-                        color_running_background = "#FEE11A",
-                        color_running_text = "#000")`
+`r countdown::countdown(minutes = 3)`
 
 
 ---
@@ -102,15 +106,10 @@ Even if you don't know the specific code, what would we change?
 --
 ### Try!
 
-`r countdown::countdown(minutes = 2, 
-                        left = 0, 
-                        right = 0,
-                        bottom = 1,
-                        color_running_background = "#FEE11A",
-                        color_running_text = "#000")`
+`r countdown::countdown(minutes = 2)`
 
 ---
-class: inverse center middle
+class: inverse-red middle
 
 # layouts
 
@@ -150,19 +149,14 @@ tibble(lower = lag(h$breaks),
   mutate(counts = h$counts) %>%
   mutate_if(is.numeric, round, 2)
 ```
---
-* You take it from here! Add a table below the plot with `DT::datatable` or `reactable::reactable`
+---
+# Your turn
+You take it from here! Add a table below the plot with `DT::datatable` or `reactable::reactable`
 
-`r countdown::countdown(minutes = 8, 
-                        left = 1, 
-                        right = 0,
-                        bottom = 0,
-                        top = 1,
-                        color_running_background = "#FEE11A",
-                        color_running_text = "#000")`
+`r countdown::countdown(minutes = 8)`
 
 ---
-class: inverse center middle
+class: inverse-red middle
 
 # [demo]
 
@@ -171,14 +165,7 @@ class: inverse center middle
 # Move it to a tabset
 * Just create a `tabsetPanel` within the `mainPanel`, then put the output for each tab within `tabPanel`.
 
-`r countdown::countdown(minutes = 5, 
-                        left = 0, 
-                        right = 0,
-                        bottom = 0.5,
-                        color_running_background = "#FEE11A",
-                        color_running_text = "#000")`
-
-
+`r countdown::countdown(minutes = 5)`
 
 
 ---
@@ -206,7 +193,7 @@ class: inverse center middle
 
 
 ---
-class: inverse center middle
+class: inverse-orange middle
 
 
 # [demo]
@@ -218,12 +205,15 @@ class: inverse center middle
 within a page)
 
 * Refactoring can help organization A LOT
+
   + Pull pieces out to try to make code more readable/less buggy.
 
 
+* You might consider [shiny modules](https://shiny.rstudio.com/articles/modules.html)
+
 
 ---
-class: inverse center middle
+class: inverse-blue middle
 # {shinydashboard}
 [Getting started](https://rstudio.github.io/shinydashboard/get_started.html)
 
@@ -296,7 +286,7 @@ body
 sidebarMenu(
   menuItem("Histogram", tabName = "histo", icon = icon("chart-bar")),
   menuItem("Bin Counts", tabName = "bins", icon = icon("table"))
-    )
+)
 ```
 
 You can also do things like put the slider in the `sidebarMenu`
@@ -335,3 +325,9 @@ slide).
 * Really helpful and fun way to build data tools for practitioners
 
 * Takes some practice, but basically allows you to write normal R code, and get interactive websites
+
+---
+class: inverse-green middle 
+# Next time
+## More Shiny
+Specifically we'll talk about reactivity and, perhaps, shiny modules

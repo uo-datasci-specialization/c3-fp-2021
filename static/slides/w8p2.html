@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Shiny: Part 2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Daniel Anderson" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Shiny: Part 2
+### Daniel Anderson
+### Week 8, Class 2
+
+---
+
+
+
+
+layout: true
+
+  &lt;script&gt;
+    feather.replace()
+  &lt;/script&gt;
+  
+  &lt;div class="slides-footer"&gt;
+  &lt;span&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w8p2.pdf"&gt;
+    &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w8p2.html"&gt;
+    &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/"&gt;
+    &lt;i class = "footer-icon" data-feather="globe"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021"&gt;
+    &lt;i class = "footer-icon" data-feather="github"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;/span&gt;
+  &lt;/div&gt;
+  
+
+---
+# Agenda
+* Review Lab 3
+
+* Review shiny basics
+
+* Discuss some layout options
+
+* Introduce shiny dashboard
+
+* Some extensions worth exploring later
+
+---
+# Learning objectives
+* Solidify your understanding of the UI/Server relation
+
+* Be able create tabsets and a navbar
+
+* Be able to create basic shiny dashboards
+
+---
+class: inverse-blue middle
+# Review Lab 3
+
+
+---
+# Basic shiny
+
+Create a basic shiny template, as we did before.
+
+<div class="countdown" id="timer_60a2a0c6" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+# UI 
+
+* The `ui` defines the look and feel of the app - the user interface
+
+* Use it to define where output "lives"
+
+* It also defines the inputs for the `server`, where functions are actually
+evaluated.
+
+* In the template/default case, a `sliderInput` has been defined, which we're
+calling `"bins"`. It will take on values from 1 to 50, and will start at 30.
+
+* Access the specific value the user selects within the `server`, through `input$bins`.
+
+
+---
+# Server
+
+* The `server` function takes the `input` from the UI and produces `output` with normal R code.
+
+* In this case, we're creating one output object, called `distPlot`. The result is then called through the `ui` on line 30
+
+
+---
+# Change the input
+Let's switch from a slider to a drop down menu. 
+
+
+--
+### How?
+
+Even if you don't know the specific code, what would we change?
+
+
+--
+`sliderInput` will become `selectInput`. The arguments will also be slightly
+  different
+
+
+--
+### Try!
+
+<div class="countdown" id="timer_60a2a2de" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: inverse-red middle
+
+# layouts
+
+---
+# Tabs
+
+* Let's say we wanted a tabset with different things.
+
+
+--
+* First, we need at least two things!
+
+
+--
+* Let's create a table that has the lower/upper bound of the bin, and the counts
+within that range.
+
+---
+# Table creation
+.footnote[Because this is base syntax, I'll give you the basics for the table, you focus
+on the shiny part]
+
+
+```r
+input_bins &lt;- 30 # placeholder for whatever the input is
+
+x &lt;- faithful[, 2] # data you're working with
+
+bins &lt;- seq(min(x), 
+            max(x), 
+            length.out = input_bins + 1)
+
+h &lt;- hist(x, breaks = bins, plot = FALSE)
+
+tibble(lower = lag(h$breaks),
+       upper = h$breaks) %&gt;%
+  drop_na(lower) %&gt;%
+  mutate(counts = h$counts) %&gt;%
+  mutate_if(is.numeric, round, 2)
+```
+---
+# Your turn
+You take it from here! Add a table below the plot with `DT::datatable` or `reactable::reactable`
+
+<div class="countdown" id="timer_60a2a45f" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: inverse-red middle
+
+# [demo]
+
+
+---
+# Move it to a tabset
+* Just create a `tabsetPanel` within the `mainPanel`, then put the output for each tab within `tabPanel`.
+
+<div class="countdown" id="timer_60a2a36b" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+# Different pages
+### Add a navbar
+
+* Instead of using a tabset with `tabsetPanel`, you might want to have a navbar at the top of the page, which you can create with `navbarPage`.
+
+
+--
+* Can be a bit more complicated - each `tabset` needs to include everything, including the `sidebarPanel` (if present), could include tabsets, `mainPanel`, etc.
+
+
+--
+* Essentially each tab from the `navbar` becomes an entirely new page.
+
+---
+# Important things with navbar
+
+* Move the title of your application to the first argument of `navbar` .g[otherwise you'll end up with weird renderings]
+
+
+--
+* Use separate input IDs even if you're repeating the same thing (otherwise it won't be responsive)
+
+
+---
+class: inverse-orange middle
+
+
+# [demo]
+
+
+---
+# More on the navbar
+* Can really help with organization/flexibility (you could even have tabs
+within a page)
+
+* Refactoring can help organization A LOT
+
+  + Pull pieces out to try to make code more readable/less buggy.
+
+
+* You might consider [shiny modules](https://shiny.rstudio.com/articles/modules.html)
+
+
+---
+class: inverse-blue middle
+# {shinydashboard}
+[Getting started](https://rstudio.github.io/shinydashboard/get_started.html)
+
+---
+### First dashboard - ui
+
+```r
+library(shiny)
+library(shinydashboard)
+
+ui &lt;- dashboardPage(
+  dashboardHeader(title = "Basic dashboard"),
+  dashboardSidebar(),
+  dashboardBody(
+    # Boxes need to be put in a row (or column)
+    fluidRow(
+      box(plotOutput("plot1", height = 250)),
+
+      box(
+        title = "Controls",
+        sliderInput("slider", "Number of observations:", 1, 100, 50)
+      )
+    )
+  )
+)
+```
+
+---
+# First dashboard - server
+
+
+```r
+server &lt;- function(input, output) {
+  set.seed(122)
+  histdata &lt;- rnorm(500)
+
+  output$plot1 &lt;- renderPlot({
+    data &lt;- histdata[seq_len(input$slider)]
+    hist(data)
+  })
+}
+```
+
+--
+### Run it
+
+
+```r
+shinyApp(ui, server)
+```
+
+[demo]
+
+---
+# Main differences
+* You now have `dashboardSidebar` and `dashboardBody`
+
+* You also now have `fluidRow` and `box` arguments to arrange things in the main
+body
+
+
+---
+# Sidebar
+* Probably the defining characteristic of the dashboard
+
+  + Define a `sidebarMenu` with `menuItem`s
+
+
+--
+### Example
+
+
+```r
+sidebarMenu(
+  menuItem("Histogram", tabName = "histo", icon = icon("chart-bar")),
+  menuItem("Bin Counts", tabName = "bins", icon = icon("table"))
+)
+```
+
+You can also do things like put the slider in the `sidebarMenu`
+
+[demo]
+
+---
+# Referencing menu items
+
+* If you define `menuItem`s, you'll have to give them a `tabName` (see previous
+slide).
+
+* In the `dashboardBody`, create a `tabItems` with specific `tabItem` pieces.
+  This should be how you control/refer to the `menuItem`.
+
+
+[demo]
+
+
+
+---
+# Extension
+
+* There's lots of extensions for shiny, and quite a few (but not as many) for shinydashboard
+
+* Consider themeing shiny apps with [{shinythemes}](https://rstudio.github.io/shinythemes/) and dashboards with [{dashboardthemes}](https://github.com/nik01010/dashboardthemes)
+
+* Consider themeing figures to match your shiny theme with [{thematic}](https://rstudio.github.io/thematic/)
+
+---
+# Conclusions
+* Shiny is super customizable - almost limitless (see more examples [here](https://shiny.rstudio.com/gallery/))
+
+* Great for building interactive plots, but you can use it for all sorts of other things too (including text and tables)
+
+* Really helpful and fun way to build data tools for practitioners
+
+* Takes some practice, but basically allows you to write normal R code, and get interactive websites
+
+---
+class: inverse-green middle 
+# Next time
+## More Shiny
+Specifically we'll talk about reactivity and, perhaps, shiny modules
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

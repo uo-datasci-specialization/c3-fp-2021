@@ -334,7 +334,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-even "05-19" >}}
   {{< description "Shiny 2" "We will review the basics of shiny and introduce shiny dashboards. Different layout options will also be discussed." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w8p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 {{< assigned "assignments/#peer-review" "PR" >}}
