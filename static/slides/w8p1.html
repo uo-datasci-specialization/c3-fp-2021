@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Shiny: Part 1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Daniel Anderson" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Shiny: Part 1
+### Daniel Anderson
+### Week 8, Class 1
+
+---
+
+
+
+
+layout: true
+
+  &lt;script&gt;
+    feather.replace()
+  &lt;/script&gt;
+  
+  &lt;div class="slides-footer"&gt;
+  &lt;span&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w8p1.pdf"&gt;
+    &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w8p1.html"&gt;
+    &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/"&gt;
+    &lt;i class = "footer-icon" data-feather="globe"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021"&gt;
+    &lt;i class = "footer-icon" data-feather="github"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;/span&gt;
+  &lt;/div&gt;
+  
+
+---
+
+# Agenda
+* Shiny!
+  + template
+  + ui/server
+
+---
+# Learning objectives
+* Be able to create basic interactive plots with shiny
+
+* Understand basic layouts
+
+---
+class: bottom
+background-image: url(https://media1.tenor.com/images/2bd01ebe28ecba4265f6e1ac46110ed2/tenor.gif?itemid=9167820)
+background-size: contain
+
+--
+It's required you make this joke when talking about shiny
+(especially if you're a parent of a 6 (almost 7) and 9 year old)
+
+---
+# The basics!
+Do the following:
+* Create a new R project
+* Select "Shiny Web Application"
+* Select the directory
+* Click "create project"
+
+[demo]
+
+---
+# First thing - Run App!
+* I like to open in the browser
+
+* What's going on here? Talk with your neighbor and see if you can deduce the
+basic functionality.
+
+<div class="countdown" id="timer_609c8d60" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+# UI 
+
+* The `ui` defines the look and feel of the app - the user interface
+
+* Use it to define where output "lives"
+
+* It also defines the inputs for the `server`, where functions are actually
+evaluated.
+
+* In this case - we have defined a `sliderInput`, which we're calling `"bins"`.
+It will take on values from 1 to 50, and will start at 30.
+
+* Access the specific value the user selects within the `server`, through `input$bins`.
+
+
+---
+# Server
+
+* The `server` function takes the input from the UI and puts it in normal R code.
+
+* In this case, we're creating one output object, called `distPlot`. The result is then called through the `ui` on line 30
+
+* Try removing lines 39-44, and replacing it with `print(input$bins)`
+
+
+--
+* Feels like it should work, but it doesn't. Any ideas why?
+
+
+---
+# Text output
+
+We are no longer rendering a plot. We are rendering text. 
+
+We need to change `renderPlot` to `renderText` and `plotOutput` to `textOutput`. 
+
+
+--
+## Try
+
+Does it work now?
+
+
+
+---
+# Challenge
+* Try producing essentially the same thing as the default, but use `ggplot` instead of base plotting.
+
+* Reminder, the data are called `faithful`, and you'll be showing the distribution of `waiting`
+
+<div class="countdown" id="timer_609c8d25" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: inverse-red middle
+# [demo]
+
+---
+# Change the input
+* Let's say instead of a slider, we want 5 options: 1, 5, 20, 50, or 100
+
+
+--
+* We can change the input from a slider (representing continuous intervals) to radio buttons, representing discrete choices.
+
+
+--
+* Just change `sliderInput` to `radioButtons`, and put in the appropriate `choices`. You can also add a `selected` argument for which it defaults to.
+
+
+--
+### Try it out!
+
+<div class="countdown" id="timer_609c8fa7" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: inverse-red middle
+# [demo]
+
+---
+# More complicated
+* Let's say we wanted to build a plot that showed the distribution of highway miles per gallon that could be faceted by `year`, `trans`, or `class`.
+
+* Let's say you also wanted to keep a slider on there to control the number of bins.
+
+* Use `radioButtons` for the variables, and `sliderInput` for the bins.
+
+* You'll need to create a second entry to your `ui`
+
+
+[demo]
+
+
+---
+# Tables
+
+* My recommendation: Use one of the following: 
+
+  + `DT::datatable`
+  + `reactable::reactable`
+
+
+--
+* Let's build a table to go below our distribution(s) that shows `mean`, `sd`, `min`, and `max` of the corresponding distribution(s)
+
+
+--
+* You'll need to create a new output object in the server, and tell the ui where it should be rendered
+
+
+---
+* Use `renderDataTable` in the server and `dataTableOutput` in the ui or `renderReactable` and `reactableOutput`
+
+
+--
+* If you want to use `{dplyr}`, as I would, then you have to deal with NSE. In this case it's not that big of a deal though. Just use `!!sym(input$var)`, where `sym` transforms a string to a symbol.
+
+
+[demo]
+
+---
+# Last thing for today
+### Change the layout
+
+* Let's say instead of having the table below, we wanted it within a tabset
+
+
+--
+* Just create a `tabsetPanel` within the `mainPanel`, then put the output for each tab within `tabPanel`.
+
+
+--
+[demo]
+
+
+---
+# Alternative
+
+* Instead of using a tabset with `tabsetPanel`, you might want to have a navbar at the top of the page, which you can create with `navbarPage`.
+
+
+--
+* Can be a bit more complicated - each `tabset` needs to include everything, including the `sidebarPanel` (if present), could include tabsets, `mainPanel`, etc.
+
+
+--
+* Essentially each tab from the `navbar` becomes an entirely new page.
+
+
+--
+* Consider pulling pieces out as a refactoring method to try to make code more readable/less buggy.
+
+
+[example]
+
+
+---
+# Conclusions
+* Shiny is super customizable - just scratched the surface today
+
+* The new [Mastering Shiny](https://mastering-shiny.org) book should be your guide for going deeper
+
+* Great for building interactive plots, but you can use it for all sorts of other things too (including text and tables)
+
+* Next time we'll talk about {shinydashboard} for, basically, an alternative layout.
+
+
+
+---
+class: inverse-green middle
+# Next time
+## Shiny dashboards
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

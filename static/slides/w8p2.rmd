@@ -1,0 +1,337 @@
+---
+title: "Shiny: Part 2"
+author: "Daniel Anderson "
+date: "Week 8, Class 2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "uo", "uo-fonts", "custom.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: atelier-dune-light
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+theme_set(theme_minimal(20))
+update_geom_defaults("point", list(size = 3))
+knitr::opts_chunk$set(fig.width = 13, 
+                      message = FALSE, 
+                      warning = FALSE)
+```
+
+# Agenda
+* Review Lab 4
+
+* Review shiny basics
+
+* Discuss some layout options
+
+* Introduce shiny dashboard
+
+* Some extensions worth exploring later
+
+---
+# Learning objectives
+* Solidify your understanding of the UI/Server relation
+
+* Be able create tabsets and a navbar
+
+* Be able to create basic shiny dashboards
+
+---
+class: inverse center middle
+# Review lab
+
+
+---
+# Basic shiny
+
+Create a basic shiny template, as we did before.
+
+`r countdown::countdown(minutes = 3, 
+                        left = 0, 
+                        right = 0,
+                        bottom = 0.5,
+                        color_running_background = "#FEE11A",
+                        color_running_text = "#000")`
+
+
+---
+# UI 
+
+* The `ui` defines the look and feel of the app - the user interface
+
+* Use it to define where output "lives"
+
+* It also defines the inputs for the `server`, where functions are actually
+evaluated.
+
+* In the template/default case, a `sliderInput` has been defined, which we're
+calling `"bins"`. It will take on values from 1 to 50, and will start at 30.
+
+* Access the specific value the user selects within the `server`, through `input$bins`.
+
+
+---
+# Server
+
+* The `server` function takes the `input` from the UI and produces `output` with normal R code.
+
+* In this case, we're creating one output object, called `distPlot`. The result is then called through the `ui` on line 30
+
+
+---
+# Change the input
+Let's switch from a slider to a drop down menu. 
+
+
+--
+### How?
+
+Even if you don't know the specific code, what would we change?
+
+
+--
+`sliderInput` will become `selectInput`. The arguments will also be slightly
+  different
+
+
+--
+### Try!
+
+`r countdown::countdown(minutes = 2, 
+                        left = 0, 
+                        right = 0,
+                        bottom = 1,
+                        color_running_background = "#FEE11A",
+                        color_running_text = "#000")`
+
+---
+class: inverse center middle
+
+# layouts
+
+---
+# Tabs
+
+* Let's say we wanted a tabset with different things.
+
+
+--
+* First, we need at least two things!
+
+
+--
+* Let's create a table that has the lower/upper bound of the bin, and the counts
+within that range.
+
+---
+# Table creation
+.footnote[Because this is base syntax, I'll give you the basics for the table, you focus
+on the shiny part]
+
+```{r tbl, eval = FALSE}
+input_bins <- 30 # placeholder for whatever the input is
+
+x <- faithful[, 2] # data you're working with
+
+bins <- seq(min(x), 
+            max(x), 
+            length.out = input_bins + 1)
+
+h <- hist(x, breaks = bins, plot = FALSE)
+
+tibble(lower = lag(h$breaks),
+       upper = h$breaks) %>%
+  drop_na(lower) %>%
+  mutate(counts = h$counts) %>%
+  mutate_if(is.numeric, round, 2)
+```
+--
+* You take it from here! Add a table below the plot with `DT::datatable` or `reactable::reactable`
+
+`r countdown::countdown(minutes = 8, 
+                        left = 1, 
+                        right = 0,
+                        bottom = 0,
+                        top = 1,
+                        color_running_background = "#FEE11A",
+                        color_running_text = "#000")`
+
+---
+class: inverse center middle
+
+# [demo]
+
+
+---
+# Move it to a tabset
+* Just create a `tabsetPanel` within the `mainPanel`, then put the output for each tab within `tabPanel`.
+
+`r countdown::countdown(minutes = 5, 
+                        left = 0, 
+                        right = 0,
+                        bottom = 0.5,
+                        color_running_background = "#FEE11A",
+                        color_running_text = "#000")`
+
+
+
+
+---
+# Different pages
+### Add a navbar
+
+* Instead of using a tabset with `tabsetPanel`, you might want to have a navbar at the top of the page, which you can create with `navbarPage`.
+
+
+--
+* Can be a bit more complicated - each `tabset` needs to include everything, including the `sidebarPanel` (if present), could include tabsets, `mainPanel`, etc.
+
+
+--
+* Essentially each tab from the `navbar` becomes an entirely new page.
+
+---
+# Important things with navbar
+
+* Move the title of your application to the first argument of `navbar` .g[otherwise you'll end up with weird renderings]
+
+
+--
+* Use separate input IDs even if you're repeating the same thing (otherwise it won't be responsive)
+
+
+---
+class: inverse center middle
+
+
+# [demo]
+
+
+---
+# More on the navbar
+* Can really help with organization/flexibility (you could even have tabs
+within a page)
+
+* Refactoring can help organization A LOT
+  + Pull pieces out to try to make code more readable/less buggy.
+
+
+
+---
+class: inverse center middle
+# {shinydashboard}
+[Getting started](https://rstudio.github.io/shinydashboard/get_started.html)
+
+---
+### First dashboard - ui
+```{r dashboard1-ui, eval = FALSE}
+library(shiny)
+library(shinydashboard)
+
+ui <- dashboardPage(
+  dashboardHeader(title = "Basic dashboard"),
+  dashboardSidebar(),
+  dashboardBody(
+    # Boxes need to be put in a row (or column)
+    fluidRow(
+      box(plotOutput("plot1", height = 250)),
+
+      box(
+        title = "Controls",
+        sliderInput("slider", "Number of observations:", 1, 100, 50)
+      )
+    )
+  )
+)
+```
+
+---
+# First dashboard - server
+
+```{r dashboard1-server, eval = FALSE}
+server <- function(input, output) {
+  set.seed(122)
+  histdata <- rnorm(500)
+
+  output$plot1 <- renderPlot({
+    data <- histdata[seq_len(input$slider)]
+    hist(data)
+  })
+}
+```
+
+--
+### Run it
+
+```{r, run-dashboard, eval = FALSE}
+shinyApp(ui, server)
+```
+
+[demo]
+
+---
+# Main differences
+* You now have `dashboardSidebar` and `dashboardBody`
+
+* You also now have `fluidRow` and `box` arguments to arrange things in the main
+body
+
+
+---
+# Sidebar
+* Probably the defining characteristic of the dashboard
+
+  + Define a `sidebarMenu` with `menuItem`s
+
+
+--
+### Example
+
+```{r sidebar, eval = FALSE}
+sidebarMenu(
+  menuItem("Histogram", tabName = "histo", icon = icon("chart-bar")),
+  menuItem("Bin Counts", tabName = "bins", icon = icon("table"))
+    )
+```
+
+You can also do things like put the slider in the `sidebarMenu`
+
+[demo]
+
+---
+# Referencing menu items
+
+* If you define `menuItem`s, you'll have to give them a `tabName` (see previous
+slide).
+
+* In the `dashboardBody`, create a `tabItems` with specific `tabItem` pieces.
+  This should be how you control/refer to the `menuItem`.
+
+
+[demo]
+
+
+
+---
+# Extension
+
+* There's lots of extensions for shiny, and quite a few (but not as many) for shinydashboard
+
+* Consider themeing shiny apps with [{shinythemes}](https://rstudio.github.io/shinythemes/) and dashboards with [{dashboardthemes}](https://github.com/nik01010/dashboardthemes)
+
+* Consider themeing figures to match your shiny theme with [{thematic}](https://rstudio.github.io/thematic/)
+
+---
+# Conclusions
+* Shiny is super customizable - almost limitless (see more examples [here](https://shiny.rstudio.com/gallery/))
+
+* Great for building interactive plots, but you can use it for all sorts of other things too (including text and tables)
+
+* Really helpful and fun way to build data tools for practitioners
+
+* Takes some practice, but basically allows you to write normal R code, and get interactive websites

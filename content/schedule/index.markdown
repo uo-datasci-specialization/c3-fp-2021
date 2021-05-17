@@ -303,7 +303,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "other" "https://shiny.rstudio.com/articles/build.html" "NA" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/JrhBTl4EROQ" >}}
 {{< /wrap >}}
 {{< /week-even >}}
 
@@ -314,7 +314,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "05-17" >}}
   {{< description "Shiny 1" "The very basics of shiny - the user interface (UI) and the server. We will work together to create a basic shiny application, modifying the default template to use ggplot2." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w8p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
