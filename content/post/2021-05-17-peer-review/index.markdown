@@ -21,13 +21,13 @@ You are required to provide a peer review of two groups. The groups you have bee
 
 <div class = "assigned-tbl">
 
-| Group Number |Group Members                |Repo                                                                                      |Final Project                                                                      |
-|:------------:|:----------------------------|:-----------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------|
-|      1       |Chris L, Merly, Anwesha      |<i class = 'gh' data-feather='github'>                                                    |<i class = 'gh' data-feather='link'>                                               |
-|      2       |Sarah, Wanjia, Meg, Lea      |[<i class = 'gh' data-feather='github'>](https://github.com/lfrank14/fp-w2021-final)      |[<i class = 'gh' data-feather='link'>](https://lfrank14.github.io/fp-w2021-final/) |
-|      3       |Janette, David, Joe, Makayla |[<i class = 'gh' data-feather='github'>](https://github.com/dwfainstein/finalproject_653) |<i class = 'gh' data-feather='link'>                                               |
-|      4       |Shijing, Vinita, Raleigh     |<i class = 'gh' data-feather='github'>                                                    |<i class = 'gh' data-feather='link'>                                               |
-|      5       |Chris I, Rachael, Tess       |<i class = 'gh' data-feather='github'>                                                    |<i class = 'gh' data-feather='link'>                                               |
+| Group Number |Group Members                |Repo                                                                                                |Final Project                                                                      |
+|:------------:|:----------------------------|:---------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------|
+|      1       |Chris L, Merly, Anwesha      |[<i class = 'gh' data-feather='github'>](https://github.com/Chhr1s/EDLD_653_Final)                  |<i class = 'gh' data-feather='link'>                                               |
+|      2       |Sarah, Wanjia, Meg, Lea      |[<i class = 'gh' data-feather='github'>](https://github.com/lfrank14/fp-w2021-final)                |[<i class = 'gh' data-feather='link'>](https://lfrank14.github.io/fp-w2021-final/) |
+|      3       |Janette, David, Joe, Makayla |[<i class = 'gh' data-feather='github'>](https://github.com/dwfainstein/finalproject_653)           |<i class = 'gh' data-feather='link'>                                               |
+|      4       |Shijing, Vinita, Raleigh     |[<i class = 'gh' data-feather='github'>](https://github.com/raleighgoodwin/EDLD3-final-project.git) |<i class = 'gh' data-feather='link'>                                               |
+|      5       |Chris I, Rachael, Tess       |<i class = 'gh' data-feather='github'>                                                              |<i class = 'gh' data-feather='link'>                                               |
 </div>
 
 ## Assignments
