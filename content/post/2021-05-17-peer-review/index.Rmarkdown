@@ -1,0 +1,89 @@
+---
+title: Peer Review Assignments
+author: Daniel Anderson
+date: '2021-05-17'
+assigned: '2021-04-07'
+due: '2021-04-14'
+slug: peer-review
+categories:
+  - Assignments
+tags:
+  - Peer Review
+  - Assignments
+---
+
+Each group's members and final project repo is linked below.
+
+```{r, message = FALSE, echo = FALSE, results = "asis", warning = FALSE}
+library(tidyverse)
+groups <- read_csv(here::here("nopublish", "final-groups.csv")) %>% 
+  mutate(Repo = ifelse(
+           !is.na(Repo),
+           paste0("[<i class = 'gh' data-feather='github'>](", Repo, ")"),
+           "<i class = 'gh' data-feather='github'>"
+          ),
+         `Final Project` = ifelse(
+           !is.na(`Final Project`),
+           paste0("[<i class = 'gh' data-feather='link'>](", `Final Project`, ")"),
+           "<i class = 'gh' data-feather='link'>"
+          )
+         ) 
+```
+
+You are required to provide a peer review of two groups. The groups you have been assigned are below.
+
+
+<div class = "assigned-tbl">
+```{r echo = FALSE}
+knitr::kable(groups, align = "clll")
+```
+</div>
+
+## Assignments
+Below you will find your name and the groups you are assigned to review
+
+<div class = "assigned-tbl">
+```{r echo = FALSE}
+peeps <- strsplit(groups$`Group Members`, split = ",")
+peeps <- lapply(peeps, trimws)
+group <- map2(seq_along(peeps), peeps, ~rep(.x, length(.y)))
+
+peeps <- unlist(peeps)
+group <- unlist(group)
+
+shuffle <- function(v, g) {
+	v <- setNames(v, g)
+	repeat {
+		
+		you <- v 
+		assign1 <- sample(v)
+		assign2 <- sample(v)
+		
+		c1 <- !any(g[match(you, v)] == g[match(assign1, v)])
+		c2 <- !any(g[match(you, v)] == g[match(assign2, v)])
+		c3 <- !any(g[match(assign1, v)] == g[match(assign2, v)])
+		c4 <- !any(assign1 == assign2)
+
+		if(all(c1, c2, c3, c4)) {
+    	break
+  	}
+	}
+	tibble::tibble(You = you, 
+	               `Review 1` = paste("Group", names(assign1)), 
+	               `Review 2` = paste("Group", names(assign2))
+	               )
+}
+
+set.seed(8675309)
+out <- shuffle(peeps, group)
+
+# checks
+# table(out$`Review 1` == out$`Review 2`)
+# table(group[match(out$You, peeps)] == group[match(out$`Review 1`, peeps)])
+# table(group[match(out$You, peeps)] == group[match(out$`Review 2`, peeps)])
+# table(group[match(out$`Review 1`, peeps)] == group[match(out$`Review 2`, peeps)])
+
+knitr::kable(out)
+
+```
+</div>
