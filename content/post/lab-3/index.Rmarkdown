@@ -96,11 +96,11 @@ purrr::map_dbl(split(mtcars$cyl, mtcars$cyl), length) / length(mtcars$cyl)
 ```
 
 ```{r ans4, include = FALSE}
-prop_missing <- function(x) {
-	mean(is.na(x))
+count_missing <- function(x) {
+	sum(is.na(x))
 }
-prop_missing(c(rep(NA, 25), rnorm(75)))
-prop_missing(c(rep(NA, 42), rnorm(58)))
+count_missing(c(rep(NA, 25), rnorm(75)))
+count_missing(c(rep(NA, 42), rnorm(58)))
 
 prop_cat <- function(cat_v) {
 	purrr::map_dbl(split(cat_v, cat_v), length) / length(cat_v)
@@ -108,13 +108,17 @@ prop_cat <- function(cat_v) {
 prop_cat(rep(letters[1:4], each = 25))
 prop_cat(c(rep(letters[1], 50), rep(letters[4:5], each = 25)))
 
-
-standardize <- function(x) {
-	if(any(is.na(x))) {
+fix_missingness <- function(x) {
+  if(any(is.na(x))) {
 		tot_na <- sum(is.na(x))
 		warning(paste(tot_na, "observations removed due to missingness"))
 		x <- na.omit(x)
-	}
+  }
+  x
+}
+
+standardize <- function(x) {
+	x <- fix_missingness(x)
 	(x - mean(x)) / sd(x) 
 }
 test_standardize <- cbind(standardize(airquality$Ozone), 
@@ -126,16 +130,16 @@ identical(test_standardize[ ,1], test_standardize[ ,2])
 frame with only the numeric columns.
 
 ```{r ans5, include = FALSE}
-df_numeric <- function(df, as_tibble = TRUE) {
+extract_numeric_df <- function(df, as_tibble = TRUE) {
 	num <- purrr::map_lgl(df, is.numeric)
 	
 	if(as_tibble) {
 		return(tibble::as_tibble(df[ ,num]))
 	}
-	df[ ,num]
+	as.data.frame(df[ ,num])
 }
-df_numeric(iris)
-df_numeric(iris, as_tibble = FALSE)
+extract_numeric_df(forcats::gss_cat)
+extract_numeric_df(forcats::gss_cat, as_tibble = FALSE)
 ```
 
 5. Write a function that uses the function you wrote in Question 5, and returns
@@ -145,13 +149,15 @@ a data frame with the mean and standard deviation of each numeric column. If col
 quiet_mymean <- purrr::quietly(my_mean)
 
 df_summary <- function(df, as_tibble = TRUE) {
-	df_num <- df_numeric(df)
+	df_num <- extract_numeric_df(df)
 	means <- purrr::map(df_num, quiet_mymean)
 	
 	warns <- purrr::map_chr(means, "warnings", .default = NA_character_)
 	warns <- gsub("^\\d+\\so(.+$)", "O\\1", warns)
 	warns <- unique(warns[!is.na(warns)])
 	
+	means <- purrr::map_dbl(means, "result")
+	  
 	sds <- purrr::map_dbl(df_num, sd, na.rm = TRUE)
   
 	if(length(names(df)) != length(names(df_num))) {
