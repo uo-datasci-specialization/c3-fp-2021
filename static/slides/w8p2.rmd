@@ -305,7 +305,16 @@ slide).
 
 [demo]
 
+---
+# Put slider in sidebar
 
+In this case, it's less than ideal to have the slider separated.
+
+Instead, we can put it right in the sidebar
+
+Bonus - it can then control things across tabs
+
+[demo]
 
 ---
 # Extension
