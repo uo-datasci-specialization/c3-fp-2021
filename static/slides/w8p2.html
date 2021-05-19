@@ -63,11 +63,11 @@ layout: true
 
 * Review shiny basics
 
-* Discuss some layout options
+* Review some layout options
 
 * Introduce shiny dashboard
 
-* Some extensions worth exploring later
+* If time allows - introduce reactivity
 
 ---
 # Learning objectives
@@ -87,7 +87,7 @@ class: inverse-blue middle
 
 Create a basic shiny template, as we did before.
 
-<div class="countdown" id="timer_60a2a0c6" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60a54455" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -135,7 +135,7 @@ Even if you don't know the specific code, what would we change?
 --
 ### Try!
 
-<div class="countdown" id="timer_60a2a2de" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60a54200" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -185,7 +185,7 @@ tibble(lower = lag(h$breaks),
 # Your turn
 You take it from here! Add a table below the plot with `DT::datatable` or `reactable::reactable`
 
-<div class="countdown" id="timer_60a2a45f" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60a54502" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -199,7 +199,7 @@ class: inverse-red middle
 # Move it to a tabset
 * Just create a `tabsetPanel` within the `mainPanel`, then put the output for each tab within `tabPanel`.
 
-<div class="countdown" id="timer_60a2a36b" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60a54324" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -355,6 +355,158 @@ slide).
 * Consider themeing shiny apps with [{shinythemes}](https://rstudio.github.io/shinythemes/) and dashboards with [{dashboardthemes}](https://github.com/nik01010/dashboardthemes)
 
 * Consider themeing figures to match your shiny theme with [{thematic}](https://rstudio.github.io/thematic/)
+
+---
+class: inverse-blue middle
+# reactivity
+
+---
+# What is it?
+* What you've been doing when writing shiny code
+
+--
+
+* Specify a graph of dependencies 
+
+  + When an input changes, all related output is updated
+
+
+---
+# Inputs 
+
+* `input` is a basically a list object that contains objects from the ui
+
+--
+
+
+```r
+ui &lt;- fluidPage(
+  numericInput("count", label = "Number of values", value = 100)
+)
+```
+
+After writing this code, `input$count` will be a available in the server, and the value it takes will depend on the browser input (starting at 100)
+
+
+--
+These are read-only, and cannot be modified
+
+
+---
+# Selective read permissions
+It must be in a reactive context, or it won't work. 
+
+
+--
+That's why this results in an error
+
+
+```r
+server &lt;- function(input, output, session) {
+  print(paste0("The value of input$count is ", input$count))
+}
+
+shinyApp(ui, server)
+# &gt; Error in .getReactiveEnvironment()$currentContext() : 
+# &gt;  Operation not allowed without an active reactive context. 
+# &gt; (You tried to do something that can only be done from inside a reactive expression or observer.)
+```
+
+---
+# Output
+
+* The `output` object is similar to `input`, in terms of being a list-like object.
+
+* Create new components of the list for new output, and refer to them in the UI
+
+* These also need to be in reactive contexts (e.g., `render*`)
+
+
+---
+# Simple example
+
+.footnote[From [Mastering Shiny](https://mastering-shiny.org/basic-reactivity.html#reactive-programming)]
+
+Try this app. Type the letters in one at a time. Notice how it updates.
+
+
+```r
+ui &lt;- fluidPage(
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
+)
+
+server &lt;- function(input, output, session) {
+  output$greeting &lt;- renderText({
+    paste0("Hello ", input$name, "!")
+  })
+}
+```
+
+---
+# Programming style
+* Notice you don't have to "run" the code each time the input updates
+
+* Your app provides instructions to R. Shiny decides when it actually runs the code.
+
+
+--
+### This is known as declarative programming
+
+
+--
+Normal R code is *imperative* programming - you decide when it's run. Declarative programming means you provide instructions, but don't actually run it.
+
+
+--
+&gt; you describe your overall goals, and the software figures out how to achieve them
+
+(from Hadley)
+
+---
+# Reactive graph
+
+.footnote[image from [Mastering Shiny](https://mastering-shiny.org/basic-reactivity.html#the-reactive-graph)]
+
+* Normally, you understand R code by running it top to bottom
+
+* This doesn't work with shiny
+
+* Instead, we think through reactive graphs
+
+![](https://d33wubrfki0l68.cloudfront.net/056990a803a41501e2dbe05df351f8b8f7b493ab/f773a/diagrams/basic-reactivity/graph-1b.png)
+
+---
+# [reactlog](https://rstudio.github.io/reactlog/)
+
+![](http://rstudio.github.io/reactlog/readme-images/pythagoras.gif)
+
+---
+# Basic example
+
+
+```r
+library(shiny)
+library(reactlog)
+
+reactlog_enable()
+
+ui &lt;- fluidPage(
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
+)
+
+server &lt;- function(input, output, session) {
+  output$greeting &lt;- renderText({
+    paste0("Hello ", input$name, "!")
+  })
+}
+
+shinyApp(ui, server)
+
+# close app, then
+reactlogShow()
+```
 
 ---
 # Conclusions

@@ -36,11 +36,11 @@ update_geom_defaults("point", list(size = 3))
 
 * Review shiny basics
 
-* Discuss some layout options
+* Review some layout options
 
 * Introduce shiny dashboard
 
-* Some extensions worth exploring later
+* If time allows - introduce reactivity
 
 ---
 # Learning objectives
@@ -315,6 +315,154 @@ slide).
 * Consider themeing shiny apps with [{shinythemes}](https://rstudio.github.io/shinythemes/) and dashboards with [{dashboardthemes}](https://github.com/nik01010/dashboardthemes)
 
 * Consider themeing figures to match your shiny theme with [{thematic}](https://rstudio.github.io/thematic/)
+
+---
+class: inverse-blue middle
+# reactivity
+
+---
+# What is it?
+* What you've been doing when writing shiny code
+
+--
+
+* Specify a graph of dependencies 
+
+  + When an input changes, all related output is updated
+
+
+---
+# Inputs 
+
+* `input` is a basically a list object that contains objects from the ui
+
+--
+
+```{r eval = FALSE}
+ui <- fluidPage(
+  numericInput("count", label = "Number of values", value = 100)
+)
+```
+
+After writing this code, `input$count` will be a available in the server, and the value it takes will depend on the browser input (starting at 100)
+
+
+--
+These are read-only, and cannot be modified
+
+
+---
+# Selective read permissions
+It must be in a reactive context, or it won't work. 
+
+
+--
+That's why this results in an error
+
+```{r eval = FALSE}
+server <- function(input, output, session) {
+  print(paste0("The value of input$count is ", input$count))
+}
+
+shinyApp(ui, server)
+# > Error in .getReactiveEnvironment()$currentContext() : 
+# >  Operation not allowed without an active reactive context. 
+# > (You tried to do something that can only be done from inside a reactive expression or observer.)
+```
+
+---
+# Output
+
+* The `output` object is similar to `input`, in terms of being a list-like object.
+
+* Create new components of the list for new output, and refer to them in the UI
+
+* These also need to be in reactive contexts (e.g., `render*`)
+
+
+---
+# Simple example
+
+.footnote[From [Mastering Shiny](https://mastering-shiny.org/basic-reactivity.html#reactive-programming)]
+
+Try this app. Type the letters in one at a time. Notice how it updates.
+
+```{r eval = FALSE}
+ui <- fluidPage(
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
+)
+
+server <- function(input, output, session) {
+  output$greeting <- renderText({
+    paste0("Hello ", input$name, "!")
+  })
+}
+```
+
+---
+# Programming style
+* Notice you don't have to "run" the code each time the input updates
+
+* Your app provides instructions to R. Shiny decides when it actually runs the code.
+
+
+--
+### This is known as declarative programming
+
+
+--
+Normal R code is *imperative* programming - you decide when it's run. Declarative programming means you provide instructions, but don't actually run it.
+
+
+--
+> you describe your overall goals, and the software figures out how to achieve them
+
+(from Hadley)
+
+---
+# Reactive graph
+
+.footnote[image from [Mastering Shiny](https://mastering-shiny.org/basic-reactivity.html#the-reactive-graph)]
+
+* Normally, you understand R code by running it top to bottom
+
+* This doesn't work with shiny
+
+* Instead, we think through reactive graphs
+
+![](https://d33wubrfki0l68.cloudfront.net/056990a803a41501e2dbe05df351f8b8f7b493ab/f773a/diagrams/basic-reactivity/graph-1b.png)
+
+---
+# [reactlog](https://rstudio.github.io/reactlog/)
+
+![](http://rstudio.github.io/reactlog/readme-images/pythagoras.gif)
+
+---
+# Basic example
+
+```{r eval = FALSE}
+library(shiny)
+library(reactlog)
+
+reactlog_enable()
+
+ui <- fluidPage(
+  textInput("name", "What's your name?"),
+  textOutput("greeting")
+)
+
+server <- function(input, output, session) {
+  output$greeting <- renderText({
+    paste0("Hello ", input$name, "!")
+  })
+}
+
+shinyApp(ui, server)
+
+# close app, then
+reactlogShow()
+```
 
 ---
 # Conclusions
