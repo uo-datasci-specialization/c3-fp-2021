@@ -357,7 +357,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-odd "05-24" >}}
   {{< description "Shiny 3" "Our final lecture on shiny will focus on workflows and organization. We will discuss writing functions to help with organization. Additionally, shiny applications are somewhat notorious for being slow. If time allows, we will also discuss methods to profile your code and identify bottlenecks." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w9p1" >}}
 {{< /wrap >}}
   {{< wrap >}}
 
