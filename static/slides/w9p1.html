@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Shiny: Part 2</title>
+    <title>Shiny: Part 3</title>
     <meta charset="utf-8" />
     <meta name="author" content="Daniel Anderson" />
     <script src="libs/header-attrs-2.7/header-attrs.js"></script>
@@ -10,8 +10,6 @@
     <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
     <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
     <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
-    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
-    <script src="libs/countdown-0.3.5/countdown.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="new.css" type="text/css" />
   </head>
@@ -19,9 +17,10 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Shiny: Part 2
+# Shiny: Part 3
+## {shinydashboards}
 ### Daniel Anderson
-### Week 8, Class 2
+### Week 9, Class 1
 
 ---
 
@@ -37,11 +36,11 @@ layout: true
   &lt;div class="slides-footer"&gt;
   &lt;span&gt;
   
-  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w8p2.pdf"&gt;
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w9p1.pdf"&gt;
     &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
   &lt;/a&gt;
   
-  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w8p2.html"&gt;
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w9p1.html"&gt;
     &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
   &lt;/a&gt;
   
@@ -59,198 +58,24 @@ layout: true
 
 ---
 # Agenda
-* Review Lab 3
-
-* Review shiny basics
-
-* Review some layout options
-
 * Introduce shiny dashboard
 
-* If time allows - introduce reactivity
+* Introduce reactivity
+
+* Some shiny best practices
 
 ---
 # Learning objectives
-* Solidify your understanding of the UI/Server relation
-
-* Be able create tabsets and a navbar
 
 * Be able to create basic shiny dashboards
 
----
-class: inverse-blue middle
-# Review Lab 3
+* Have at least a basic understanding of reactivity
 
-
----
-# Basic shiny
-
-Create a basic shiny template, as we did before.
-
-<div class="countdown" id="timer_60a6fd5c" style="right:0;bottom:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
-
----
-# UI 
-
-* The `ui` defines the look and feel of the app - the user interface
-
-* Use it to define where output "lives"
-
-* It also defines the inputs for the `server`, where functions are actually
-evaluated.
-
-* In the template/default case, a `sliderInput` has been defined, which we're
-calling `"bins"`. It will take on values from 1 to 50, and will start at 30.
-
-* Access the specific value the user selects within the `server`, through `input$bins`.
-
-
----
-# Server
-
-* The `server` function takes the `input` from the UI and produces `output` with normal R code.
-
-* In this case, we're creating one output object, called `distPlot`. The result is then called through the `ui` on line 30
-
-
----
-# Change the input
-Let's switch from a slider to a drop down menu. 
-
-
---
-### How?
-
-Even if you don't know the specific code, what would we change?
-
-
---
-`sliderInput` will become `selectInput`. The arguments will also be slightly
-  different
-
-
---
-### Try!
-
-<div class="countdown" id="timer_60a6fe4b" style="right:0;bottom:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
----
-class: inverse-red middle
-
-# layouts
-
----
-# Tabs
-
-* Let's say we wanted a tabset with different things.
-
-
---
-* First, we need at least two things!
-
-
---
-* Let's create a table that has the lower/upper bound of the bin, and the counts
-within that range.
-
----
-# Table creation
-.footnote[Because this is base syntax, I'll give you the basics for the table, you focus
-on the shiny part]
-
-
-```r
-input_bins &lt;- 30 # placeholder for whatever the input is
-
-x &lt;- faithful[, 2] # data you're working with
-
-bins &lt;- seq(min(x), 
-            max(x), 
-            length.out = input_bins + 1)
-
-h &lt;- hist(x, breaks = bins, plot = FALSE)
-
-tibble(lower = lag(h$breaks),
-       upper = h$breaks) %&gt;%
-  drop_na(lower) %&gt;%
-  mutate(counts = h$counts) %&gt;%
-  mutate_if(is.numeric, round, 2)
-```
----
-# Your turn
-You take it from here! Add a table below the plot with `DT::datatable` or `reactable::reactable`
-
-<div class="countdown" id="timer_60a6ff12" style="right:0;bottom:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
----
-class: inverse-red middle
-
-# [demo]
-
-
----
-# Move it to a tabset
-* Just create a `tabsetPanel` within the `mainPanel`, then put the output for each tab within `tabPanel`.
-
-<div class="countdown" id="timer_60a7002e" style="right:0;bottom:0;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
-
----
-# Different pages
-### Add a navbar
-
-* Instead of using a tabset with `tabsetPanel`, you might want to have a navbar at the top of the page, which you can create with `navbarPage`.
-
-
---
-* Can be a bit more complicated - each `tabset` needs to include everything, including the `sidebarPanel` (if present), could include tabsets, `mainPanel`, etc.
-
-
---
-* Essentially each tab from the `navbar` becomes an entirely new page.
-
----
-# Important things with navbar
-
-* Move the title of your application to the first argument of `navbar` .g[otherwise you'll end up with weird renderings]
-
-
---
-* Use separate input IDs even if you're repeating the same thing (otherwise it won't be responsive)
-
-
----
-class: inverse-orange middle
-
-
-# [demo]
-
-
----
-# More on the navbar
-* Can really help with organization/flexibility (you could even have tabs
-within a page)
-
-* Refactoring can help organization A LOT
-
-  + Pull pieces out to try to make code more readable/less buggy.
-
-
-* You might consider [shiny modules](https://shiny.rstudio.com/articles/modules.html)
-
+* Recognize use cases where your functional programming skills can help make more efficient and/or clear apps
 
 ---
 class: inverse-blue middle
-# {shinydashboard}
+## {shinydashboard}
 [Getting started](https://rstudio.github.io/shinydashboard/get_started.html)
 
 ---
@@ -360,6 +185,8 @@ Bonus - it can then control things across tabs
 # Extension
 
 * There's lots of extensions for shiny, and quite a few (but not as many) for shinydashboard
+
+* See [here](https://github.com/nanxstats/awesome-shiny-extensions) for a mostly comprehensive list
 
 * Consider themeing shiny apps with [{shinythemes}](https://rstudio.github.io/shinythemes/) and dashboards with [{dashboardthemes}](https://github.com/nik01010/dashboardthemes)
 
@@ -518,6 +345,289 @@ reactlogShow()
 ```
 
 ---
+# Why reactivity?
+
+Imagine we want to have a simple app converting temperatures from Fahrenheit to Celsius
+
+
+--
+Do this with variables
+
+
+```r
+temp_f &lt;- 72
+temp_c &lt;- (temp_f - 32) * (5/9)
+temp_c
+```
+
+```
+## [1] 22.22222
+```
+
+--
+But changing `temp_f` has no impact on `temp_c`
+
+
+```r
+temp_f &lt;- 50
+temp_c
+```
+
+```
+## [1] 22.22222
+```
+
+---
+# Use a function?
+Let's instead make this a function that depends on the object in the global environment.
+
+
+```r
+to_celsius &lt;- function() {
+  (temp_f - 32) * (5/9)
+}
+to_celsius()
+```
+
+```
+## [1] 10
+```
+
+```r
+temp_f &lt;- 30
+to_celsius()
+```
+
+```
+## [1] -1.111111
+```
+
+--
+This works, but it's less than ideal computationally. 
+
+Even if `temp_f` hasn't changed, the conversion is re-computed
+
+--
+Not a big deal in this case, but is a big deal with more computationally intensive operations.
+
+
+---
+# Reactive alternative
+
+First create a reactive variable
+
+
+```r
+library(shiny)
+reactiveConsole(TRUE)
+temp_f &lt;- reactiveVal(72)
+temp_f()
+```
+
+```
+## [1] 72
+```
+
+```r
+temp_f(50)
+temp_f()
+```
+
+```
+## [1] 50
+```
+
+---
+# Reactive function
+Next create a reactive function
+
+
+```r
+to_celsius &lt;- reactive({
+  message("Converting...")
+  (temp_f() - 32) * (5/9)
+})
+```
+
+--
+
+Now it will convert **only** when the value of `temp_f()` changes
+
+```r
+to_celsius()
+```
+
+```
+## [1] 10
+```
+
+```r
+to_celsius()
+```
+
+```
+## [1] 10
+```
+
+```r
+temp_f(100)
+to_celsius()
+```
+
+```
+## [1] 37.77778
+```
+
+```r
+to_celsius()
+```
+
+```
+## [1] 37.77778
+```
+
+---
+class: inverse-blue middle
+# Some shiny best practices
+
+&gt; Any fool can write code that a computer can understand. Good programmers write code that humans can understand. — Martin Fowler
+
+---
+# Things to consider
+
+.footnote[From [Mastering Shiny](https://mastering-shiny.org/best-practices.html)]
+
+* Are variable/function names clear and concise?
+
+* Is code commented, where needed?
+
+* Is there a way to break up complex functions?
+
+* Are there many instances of copy/pasting?
+
+* Can I manage different components of my app independently? Or are they too tangled together?
+
+---
+# Functions
+
+### Something new I learned
+
+Last time I showed you how to `source()` files. It turns out you don't need to do this!
+
+* Create a new folder, `R/`
+
+* Place `.R` files in that folder
+
+* shiny will source them automatically!!
+
+---
+# UI example
+
+.footnote[Example from [Mastering Shiny]()]
+
+Imagine we have a bunch of different sliders we want to create. We could do something like this:
+
+
+```r
+ui &lt;- fluidRow(
+  sliderInput("alpha", "alpha", min = 0, max = 1, value = 0.5, step = 0.1),
+  sliderInput("beta",  "beta",  min = 0, max = 1, value = 0.5, step = 0.1),
+  sliderInput("gamma", "gamma", min = 0, max = 1, value = 0.5, step = 0.1),
+  sliderInput("delta", "delta", min = 0, max = 1, value = 0.5, step = 0.1)
+)
+```
+
+
+--
+Ideas on how you could write a function to reduce the amount of code here?
+
+---
+# Slider function
+
+
+```r
+my_slider &lt;- function(id) {
+  sliderInput(id, id, min = 0, max = 1, value = 0.5, step = 0.1)
+}
+ui &lt;- fluidRow(
+  my_slider("alpha"),
+  my_slider("beta"),
+  my_slider("gamma"),
+  my_slider("delta")
+)
+```
+
+--
+Anyway to make this even less repetitive?
+
+---
+# Loop through the ids
+
+
+```r
+ids &lt;- c("alpha", "beta", "gamma", "delta")
+sliders &lt;- map(ids, my_slider)
+ui &lt;- fluidRow(sliders)
+```
+
+---
+# Other use cases
+
+* Maybe you want to use a shiny function, but assign it with some standard formatting
+  - e.g., icons
+
+* Maybe there are functions where you only want to change 1-3 things? Create a function that allows you to modify those, but keep other things at the values you want
+
+---
+# Server functions
+
+* I often find it helpful to create functions for output, even if I'm not repeating them a lot
+  + Can help keep server code clean and concise
+  
+* Inspect your code and consider refactoring in a similar way you would standard functions
+
+* Consider keeping these in a separate `.R` file from your UI functions
+
+---
+class: inverse-red middle
+
+# shiny modules
+(briefly)
+
+---
+# What is a module?
+
+* Allows you to modularize parts of your shiny app
+
+* This can help "de-tangle" these pices from the rest of the app
+
+* Primarily useful when the thing you want to modularize spans *both* the UI and the server
+
+---
+# Example
+### No modules
+
+.footnote[From [Mastering Shiny](https://mastering-shiny.org/scaling-modules.html)]
+
+![](https://d33wubrfki0l68.cloudfront.net/051011ce1a1bc8989ae41b735b05b607b2ebde65/2e519/diagrams/scaling-modules/before.png)
+
+
+---
+# Example
+### Same app, but with modules
+
+.footnote[From [Mastering Shiny](https://mastering-shiny.org/scaling-modules.html)]
+
+![](https://d33wubrfki0l68.cloudfront.net/3d9a229fec717ef7bfda8e17a9c9d4fdc66b8b08/953f7/diagrams/scaling-modules/after.png)
+
+---
+# Create modules
+
+* It's fairly complicated. See the [chapter](https://mastering-shiny.org/scaling-modules.html) from Mastering Shiny on the topic
+
+* Probably not worth it until you're creating complicated apps, but I wanted to make you aware of them
+
+---
 # Conclusions
 * Shiny is super customizable - almost limitless (see more examples [here](https://shiny.rstudio.com/gallery/))
 
@@ -528,10 +638,24 @@ reactlogShow()
 * Takes some practice, but basically allows you to write normal R code, and get interactive websites
 
 ---
+# Any time left?
+
+### Challenge
+
+* Create a shiny app or shiny dashboard with the `palmerpenguins` dataset
+
+* Allow the x and y axis to be selected by the user
+  + These should be any numeric variables
+  
+* Allow the points to be colored by any categorical variable
+
+  + For an added challenge, try to add in a "no color" option, which should be the default
+
+
+---
 class: inverse-green middle 
 # Next time
-## More Shiny
-Specifically we'll talk about reactivity and, perhaps, shiny modules
+## Review
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
