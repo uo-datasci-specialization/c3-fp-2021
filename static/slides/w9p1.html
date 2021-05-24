@@ -79,7 +79,37 @@ class: inverse-blue middle
 [Getting started](https://rstudio.github.io/shinydashboard/get_started.html)
 
 ---
-### First dashboard - ui
+# Most basic dashboard
+
+
+```r
+## app.R ##
+library(shiny)
+library(shinydashboard)
+
+ui &lt;- dashboardPage(
+  dashboardHeader(),
+  dashboardSidebar(),
+  dashboardBody()
+)
+
+server &lt;- function(input, output) { }
+
+shinyApp(ui, server)
+```
+
+---
+# Looks like this
+
+.center[
+![](https://rstudio.github.io/shinydashboard/images/blank_dashboard.png)
+]
+
+---
+# First dashboard - ui
+
+Follow along!
+
 
 ```r
 library(shiny)
@@ -87,7 +117,9 @@ library(shinydashboard)
 
 ui &lt;- dashboardPage(
   dashboardHeader(title = "Basic dashboard"),
+  
   dashboardSidebar(),
+  
   dashboardBody(
     # Boxes need to be put in a row (or column)
     fluidRow(
@@ -99,6 +131,7 @@ ui &lt;- dashboardPage(
       )
     )
   )
+  
 )
 ```
 
@@ -182,6 +215,53 @@ Bonus - it can then control things across tabs
 [demo]
 
 ---
+# Increase readability
+* As I've mentioned, shiny apps can become unreadable quickly
+
+
+--
+Consider creating objects for each piece, possibly even in separate R files.
+
+---
+# Example
+
+
+```r
+sidebar &lt;- dashboardSidebar(
+  sidebarMenu(
+    menuItem("Histogram", tabName = "histo", icon = icon("chart-bar")),
+    sliderInput("slider", "Number of observations:", 1, 100, 50)
+  )
+)
+
+body &lt;- dashboardBody(
+  fluidRow(
+    tabItems(
+      tabItem(
+        "histo",
+        box(plotOutput("plot1", height = 250))
+      )
+    )
+  )
+)
+```
+
+---
+# UI part
+
+
+```r
+ui &lt;- dashboardPage(
+  dashboardHeader(title = "Basic dashboard"),
+  sidebar,
+  body
+)
+```
+
+--
+Note you could create intermediary objects within each of the `sidebar` and `body` parts as well.
+
+---
 # Extension
 
 * There's lots of extensions for shiny, and quite a few (but not as many) for shinydashboard
@@ -210,7 +290,7 @@ class: inverse-blue middle
 ---
 # Inputs 
 
-* `input` is a basically a list object that contains objects from the ui
+* `input` is basically a list object that contains objects from the ui
 
 --
 
@@ -408,7 +488,7 @@ This works, but it's less than ideal computationally.
 Even if `temp_f` hasn't changed, the conversion is re-computed
 
 --
-Not a big deal in this case, but is a big deal with more computationally intensive operations.
+Not a big deal in this case, but often is.
 
 
 ---
@@ -453,6 +533,8 @@ to_celsius &lt;- reactive({
 
 Now it will convert **only** when the value of `temp_f()` changes
 
+---
+
 ```r
 to_celsius()
 ```
@@ -485,6 +567,10 @@ to_celsius()
 ```
 ## [1] 37.77778
 ```
+
+
+--
+Unless the value of `temp_f` changes, the code will not be re-run.
 
 ---
 class: inverse-blue middle
