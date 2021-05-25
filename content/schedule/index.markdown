@@ -376,7 +376,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-even "05-26" >}}
   {{< description "Functions and shiny review" "This is a built-in day for review and to make sure we have covered the primary topics of shiny. We will also review the basics of functions. Students will be allowed to request topics for review before class." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w9p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 

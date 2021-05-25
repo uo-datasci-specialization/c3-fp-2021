@@ -1,0 +1,559 @@
+---
+title: "Review"
+author: "Daniel Anderson "
+date: "Week 9, Class 2"
+output:
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+      beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: "load-feather.html"
+---
+
+```{r include = FALSE, results = "asis"}
+source(here::here("static", "slides", "slide-setup.R"))
+xaringanExtra::use_clipboard()
+knitr::opts_chunk$set(fig.width = 13, 
+                      message = FALSE, 
+                      warning = FALSE)
+
+library(tidyverse)
+theme_set(theme_minimal(20))
+update_geom_defaults("point", list(size = 3))
+```
+
+`r setup("w9p2")`
+
+---
+# Agenda
+
+* Review functions
+
+* A shiny challenge
+  + But first, a brief discussion on publishing shiny apps
+
+---
+class: inverse-blue middle
+# Functions review
+
+---
+# Remember
+
+* Everything is a function
+
+
+--
+The following are equivalent
+
+```{r}
+3 + 5
+```
+
+
+```{r plus-fun}
+`+`(3, 5)
+``` 
+
+---
+# Using functions
+
+* Most functions are bound to a name, e.g., `mean()`
+
+
+--
+* Anonymous functions are also common 
+
+  + Apply the function in a loop, and it only ever exists in the loop
+  
+
+--
+* You can also store functions in lists
+
+  + Helpful if you want to apply lots of operations to a single vector
+
+---
+# Binding to a name
+
+* Let's create a function that takes two arguments: (a) a data frame, and (b) the name of a discrete/categorical variable/column in the data frame.
+
+* The function should return the count of each "level" in the categorical variable.
+
+* For a small added challenge, have it optionally add the proportion
+
+--
+Example:
+
+```{r echo = FALSE}
+get_counts <- function(df, col, include_proportion = FALSE) {
+  splt <- split(df, df[[col]])
+  n_by <- vapply(splt, nrow, FUN.VALUE = integer(1))
+  
+  counts <- data.frame(
+    col = names(n_by),
+    count = n_by
+  )
+  
+  names(counts)[1] <- col
+  rownames(counts) <- NULL
+  
+  if (include_proportion) {
+    counts$proportion <- n_by / sum(n_by)
+  }
+  counts
+}
+```
+
+Example output with `palmerpenguins::penguins`.
+
+.pull-left[
+```{r echo = FALSE}
+library(palmerpenguins)
+get_counts(penguins, "species")
+```
+
+]
+
+.pull-right[
+```{r echo = FALSE}
+get_counts(penguins, "species", TRUE)
+```
+]
+
+
+---
+# You try first 
+
+Test it out with the **palmerpenguins** dataset. Do you get the same results I did?
+
+Note - the example I used included only base R functions. You can feel free to use **dplyr** or whatevs, just be careful with NSE.
+
+You also don't have to return a data frame output - return it however you want
+
+`r countdown::countdown(7)`
+
+---
+# Where to start?
+
+~~write a function~~
+
+* Solve the problem for one example, generalize it to a function.
+
+
+--
+Use the **palmerpenguins** dataset *for* your example!
+
+
+--
+```{r }
+library(palmerpenguins)
+penguins
+```
+
+---
+# How do you want to solve it?
+Lots of ways, here's a base method
+
+--
+* First, split by species
+
+```{r }
+splt <- split(penguins, penguins$species)
+```
+
+--
+* Next, count how many rows (observations) in each split
+
+```{r }
+sapply(splt, nrow)
+```
+
+--
+Could go on, but this is basically the output.
+
+---
+# Wrap in a function
+
+* What will the arguments be?
+
+
+--
+The data frame and the column
+
+```{r }
+get_counts <- function(df, column) {
+  
+}
+```
+
+
+--
+What will the body be?
+
+---
+# Same as before
+Just swap out the code for the arguments. Notice I'm indexing the columns differently. Why?
+
+I'm also swapping out `sapply()` for `vapply()` to be a little more safe.
+
+```{r }
+get_counts <- function(df, column) {
+  splt <- split(df, df[[column]])
+  vapply(splt, nrow, FUN.VALUE = integer(1))
+}
+```
+
+---
+# Test it
+
+```{r }
+get_counts(penguins, "species")
+get_counts(penguins, "island")
+```
+
+---
+# Extensions
+Let's say we want a data frame as the output.
+
+Can you modify what we have now to make that so?
+
+`r countdown::countdown(3)`
+
+---
+# Data frame
+
+```{r }
+get_counts <- function(df, column) {
+  splt <- split(df, df[[column]])
+  counts <- vapply(splt, nrow, FUN.VALUE = integer(1))
+  
+  tibble::tibble(
+    var_levels = names(counts), # could use names(splt)
+    count = counts
+  )
+}
+```
+
+---
+# Test it
+
+```{r }
+get_counts(penguins, "species")
+get_counts(penguins, "island")
+```
+
+---
+# Column name
+
+Can we make the output from the data frame have the same column that we fed it?
+
+`r countdown::countdown(2)`
+
+--
+
+```{r }
+get_counts <- function(df, column) {
+  splt <- split(df, df[[column]])
+  counts <- vapply(splt, nrow, FUN.VALUE = integer(1))
+  
+  d <- tibble::tibble(
+    var_levels = names(counts), # could use names(splt)
+    count = counts
+  )
+  names(d)[1] <- column #<<
+  d
+}
+```
+
+---
+# Test it
+
+```{r }
+get_counts(penguins, "species")
+get_counts(penguins, "island")
+```
+
+
+---
+# {dplyr} version
+
+Can we replicate this function using dplyr?
+
+We'll have to use non-standard evaluation
+
+
+--
+
+First, solve it on a use case
+
+```{r }
+penguins %>% 
+  count(species)
+```
+
+---
+# Function
+
+Will this work?
+
+```{r }
+get_counts <- function(df, column) {
+  df %>% 
+    count(column)
+}
+```
+
+
+--
+```{r error = TRUE}
+get_counts(penguins, species)
+```
+
+---
+# Use NSE
+
+```{r}
+get_counts <- function(df, column) {
+  df %>% 
+    count({{column}})
+}
+```
+
+--
+```{r }
+get_counts(penguins, species)
+get_counts(penguins, island)
+```
+
+---
+# Pass the dots
+
+Alternatively, you could just pass the dots
+
+Bonus, this will now give you the counts for multiple columns
+
+
+--
+```{r }
+get_counts <- function(df, ...) {
+  df %>% 
+    count(...)
+}
+```
+
+---
+# Test it
+
+```{r }
+get_counts(penguins, species)
+get_counts(penguins, species, island)
+```
+
+---
+# Conditions
+
+* Let's add a condition that optionally reports the proportions in addition to the counts.
+
+
+--
+* What will be the first step?
+
+
+--
+* Add a new argument (and consider setting defaults for that argument)
+
+
+--
+```{r }
+get_counts <- function(df, column, return_proportions = FALSE) {
+  df %>% 
+    count({{column}})
+}
+```
+
+---
+# Set conditional block
+Create a block for operations to conduct **when the condition is TRUE**
+
+```{r }
+get_counts <- function(df, column, return_proportions = FALSE) {
+  counts <- df %>% 
+    count({{column}})
+  
+  if (isTRUE(return_proportions)) {
+    
+  }
+  counts
+}
+```
+
+---
+# Write condition
+In the block, include the code that is only evaluated when the condition is `TRUE`.
+
+```{r }
+get_counts <- function(df, column, return_proportions = FALSE) {
+  counts <- df %>% 
+    count({{column}})
+  
+  if (isTRUE(return_proportions)) {
+    counts <- counts %>% 
+      mutate(proportion = n / sum(n))
+  }
+  counts
+}
+```
+
+---
+# Test it
+
+```{r }
+get_counts(penguins, species)
+get_counts(penguins, species, return_proportions = TRUE)
+```
+
+---
+# Challenge
+Now that we have a basic function, can you write a **new** function that *calls this function* to add the proportions and/or counts to a data frame?
+
+Should return the original data frame, but with the counts/proportions added in as a new column.
+
+`r countdown::countdown(4)`
+
+---
+# One solution
+
+```{r}
+add_counts <- function(data, column, add_proportions = FALSE) {
+  counts <- get_counts(data, {{column}}, add_proportions)
+  left_join(data, counts)
+}
+```
+
+---
+# Test it out
+
+I'm selecting variables after just so we can see the counts
+
+```{r }
+add_counts(penguins, species) %>% 
+  select(species, island, n)
+```
+
+---
+# Test it again
+
+This time let's add the proportions
+
+```{r }
+add_counts(penguins, species, add_proportions = TRUE) %>% 
+  select(species, island, n, proportion)
+```
+
+
+---
+# Embed checks
+
+Can you embed a warning or error (your choice) if the column fed to the function is not discrete?
+
+Note - this is more difficult with our **dplyr** version. Try using `dplyr::pull()`.
+
+`r countdown::countdown(3)`
+
+---
+
+```{r }
+get_counts <- function(df, column, return_proportions = FALSE) {
+  
+  column_vec <- dplyr::pull(df, {{column}})
+  
+  if(is.numeric(column_vec)) {
+    stop("Numeric column passed to function. Counts must be computed on categorical data.")
+  }
+  
+  counts <- df %>% 
+    count({{column}})
+  
+  if (isTRUE(return_proportions)) {
+    counts <- counts %>% 
+      mutate(proportion = n / sum(n))
+  }
+  counts
+}
+```
+
+---
+# Test it out
+Note we can test it with either the `get_counts()` or `add_counts()` functions
+
+```{r error = TRUE}
+get_counts(penguins, bill_length_mm)
+add_counts(penguins, bill_length_mm)
+```
+
+---
+class: inverse-blue middle
+# Shiny
+
+---
+# Publishing
+* We never talked about publishing shiny apps
+
+See [here](https://statsandr.com/blog/how-to-publish-shiny-app-example-with-shinyapps-io/) for a nice step-by-step walkthrough for publishing with https://www.shinyapps.io/
+
+--
+Basically:
+* Register an account with https://www.shinyapps.io/
+* Add a token to your account on shinyapps
+* Back locally, set your account info with the token and secret via 
+
+```{r eval = FALSE}
+rsconnect::setAccountInfo(
+  name = "myaccount", # replace with your account name
+  token = "mytokencopiedfromshinyappsio", # your token
+  secret = "mysecretcopiedfromshinyappsio"
+)
+```
+
+---
+.center[
+### Publish
+]
+
+.footnote[image from tutorial [here](https://statsandr.com/blog/how-to-publish-shiny-app-example-with-shinyapps-io/)]
+
+![](https://statsandr.com/blog/2020-05-29-how-to-deploy-a-shiny-app-an-example-with-shinyapps-io_files/publish-shiny-app-online-shinyapps-io-4.png)
+
+---
+# Shiny app
+* Create a shiny app or shiny dashboard with the `palmerpenguins` dataset
+
+* Allow the x and y axis to be selected by the user
+  + Only numeric variables should be available to be selected
+  
+* Allow the points to be colored by any categorical variable
+
+  + For an added challenge, try to add in a "no color" option, which should be the default
+
+Once you've gone this far, try to publish your app. If you're successful, continue with challenge on next slide
+
+---
+# Challenge continued
+
+* Add a table to the app that reports descriptive data on the columns that are selected in the plot
+  + e.g., `n()`, `mean()`, `sd()`
+  
+* Use tabs so the plot shows up in one tab, and the table shows up in a different tab
+
+Now publish again to update it
+
+---
+class: inverse-green middle 
+# Next time
+## No Class Monday
+## Package Development on Wednesday
