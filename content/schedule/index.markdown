@@ -369,7 +369,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< readings "shiny" "https://mastering-shiny.org/best-practices.html" "NA" >}}
 {{< /wrap >}}
   {{< wrap >}}
-{{< lecture "" >}}
+{{< lecture "https://youtu.be/uYZRw0-nU08" >}}
 {{< /wrap >}}
 {{< /week-odd >}}
 
