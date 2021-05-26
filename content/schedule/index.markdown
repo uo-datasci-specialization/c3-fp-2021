@@ -418,7 +418,7 @@ Each of the below links to the full book. Icons in the schedule link to specific
 {{< week-even "06-02" >}}
   {{< description "Intro to packge development" "Once you are confident writing functions, it is actually not that big of a leap to wrap them all up in a package. Package development will be introduced and resources to learn more will be shared." >}}
   {{< wrap >}}
-{{< slides "" >}}
+{{< slides "w10p2" >}}
 {{< /wrap >}}
   {{< wrap >}}
 

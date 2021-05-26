@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Developing Your First R Package</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Daniel Anderson" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <script src="libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard-0.2.6/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Developing Your First R Package
+### Daniel Anderson
+### Week 10
+
+---
+
+
+
+
+layout: true
+
+  &lt;script&gt;
+    feather.replace()
+  &lt;/script&gt;
+  
+  &lt;div class="slides-footer"&gt;
+  &lt;span&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021/raw/main/static/slides/w10p2.pdf"&gt;
+    &lt;i class = "footer-icon" data-feather="download"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/slides/w10p2.html"&gt;
+    &lt;i class = "footer-icon" data-feather="link"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://fp-2021.netlify.app/"&gt;
+    &lt;i class = "footer-icon" data-feather="globe"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;a class = "footer-icon-link" href = "https://github.com/uo-datasci-specialization/c3-fp-2021"&gt;
+    &lt;i class = "footer-icon" data-feather="github"&gt;&lt;/i&gt;
+  &lt;/a&gt;
+  
+  &lt;/span&gt;
+  &lt;/div&gt;
+  
+
+---
+# Agenda
+
+---
+# Want to follow along?
+
+If you'd like to follow along, please make sure you have the following packages installed
+
+
+```r
+install.packages(c("tidyverse", "devtools", "esvis",
+                   "roxygen2", "usethis"))
+```
+
+---
+# Bundle your functions
+Once you've written more than one function, you may want to bundle them. There are two general ways to do this:
+
+--
+
+.pull-left[
+.center[.Large[source?]]
+] 
+
+.pull-right[
+.center[.Large[Write a package]]
+]
+
+--
+
+&lt;center&gt;&lt;img src = "img/twopaths.png" width = 400 align = "middle" /&gt;&lt;/center&gt;
+
+---
+# Why avoid `source`ing
+
+* Documentation is generally more sparse
+
+* Directory issues
+
+  + Which leads to reproducibility issues
+
+  + This is also less of an issue if you're using RStudio Projects and {here}
+
+---
+# More importantly
+.Large[Bundling functions into a package is not that hard!]
+
+![](https://media.giphy.com/media/3ohzdTQaODeGPt90uk/source.gif)
+
+
+---
+class: inverse-blue middle
+# My journey with {esvis}
+## My first CRAN package
+
+---
+# Background
+### Effect sizes
+Standardized mean differences
+
+--
+
+* Assumes  reasonably normally distributed distributions (mean is a good indicator of central tendency)
+
+--
+
+* Differences in means may not reflect differences at all points in scale if variances are different
+
+--
+
+* Substantive interest may also lie with differences at other points in the distribution.
+
+---
+# Varying differences
+### Quick simulated example
+
+
+```r
+library(tidyverse)
+common_var &lt;- tibble(low  = rnorm(1000, 10, 1),
+                     high = rnorm(1000, 12, 1),
+                     var  = "common")
+diff_var &lt;- tibble(low  = rnorm(1000, 10, 1),
+                   high = rnorm(1000, 12, 2),
+                   var  = "diff")
+d &lt;- bind_rows(common_var, diff_var)
+head(d)
+```
+
+```
+## # A tibble: 6 x 3
+##         low     high var   
+##       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt; 
+## 1  9.549110 13.50911 common
+## 2  9.350832 12.93887 common
+## 3 10.40181  12.20612 common
+## 4 10.81037  10.52069 common
+## 5 10.79728  12.71338 common
+## 6  9.672677 10.68060 common
+```
+
+---
+# Restructure for plotting
+
+
+```r
+d &lt;- d %&gt;% 
+  pivot_longer(
+    -var,
+    names_to = "group", 
+    values_to = "value"
+  ) 
+d
+```
+
+```
+## # A tibble: 4,000 x 3
+##    var    group     value
+##    &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;
+##  1 common low    9.549110
+##  2 common high  13.50911 
+##  3 common low    9.350832
+##  4 common high  12.93887 
+##  5 common low   10.40181 
+##  6 common high  12.20612 
+##  7 common low   10.81037 
+##  8 common high  10.52069 
+##  9 common low   10.79728 
+## 10 common high  12.71338 
+## # … with 3,990 more rows
+```
+
+---
+# Plot the distributions
+
+
+```r
+ggplot(d, aes(value, fill = group)) +
+  geom_density(alpha = 0.7,
+               color = "gray40") +
+  facet_wrap(~var) +
+  scale_fill_brewer(palette = "Set3")
+```
+
+![](w10p2_files/figure-html/plot_dists-1.png)&lt;!-- --&gt;
+
+---
+# Binned effect sizes
+
+1. Cut the distributions into `\(n\)` bins (based on percentiles)
+
+2. Calculate the mean difference between paired bins
+
+3. Divide each mean difference by the overall pooled standard deviation
+
+$$
+d\_{[i]} = \frac{\bar{X}\_{foc\_{[i]}} - \bar{X}\_{ref\_{[i]}}}
+        {\sqrt{\frac{(n\_{foc} - 1)Var\_{foc} + (n\_{ref} - 1)Var\_{ref}}
+                  {n\_{foc} + n\_{ref} - 2}}}
+$$
+
+--
+### visualize it!
+
+---
+# Back to the simulated example
+
+
+```r
+common &lt;- filter(d, var == "common")
+diff   &lt;- filter(d, var == "diff")
+```
+
+---
+
+```r
+library(esvis)
+binned_es(common, value ~ group)
+```
+
+```
+## # A tibble: 6 x 11
+##       q  qtile_lb  qtile_ub group_ref group_foc mean_diff length length1       psd        es      es_se
+##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;  &lt;int&gt;   &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1     1 0         0.3333333 high      low       -2.048922   1000    1000 0.9650763 -2.122271 0.05591828
+## 2     2 0.3333333 0.6666667 high      low       -2.080733   1000    1000 0.9650763 -2.155220 0.05623269
+## 3     3 0.6666667 1         high      low       -1.992408   1000    1000 0.9650763 -2.063733 0.05536739
+## 4     1 0         0.3333333 low       high       2.048922   1000    1000 0.9650763  2.122271 0.05591828
+## 5     2 0.3333333 0.6666667 low       high       2.080733   1000    1000 0.9650763  2.155220 0.05623269
+## 6     3 0.6666667 1         low       high       1.992408   1000    1000 0.9650763  2.063733 0.05536739
+```
+
+```r
+binned_es(diff, value ~ group)
+```
+
+```
+## # A tibble: 6 x 11
+##       q  qtile_lb  qtile_ub group_ref group_foc mean_diff length length1      psd         es      es_se
+##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;  &lt;int&gt;   &lt;int&gt;    &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1     1 0         0.3333333 high      low       -1.098328   1000    1000 1.498662 -0.7325977 0.04619822
+## 2     2 0.3333333 0.6666667 high      low       -1.967218   1000    1000 1.498662 -1.312157  0.04930276
+## 3     3 0.6666667 1         high      low       -3.133526   1000    1000 1.498662 -2.090098  0.05561428
+## 4     1 0         0.3333333 low       high       1.098328   1000    1000 1.498662  0.7325977 0.04619822
+## 5     2 0.3333333 0.6666667 low       high       1.967218   1000    1000 1.498662  1.312157  0.04930276
+## 6     3 0.6666667 1         low       high       3.133526   1000    1000 1.498662  2.090098  0.05561428
+```
+
+---
+# Visualize it
+### Common Variance
+
+```r
+binned_plot(common, value ~ group)
+```
+
+![](w10p2_files/figure-html/sim_binned_plot_common-1.png)&lt;!-- --&gt;
+
+---
+# Visualize it
+### Different Variance
+
+```r
+binned_plot(diff, value ~ group)
+```
+
+![](w10p2_files/figure-html/sim_binned_plot_diff-1.png)&lt;!-- --&gt;
+
+---
+# Wait a minute...
+
+.pull-left[
+* The *esvis* package will (among other things) calculate and visually display binned effect sizes.
+* But how did we get from an idea, to functions, to a package?
+]
+
+.pull-right[![confused](http://www.lovethispic.com/uploaded_images/286476-I-m-Confused.jpg)]
+
+---
+class: inverse-red middle
+# Taking a step back
+
+---
+# Package Creation
+### The (or rather a) recipe
+1. Come up with ~~a brilliant~~ an idea 
+  + can be boring and mundane but just something you do a lot
+--
+
+2. Write a function! .gray[or more likely, a set of functions]
+--
+
+3. Create package skelton
+--
+
+4. Document your function
+--
+
+5. Install/fiddle/install
+--
+
+6. Write tests for your functions
+--
+
+7. Host your package somewhere public .gray[(GitHub is probably best)] and promote it - leverage the power of open source!
+
+--
+
+Use tools to automate
+
+---
+# A really good point
+
+&lt;blockquote class="twitter-tweet" data-conversation="none" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;1a) check that no one had the same idea 😇&lt;/p&gt;&amp;mdash; Maëlle Salmon 🐟 (@ma_salmon) &lt;a href="https://twitter.com/ma_salmon/status/983572108474241025?ref_src=twsrc%5Etfw"&gt;April 10, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt;
+
+&lt;br/&gt;
+
+[And some further recommendations/good advice](http://www.masalmon.eu/2017/12/11/goodrpackages/)
+
+---
+# Some resources 
+We surely won't get through everything. In my mind, the best resources are:
+
+.pull-left[
+### Advanced R
+&lt;img src = "https://d33wubrfki0l68.cloudfront.net/565916198b0be51bf88b36f94b80c7ea67cafe7c/7f70b/cover.png" height = 280 /&gt;
+]
+
+.pull-right[
+### R Packages
+&lt;img src = "https://d33wubrfki0l68.cloudfront.net/19c4a5cab01d9bcb1d2edeb63ce5ba0f21870e33/68feb/images/cover.png" height = 280 /&gt;
+]
+
+
+---
+# Our package
+We're going to write a package today! Let's keep it really simple...
+
+1. Idea (which we've actually used before): Report basic descriptive statistics
+for a vector, `x`: `N`, `n-valid`, `n-missing`, `mean`, and `sd`. 
+
+---
+# Our function
+* Let's have it return a data frame
+
+* What will be the formal arguments?
+
+* What will the body look like?
+
+
+--
+### Want to give it a go?
+
+---
+# The approach I took...
+
+
+```r
+describe &lt;- function(data, column_name) {
+  x &lt;- data[[column_name]]
+  
+  nval  &lt;- length(na.omit(x))
+  nmiss &lt;- sum(is.na(x))
+  mn    &lt;- mean(x, na.rm = TRUE)
+  stdev &lt;- sd(x, na.rm = TRUE)
+  
+  out &lt;- tibble::tibble(N         = nval + nmiss,
+                        n_valid   = nval, 
+                        n_missing = nmiss, 
+                        mean      = mn, 
+                        sd        = stdev)
+  out
+}
+```
+
+---
+# The approach I took...
+
+
+```r
+describe &lt;- function(data, column_name) {
+* x &lt;- data[[column_name]] # Extract just the vector to summarize
+  
+  nval  &lt;- length(na.omit(x))
+  nmiss &lt;- sum(is.na(x))
+  mn    &lt;- mean(x, na.rm = TRUE)
+  stdev &lt;- sd(x, na.rm = TRUE)
+  
+  out &lt;- tibble::tibble(N         = nval + nmiss,
+                        n_valid   = nval, 
+                        n_missing = nmiss, 
+                        mean      = mn, 
+                        sd        = stdev)
+  out
+}
+```
+
+---
+# The approach I took...
+
+
+```r
+describe &lt;- function(data, column_name) {
+  x &lt;- data[[column_name]] 
+  
+* nval  &lt;- length(na.omit(x)) # Count non-missing
+* nmiss &lt;- sum(is.na(x)) # Count missing
+* mn    &lt;- mean(x, na.rm = TRUE) # Compute mean
+* stdev &lt;- sd(x, na.rm = TRUE) # Computer SD
+  
+  out &lt;- tibble::tibble(N         = nval + nmiss,
+                        n_valid   = nval, 
+                        n_missing = nmiss, 
+                        mean      = mn, 
+                        sd        = stdev)
+  out
+}
+```
+
+---
+# The approach I took...
+
+
+```r
+describe &lt;- function(data, column_name) {
+  x &lt;- data[[column_name]] 
+  
+  nval  &lt;- length(na.omit(x)) 
+  nmiss &lt;- sum(is.na(x)) 
+  mn    &lt;- mean(x, na.rm = TRUE) 
+  stdev &lt;- sd(x, na.rm = TRUE) 
+  
+  # Compile into a df
+* out &lt;- tibble::tibble(N         = nval + nmiss,
+*                       n_valid   = nval,
+*                       n_missing = nmiss,
+*                       mean      = mn,
+*                       sd        = stdev)
+  out
+}
+```
+
+---
+# The approach I took...
+
+
+```r
+describe &lt;- function(data, column_name) {
+  x &lt;- data[[column_name]] 
+  
+  nval     &lt;- length(na.omit(x)) 
+  nmiss &lt;- sum(is.na(x)) 
+  mn    &lt;- mean(x, na.rm = TRUE) 
+  stdev &lt;- sd(x, na.rm = TRUE) 
+  
+  out &lt;- tibble::tibble(N         = nval + nmiss, 
+                        n_valid   = nval, 
+                        n_missing = nmiss,
+                        mean      = mn, 
+                        sd        = stdev)
+* out # Return the table
+}
+```
+
+---
+# Informal testing
+
+
+```r
+set.seed(8675309)
+df1 &lt;- tibble(x = rnorm(100))
+df2 &lt;- tibble(var_miss = c(rnorm(1000, 10, 4), rep(NA, 27)))
+describe(df1, "x")
+```
+
+```
+## # A tibble: 1 x 5
+##       N n_valid n_missing       mean        sd
+##   &lt;int&gt;   &lt;int&gt;     &lt;int&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+## 1   100     100         0 0.05230278 0.9291437
+```
+
+```r
+describe(df2, "var_miss")
+```
+
+```
+## # A tibble: 1 x 5
+##       N n_valid n_missing     mean       sd
+##   &lt;int&gt;   &lt;int&gt;     &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1  1027    1000        27 9.881107 4.090208
+```
+
+---
+# Demo
+Package skeleton: 
+* `usethis::create_package()`
+* `usethis::use_r()`
+* Use `roxygen2` special comments for documentation
+* Run `devtools::document()`
+* Install and restart, play around
+
+---
+# roxygen2 comments
+
+**Typical arguments**
+* `@param`: Describe the formal arguments. State argument name and the describe it.
+
+&gt; `#' @param x Vector to describe`
+
+* `@return`: What does the function return
+
+&gt; `#' @return A tibble with descriptive data`
+
+* `@example` or more commonly `@examples`: Provide examples of the use of your function.
+
+---
+* `@export`: Export your function
+
+If you don't include `@export`, your function will be *internal*, meaning others can't access it easily. 
+
+---
+# Other docs
+
+* **`NAMESPACE`**: Created by **{roxygen2}**. Don't edit it. If you need to, trash it and it will be reproduced. 
+
+* **`DESCRIPTION`**: Describes your package (more on next slide)
+
+* **`man/`**: The documentation files. Created by **{roxygen2}**. Don't edit.
+
+---
+# `DESCRIPTION`
+Metadata about the package. Default fields for our package are 
+
+```
+Package: practice
+Version: 0.0.0.9000
+Title: What the Package Does (One Line, Title Case)
+Description: What the package does (one paragraph).
+Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+RoxygenNote: 6.0.1
+```
+--
+
+This is where the information for `citation(package = "practice")` will come from.
+
+--
+
+Some advice - edit within RStudio, or a good text editor like [sublimetext](http://www.sublimetext.com) or [VSCode](https://code.visualstudio.com/). "Fancy" quotes and things can screw this up.
+
+---
+# Description File Fields
+&gt; The ‘Package’, ‘Version’, ‘License’, ‘Description’, ‘Title’, ‘Author’, and ‘Maintainer’ fields are mandatory, all other fields are optional.
+.right[[- Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-DESCRIPTION-file)]
+
+Some optional fields include
+* Imports and Suggests (we'll do this in a minute).
+* URL
+* BugReports
+* License (we'll have {usethis} create this for us).
+* LazyData
+
+---
+# `DESCRIPTION` for {esvis} 
+
+```
+Package: esvis
+Type: Package
+Title: Visualization and Estimation of Effect Sizes
+Version: 0.3.1
+Authors@R: person("Daniel", "Anderson", email = "daniela@uoregon.edu", 
+	   role = c("aut", "cre"))
+Description: A variety of methods are provided to estimate and visualize
+    distributional differences in terms of effect sizes. Particular emphasis
+    is upon evaluating differences between two or more distributions across
+    the entire scale, rather than at a single point (e.g., differences in
+    means). For example, Probability-Probability (PP) plots display the
+    difference between two or more distributions, matched by their empirical
+    CDFs (see Ho and Reardon, 2012; &lt;doi:10.3102/1076998611411918&gt;), allowing
+    for examinations of where on the scale distributional differences are
+    largest or smallest. The area under the PP curve (AUC) is an effect-size
+    metric, corresponding to the probability that a randomly selected
+    observation from the x-axis distribution will have a higher value
+    than a randomly selected observation from the y-axis distribution. 
+    Binned effect size plots are also available, in which the distributions
+    are split into bins (set by the user) and separate effect sizes (Cohen's
+    d) are produced for each bin - again providing a means to evaluate the
+    consistency (or lack thereof) of the difference between two or more 
+    distributions at different points on the scale. Evaluation of empirical 
+    CDFs is also provided, with  built-in arguments for providing annotations 
+    to help evaluate distributional differences at specific points (e.g., 
+    semi-transparent shading). All function take a consistent argument 
+    structure. Calculation of specific effect sizes is also possible. The
+    following effect sizes are estimable: (a) Cohen's d, (b) Hedges' g, 
+    (c) percentage above a cut, (d) transformed (normalized) percentage above 
+    a cut, (e)  area under the PP curve, and (f) the V statistic (see Ho, 
+    2009; &lt;doi:10.3102/1076998609332755&gt;), which essentially transforms the 
+    area under the curve to standard deviation units. By default, effect sizes 
+    are calculated for all possible pairwise comparisons, but a reference 
+    group (distribution) can be specified.
+```
+
+---
+# `DESCRIPTION` for {esvis} (continued)
+
+```
+Depends:
+    R (&gt;= 3.1)
+Imports:
+    sfsmisc,
+    ggplot2,
+    magrittr,
+    dplyr,
+    rlang,
+    tidyr (&gt;= 1.0.0),
+    purrr,
+    Hmisc,
+    tibble
+URL: https://github.com/datalorax/esvis
+BugReports: https://github.com/datalorax/esvis/issues
+License: MIT + file LICENSE
+LazyData: true
+RoxygenNote: 7.0.2
+Suggests:
+	testthat, 
+	viridisLite
+```
+
+---
+# Demo
+* Change the author name. 
+  + Add a contributor just for fun.
+* Add a license. We'll go for MIT license using `usethis::use_mit_license("First and Last Name")`
+* Install and reload.
+
+---
+# Declare dependencies
+* The function **depends on** the `tibble` function within the [{tibble}](https://www.tidyverse.org/articles/2018/01/tibble-1-4-2/) package. 
+
+* We have to declare this dependency
+
+---
+# My preferred approach
+* Declare package dependencies: `usethis::use_package()`
+
+* Create a package documentation page: `usethis::use_package_doc()`
+
+  + Declare all dependencies for your package there
+
+  + Only import the functions you need - not the entire package
+
+      - Use `#' importFrom pkg fun_name`
+
+* Generally won't have to worry about namespacing. The likelihood of conflicts is also reduced, so long as you don't import the full package.
+
+---
+class: inverse-blue middle
+
+# Demo
+
+---
+# Write tests!
+
+* What does it mean to write tests?
+
+  + ensure your package does what you expect it to
+
+--
+
+* Why write tests?
+  + If you write a new function, and it breaks an old one, that's good to know! 
+  + Reduces bugs, makes your package code more robust
+  
+---
+# How
+* `usethis::use_testthat` sets up the infrastructure
+
+* Make assertions, e.g.: `testthat::expect_equal()`, `testthat::expect_warning()`, `testthat::expect_error()`
+
+---
+# Testing 
+
+We'll skip over testing for today, because we just don't have time to cover everything. A few good resources:
+
+.pull-left[
+&lt;img src = "https://images.tandf.co.uk/common/jackets/amazon/978149876/9781498763653.jpg" height = "375" /&gt;
+]
+
+.pull-right[
+[Richie Cotton's book](https://www.amazon.com/Testing-Code-Chapman-Hall-CRC/dp/1498763650)
+
+[r-pkgs Chapter](http://r-pkgs.had.co.nz/tests.html)
+
+[Karl Broman Blog Post](http://kbroman.org/pkg_primer/pages/tests.html)
+]
+
+---
+# Check your R package
+* Use `devtools::check()` to run the same checks CRAN will run on your R package.
+
+  + Use `devtools::check_rhub()` to test your package on https://builder.r-hub.io/ (several platforms and R versions)
+
+  + Use `devtools::build_win()` to run the checks on CRAN computers.
+
+
+--
+I would not run the latter two until you're getting close to being ready to submit to CRAN.
+
+---
+# Patience
+
+The first time, you'll likely get errors. It will probably be frustrating, but ultimately worth the effort.
+
+![](http://i.giphy.com/RhEvCHIeZAZ6E.gif)
+
+---
+class: inverse-blue center middle
+# Let's check now!
+
+
+---
+class: center
+# 🎉 Hooray! 🎉
+### You have a package!
+
+&lt;img src = "https://thumbs.gfycat.com/TotalAffectionateHammerheadbird-max-1mb.gif" width = 600 height = 380 /&gt;
+
+---
+# A few other best practices
+* Create a `README` with `usethis::use_readme_rmd`.
+
+--
+
+* Try to get your [code coverage](https://en.wikipedia.org/wiki/Code_coverage) up above 80%.
+
+--
+
+* Automate wherever possible ([{devtools}](https://github.com/r-lib/devtools) and [{usethis}](https://github.com/r-lib/usethis) help a lot with this)
+
+--
+
+* Use the [{goodpractice}](https://github.com/MangoTheCat/goodpractice) package to help you package code be more robust, specifically with `goodpractice::gp()`. It will give you lots of good ideas
+
+---
+# A few other best practices
+
+* Host on GitHub, and capitalize on integration with other systems (all free, but require registering for an account)
+
+  + [Github Actions](https://github.com/features/actions)
+
+  + [codecov](https://codecov.io)
+  
+---
+class: inverse-blue center middle
+
+# Any time left?
+
+
+---
+# Create a `README`
+* Use standard R Markdown. Setup the infrastructure with `usethis::use_readme_rmd`. 
+* Write it just like a normal R Markdown doc and it should all flow into the `README`.
+
+&lt;img src = "img/esvis-README.png" height = 325 /&gt;
+
+---
+# Use GitHub Actions
+* Run `usethis::use_github_actions()` to get started.
+
+  + Go to the Actions tab on your repo
+  
+  + Copy and paste the code to the badge into your `README`.
+
+
+--
+
+* Now all your code will be automatically tested each time you push! You can even test on different operating systems and different versions of R!
+
+&lt;img src = "https://media.giphy.com/media/3ohzAu2U1tOafteBa0/giphy.gif" height = 200, align = "right" /&gt;
+
+
+---
+# codecov
+You can test your code coverage each time you push a new commit by using [codecov](https://codecov.io). Initialize with `usethis::use_coverage()`. Overall setup process is pretty similar to Travis CI/Appveyor.
+
+Easily see what is/is not covered by tests!
+
+&lt;img src = "img/codecov.png" height = 325 /&gt;
+
+---
+class: inverse-green middle
+
+# That's all
+### Thanks so much!
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
