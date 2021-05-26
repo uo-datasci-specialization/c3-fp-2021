@@ -2,13 +2,13 @@ library(tidyverse)
 library(fs)
 
 rmds <- dir_ls(here::here("static", "slides"), 
-               regexp = "w\\dp\\d\\.Rmd") %>% 
+               regexp = "w\\d?\\dp\\d\\.Rmd") %>% 
   file_info() %>% 
   mutate(week = gsub(".+slides/(.+)\\..+", "\\1", path)) %>% 
   select(path, week)
   
 html <- dir_ls(here::here("static", "slides"), 
-                 regexp = "w\\dp\\d\\.html") %>% 
+                 regexp = "w\\d?\\dp\\d\\.html") %>% 
   file_info() %>% 
   mutate(week = gsub(".+slides/(.+)\\..+", "\\1", path),
          modification_time = lubridate::round_date(modification_time, 

@@ -60,10 +60,371 @@ layout: true
 ---
 # Agenda
 
+* Quick looping review
+
 * Review functions
 
 * A shiny challenge
   + But first, a brief discussion on publishing shiny apps
+
+---
+class: inverse-red middle
+# Quick looping review
+
+---
+# Scenario
+
+* Let's say you want to `scale()` (standardize) every numeric column in a data frame.
+
+
+--
+Use `palmerpenguins::penguins()` for our example.
+
+
+```r
+library(palmerpenguins)
+penguins
+```
+
+```
+## # A tibble: 344 x 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex     year
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt; &lt;fct&gt;  &lt;int&gt;
+##  1 Adelie  Torgersen           39.1          18.7               181        3750 male    2007
+##  2 Adelie  Torgersen           39.5          17.4               186        3800 female  2007
+##  3 Adelie  Torgersen           40.3          18                 195        3250 female  2007
+##  4 Adelie  Torgersen           NA            NA                  NA          NA &lt;NA&gt;    2007
+##  5 Adelie  Torgersen           36.7          19.3               193        3450 female  2007
+##  6 Adelie  Torgersen           39.3          20.6               190        3650 male    2007
+##  7 Adelie  Torgersen           38.9          17.8               181        3625 female  2007
+##  8 Adelie  Torgersen           39.2          19.6               195        4675 male    2007
+##  9 Adelie  Torgersen           34.1          18.1               193        3475 &lt;NA&gt;    2007
+## 10 Adelie  Torgersen           42            20.2               190        4250 &lt;NA&gt;    2007
+## # … with 334 more rows
+```
+
+---
+# For loop method
+
+You try first. Can you write a `for` loop that loops through each column and applies `scale()` if it's numeric?
+
+<div class="countdown" id="timer_60ae8321" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+One approach
+
+
+```r
+penguins2 &lt;- penguins
+for(i in seq_along(penguins2)) {
+  if (is.numeric(penguins2[ ,i, drop = TRUE])) {
+    penguins2[ ,i] &lt;- scale(penguins2[ ,i])
+  }
+}
+```
+
+---
+
+```r
+penguins2
+```
+
+```
+## # A tibble: 344 x 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex         year
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;
+##  1 Adelie  Torgersen     -0.8832047     0.7843001        -1.416272  -0.5633167  male   -1.257484
+##  2 Adelie  Torgersen     -0.8099390     0.1260033        -1.060696  -0.5009690  female -1.257484
+##  3 Adelie  Torgersen     -0.6634077     0.4298326        -0.4206603 -1.186793   female -1.257484
+##  4 Adelie  Torgersen     NA            NA                NA         NA          &lt;NA&gt;   -1.257484
+##  5 Adelie  Torgersen     -1.322799      1.088129         -0.5628905 -0.9374027  female -1.257484
+##  6 Adelie  Torgersen     -0.8465718     1.746426         -0.7762357 -0.6880121  male   -1.257484
+##  7 Adelie  Torgersen     -0.9198375     0.3285561        -1.416272  -0.7191859  female -1.257484
+##  8 Adelie  Torgersen     -0.8648883     1.240044         -0.4206603  0.5901153  male   -1.257484
+##  9 Adelie  Torgersen     -1.799025      0.4804708        -0.5628905 -0.9062289  &lt;NA&gt;   -1.257484
+## 10 Adelie  Torgersen     -0.3520286     1.543873         -0.7762357  0.06016004 &lt;NA&gt;   -1.257484
+## # … with 334 more rows
+```
+
+---
+# Replicate with `lapply()`?
+
+<div class="countdown" id="timer_60ae84ea" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+```r
+penguins3 &lt;- penguins
+data.frame(
+  lapply(penguins3, function(x) {
+    if(is.numeric(x)) {
+      x &lt;- scale(x)
+    }
+    x
+  })
+)
+```
+
+```
+##     species    island bill_length_mm bill_depth_mm flipper_length_mm  body_mass_g    sex        year
+## 1    Adelie Torgersen    -0.88320467    0.78430007       -1.41627153 -0.563316704   male -1.25748435
+## 2    Adelie Torgersen    -0.80993901    0.12600328       -1.06069609 -0.500969030 female -1.25748435
+## 3    Adelie Torgersen    -0.66340769    0.42983257       -0.42066030 -1.186793445 female -1.25748435
+## 4    Adelie Torgersen             NA            NA                NA           NA   &lt;NA&gt; -1.25748435
+## 5    Adelie Torgersen    -1.32279862    1.08812936       -0.56289047 -0.937402749 female -1.25748435
+## 6    Adelie Torgersen    -0.84657184    1.74642615       -0.77623574 -0.688012052   male -1.25748435
+## 7    Adelie Torgersen    -0.91983750    0.32855614       -1.41627153 -0.719185889 female -1.25748435
+## 8    Adelie Torgersen    -0.86488825    1.24004400       -0.42066030  0.590115266   male -1.25748435
+## 9    Adelie Torgersen    -1.79902541    0.48047078       -0.56289047 -0.906228912   &lt;NA&gt; -1.25748435
+## 10   Adelie Torgersen    -0.35202864    1.54387329       -0.77623574  0.060160036   &lt;NA&gt; -1.25748435
+## 11   Adelie Torgersen    -1.12131806   -0.02591137       -1.06069609 -1.124445771   &lt;NA&gt; -1.25748435
+## 12   Adelie Torgersen    -1.12131806    0.07536506       -1.48738661 -0.625664378   &lt;NA&gt; -1.25748435
+## 13   Adelie Torgersen    -0.51687637    0.22727971       -1.34515644 -1.249141119 female -1.25748435
+## 14   Adelie Torgersen    -0.97478674    2.05025544       -0.70512065 -0.500969030   male -1.25748435
+## 15   Adelie Torgersen    -1.70744334    1.99961722       -0.20731504  0.247203059   male -1.25748435
+## 16   Adelie Torgersen    -1.34111504    0.32855614       -1.13181117 -0.625664378 female -1.25748435
+## 17   Adelie Torgersen    -0.95647033    0.93621471       -0.42066030 -0.937402749 female -1.25748435
+## 18   Adelie Torgersen    -0.26044656    1.79706436       -0.27843012  0.371898407   male -1.25748435
+## 19   Adelie Torgersen    -1.74407616    0.63238542       -1.20292626 -1.093271934 female -1.25748435
+## 20   Adelie Torgersen     0.38062795    2.20217008       -0.49177539 -0.002187638   male -1.25748435
+## 21   Adelie    Biscoe    -1.12131806    0.58174721       -1.91407714 -0.999750423 female -1.25748435
+## 22   Adelie    Biscoe    -1.13963448    0.78430007       -1.48738661 -0.750359726   male -1.25748435
+## 23   Adelie    Biscoe    -1.46932994    1.03749114       -0.84735082 -0.500969030 female -1.25748435
+## 24   Adelie    Biscoe    -1.04805240    0.48047078       -1.13181117 -0.313926008   male -1.25748435
+## 25   Adelie    Biscoe    -0.93815391    0.02472685       -1.48738661 -0.500969030   male -1.25748435
+## 26   Adelie    Biscoe    -1.57922843    0.88557650       -0.98958100 -0.500969030 female -1.25748435
+## 27   Adelie    Biscoe    -0.60845845    0.73366185       -1.27404135 -0.812707400   male -1.25748435
+## 28   Adelie    Biscoe    -0.62677486    0.37919435       -0.98958100 -1.249141119 female -1.25748435
+## 29   Adelie    Biscoe    -1.10300165    0.73366185       -2.05630731 -1.311488793 female -1.25748435
+## 30   Adelie    Biscoe    -0.62677486    0.88557650       -1.48738661 -0.313926008   male -1.25748435
+## 31   Adelie     Dream    -0.80993901   -0.22846423       -1.62961679 -1.186793445 female -1.25748435
+## 32   Adelie     Dream    -1.23121655    0.48047078       -1.62961679 -0.376273682   male -1.25748435
+## 33   Adelie     Dream    -0.80993901    0.32855614       -0.91846591 -1.124445771 female -1.25748435
+## 34   Adelie     Dream    -0.55350920    0.88557650       -1.20292626 -0.376273682   male -1.25748435
+## 35   Adelie     Dream    -1.37774787   -0.07654958       -0.42066030 -1.093271934 female -1.25748435
+## 36   Adelie     Dream    -0.86488825    1.99961722       -0.34954521 -0.064535312   male -1.25748435
+## 37   Adelie     Dream    -0.93815391    1.44259686       -0.77623574 -0.313926008   male -1.25748435
+## 38   Adelie     Dream    -0.31539581    0.68302364       -1.48738661 -0.812707400 female -1.25748435
+## 39   Adelie     Dream    -1.15795089    1.08812936       -1.41627153 -1.124445771 female -1.25748435
+## 40   Adelie     Dream    -0.75498976    0.98685293       -1.20292626  0.558941429   male -1.25748435
+## 41   Adelie     Dream    -1.35943145    0.42983257       -1.34515644 -1.311488793 female -1.25748435
+## 42   Adelie     Dream    -0.57182562    0.63238542       -0.42066030 -0.376273682   male -1.25748435
+## 43   Adelie     Dream    -1.45101353    0.68302364       -1.06069609 -1.373836467 female -1.25748435
+## 44   Adelie     Dream     0.03261607    1.29068222       -0.34954521  0.247203059   male -1.25748435
+## 45   Adelie     Dream    -1.26784938   -0.12718780       -1.13181117 -1.498531815 female -1.25748435
+## 46   Adelie     Dream    -0.79162259    0.83493828       -0.77623574  0.496593755   male -1.25748435
+## 47   Adelie     Dream    -0.51687637    0.93621471       -1.34515644 -0.968576586   male -1.25748435
+## 48   Adelie     Dream    -1.17626731    0.88557650       -1.55850170 -1.529705652   &lt;NA&gt; -1.25748435
+## 49   Adelie     Dream    -1.45101353    0.37919435       -0.77623574 -0.937402749 female -1.25748435
+## 50   Adelie     Dream    -0.29707939    2.05025544       -0.70512065 -0.064535312   male -1.25748435
+## 51   Adelie    Biscoe    -0.79162259    0.27791792       -1.06069609 -0.875055074 female -0.03552216
+## 52   Adelie    Biscoe    -0.70004052    0.88557650       -0.91846591  0.122507710   male -0.03552216
+## 53   Adelie    Biscoe    -1.63417768    0.37919435       -0.77623574 -0.937402749 female -0.03552216
+## 54   Adelie    Biscoe    -0.35202864    1.18940579       -0.06508486 -0.189230660   male -0.03552216
+## 55   Adelie    Biscoe    -1.72575975    0.48047078       -0.98958100 -1.623227163 female -0.03552216
+## 56   Adelie    Biscoe    -0.46192713    0.73366185       -0.70512065 -0.625664378   male -0.03552216
+## 57   Adelie    Biscoe    -0.90152108    0.17664149       -1.06069609 -0.812707400 female -0.03552216
+## 58   Adelie    Biscoe    -0.60845845    0.83493828       -0.56289047 -0.500969030   male -0.03552216
+## 59   Adelie    Biscoe    -1.35943145   -0.27910244       -1.41627153 -1.685574837 female -0.03552216
+## 60   Adelie    Biscoe    -1.15795089    0.98685293       -0.49177539 -0.563316704   male -0.03552216
+## 61   Adelie    Biscoe    -1.50596277   -0.12718780       -1.13181117 -1.311488793 female -0.03552216
+## 62   Adelie    Biscoe    -0.48024354    1.99961722       -0.42066030  0.247203059   male -0.03552216
+## 63   Adelie    Biscoe    -1.15795089   -0.07654958       -1.13181117 -0.750359726 female -0.03552216
+## 64   Adelie    Biscoe    -0.51687637    0.53110900       -0.63400556 -0.189230660   male -0.03552216
+## 65   Adelie    Biscoe    -1.37774787   -0.02591137       -1.20292626 -1.685574837 female -0.03552216
+## 66   Adelie    Biscoe    -0.42529430    0.42983257       -0.63400556 -0.313926008   male -0.03552216
+## 67   Adelie    Biscoe    -1.54259560   -0.48165530       -0.42066030 -1.062098097 female -0.03552216
+## 68   Adelie    Biscoe    -0.51687637    0.98685293       -0.91846591 -0.126882986   male -0.03552216
+## 69   Adelie Torgersen    -1.46932994   -0.27910244       -0.77623574 -1.436184141 female -0.03552216
+## 70   Adelie Torgersen    -0.38866147    1.13876757       -0.20731504  0.309550733   male -0.03552216
+## 71   Adelie Torgersen    -1.90892390    0.93621471       -0.77623574 -0.750359726 female -0.03552216
+## 72   Adelie Torgersen    -0.77330618    0.63238542       -0.77623574 -0.376273682   male -0.03552216
+## 73   Adelie Torgersen    -0.79162259    0.02472685       -0.34954521 -0.812707400 female -0.03552216
+## 74   Adelie Torgersen     0.34399512    0.88557650       -0.27843012 -0.064535312   male -0.03552216
+## 75   Adelie Torgersen    -1.54259560    0.17664149       -0.77623574 -0.625664378 female -0.03552216
+## 76   Adelie Torgersen    -0.20549732    0.68302364       -0.42066030  0.060160036   male -0.03552216
+## 77   Adelie Torgersen    -0.55350920   -0.17782601       -0.70512065 -0.625664378 female -0.03552216
+## 78   Adelie Torgersen    -1.23121655    1.13876757       -1.20292626 -0.376273682   male -0.03552216
+## 79   Adelie Torgersen    -1.41438070   -0.53229351       -0.98958100 -0.812707400 female -0.03552216
+## 80   Adelie Torgersen    -0.33371222    0.98685293       -0.42066030 -0.251578334   male -0.03552216
+## 81   Adelie Torgersen    -1.70744334    0.02472685       -0.84735082 -1.249141119 female -0.03552216
+## 82   Adelie Torgersen    -0.18718091    0.22727971       -0.34954521  0.621289103   male -0.03552216
+## 83   Adelie Torgersen    -1.32279862    0.83493828       -0.98958100 -0.500969030 female -0.03552216
+## 84   Adelie Torgersen    -1.61586126    1.13876757       -0.56289047 -0.002187638   male -0.03552216
+## 85   Adelie     Dream    -1.21290014    0.32855614       -0.70512065 -1.062098097 female -0.03552216
+## 86   Adelie     Dream    -0.48024354    1.59451151       -0.49177539 -0.812707400   male -0.03552216
+## 87   Adelie     Dream    -1.39606428    1.18940579       -0.77623574 -0.500969030   male -0.03552216
+## 88   Adelie     Dream    -1.28616579    0.73366185       -0.84735082 -0.875055074 female -0.03552216
+## 89   Adelie     Dream    -1.02973599    1.03749114       -0.84735082 -0.313926008   male -0.03552216
+## 90   Adelie     Dream    -0.91983750    0.83493828       -0.77623574 -0.750359726 female -0.03552216
+## 91   Adelie     Dream    -1.50596277    0.42983257        0.07714531 -0.812707400 female -0.03552216
+## 92   Adelie     Dream    -0.51687637    0.48047078        0.29049058  0.122507710   male -0.03552216
+## 93   Adelie     Dream    -1.81734182   -0.02591137       -1.13181117 -0.999750423 female -0.03552216
+## 94   Adelie     Dream    -0.79162259    0.48047078       -1.06069609  0.309550733   male -0.03552216
+## 95   Adelie     Dream    -1.41438070    0.07536506       -0.98958100 -1.124445771 female -0.03552216
+## 96   Adelie     Dream    -0.57182562    0.88557650        0.50383584  0.122507710   male -0.03552216
+## 97   Adelie     Dream    -1.06636882    0.73366185       -0.77623574 -0.625664378 female -0.03552216
+## 98   Adelie     Dream    -0.66340769    0.68302364       -0.34954521  0.184855384   male -0.03552216
+## 99   Adelie     Dream    -1.98218956   -0.53229351       -1.62961679 -1.623227163 female -0.03552216
+## 100  Adelie     Dream    -0.13223166    0.68302364       -0.63400556 -0.126882986   male -0.03552216
+## 101  Adelie    Biscoe    -1.63417768    0.37919435       -0.63400556 -0.594490541 female  1.18644003
+## 102  Adelie    Biscoe    -0.53519279    1.44259686        0.14826040  0.652462940   male  1.18644003
+## 103  Adelie    Biscoe    -1.13963448   -0.58293173       -1.27404135 -1.405010304 female  1.18644003
+## 104  Adelie    Biscoe    -1.12131806    1.44259686       -0.77623574  0.060160036   male  1.18644003
+## 105  Adelie    Biscoe    -1.10300165    0.73366185       -0.56289047 -1.592053326 female  1.18644003
+## 106  Adelie    Biscoe    -0.77330618    0.88557650       -1.20292626 -0.812707400   male  1.18644003
+## 107  Adelie    Biscoe    -0.97478674    0.02472685       -0.13619995 -0.563316704 female  1.18644003
+## 108  Adelie    Biscoe    -1.04805240    1.44259686       -0.77623574 -0.376273682   male  1.18644003
+## 109  Adelie    Biscoe    -1.06636882   -0.07654958       -1.41627153 -1.280314956 female  1.18644003
+## 110  Adelie    Biscoe    -0.13223166    0.93621471       -0.27843012  0.714810614   male  1.18644003
+## 111  Adelie    Biscoe    -1.06636882   -0.32974066       -0.20731504 -0.469795193 female  1.18644003
+## 112  Adelie    Biscoe     0.30736229    1.59451151       -0.70512065  0.496593755   male  1.18644003
+## 113  Adelie    Biscoe    -0.77330618    0.27791792       -0.56289047 -1.249141119 female  1.18644003
+## 114  Adelie    Biscoe    -0.31539581    1.18940579       -0.27843012  0.091333873   male  1.18644003
+## 115  Adelie    Biscoe    -0.79162259    1.79706436       -0.70512065 -0.376273682 female  1.18644003
+## 116  Adelie    Biscoe    -0.22381374    0.58174721       -0.34954521 -0.158056823   male  1.18644003
+## 117  Adelie Torgersen    -0.97478674   -0.07654958       -0.91846591 -1.623227163 female  1.18644003
+## 118  Adelie Torgersen    -1.21290014    1.69578793       -0.13619995 -0.532142867   male  1.18644003
+## 119  Adelie Torgersen    -1.50596277   -0.07654958       -0.84735082 -1.062098097 female  1.18644003
+## 120  Adelie Torgersen    -0.51687637    0.73366185       -0.84735082 -1.093271934   male  1.18644003
+## 121  Adelie Torgersen    -1.41438070    0.02472685       -0.98958100 -1.311488793 female  1.18644003
+## 122  Adelie Torgersen    -1.13963448    1.34132043       -0.20731504 -0.875055074   male  1.18644003
+## 123  Adelie Torgersen    -0.68172411   -0.07654958       -1.77184696 -0.937402749 female  1.18644003
+## 124  Adelie Torgersen    -0.46192713    0.68302364        0.07714531 -0.407447519   male  1.18644003
+## 125  Adelie Torgersen    -1.59754485   -0.63356994       -1.06069609 -1.436184141 female  1.18644003
+##  [ reached 'max' / getOption("max.print") -- omitted 219 rows ]
+```
+
+---
+# {purrr}
+
+When do we use `~`?
+
+Remember, `purrr::map()` is *exactly* like `base::lapply()`, except for the shortcut syntax
+
+
+--
+`~` is a shortcut for `function(.x)`
+
+---
+# Equivalent
+The following are the same
+
+.pull-left[
+
+
+```r
+map_df(penguins, ~{
+  if(is.numeric(.x)) {
+    .x &lt;- scale(.x)
+  }
+  .x
+})
+```
+
+```
+## # A tibble: 344 x 8
+##    species island    bill_length_mm[,1] bill_depth_mm[,1] flipper_length_mm[,1] body_mass_g[,1] sex     year[,1]
+##    &lt;fct&gt;   &lt;fct&gt;                  &lt;dbl&gt;             &lt;dbl&gt;                 &lt;dbl&gt;           &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;
+##  1 Adelie  Torgersen         -0.8832047         0.7843001            -1.416272      -0.5633167  male   -1.257484
+##  2 Adelie  Torgersen         -0.8099390         0.1260033            -1.060696      -0.5009690  female -1.257484
+##  3 Adelie  Torgersen         -0.6634077         0.4298326            -0.4206603     -1.186793   female -1.257484
+##  4 Adelie  Torgersen         NA                NA                    NA             NA          &lt;NA&gt;   -1.257484
+##  5 Adelie  Torgersen         -1.322799          1.088129             -0.5628905     -0.9374027  female -1.257484
+##  6 Adelie  Torgersen         -0.8465718         1.746426             -0.7762357     -0.6880121  male   -1.257484
+##  7 Adelie  Torgersen         -0.9198375         0.3285561            -1.416272      -0.7191859  female -1.257484
+##  8 Adelie  Torgersen         -0.8648883         1.240044             -0.4206603      0.5901153  male   -1.257484
+##  9 Adelie  Torgersen         -1.799025          0.4804708            -0.5628905     -0.9062289  &lt;NA&gt;   -1.257484
+## 10 Adelie  Torgersen         -0.3520286         1.543873             -0.7762357      0.06016004 &lt;NA&gt;   -1.257484
+## # … with 334 more rows
+```
+
+]
+
+.pull-right[
+
+
+```r
+map_df(penguins, function(.x) {
+  if(is.numeric(.x)) {
+    .x &lt;- scale(.x)
+  }
+  .x
+})
+```
+
+```
+## # A tibble: 344 x 8
+##    species island    bill_length_mm[,1] bill_depth_mm[,1] flipper_length_mm[,1] body_mass_g[,1] sex     year[,1]
+##    &lt;fct&gt;   &lt;fct&gt;                  &lt;dbl&gt;             &lt;dbl&gt;                 &lt;dbl&gt;           &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;
+##  1 Adelie  Torgersen         -0.8832047         0.7843001            -1.416272      -0.5633167  male   -1.257484
+##  2 Adelie  Torgersen         -0.8099390         0.1260033            -1.060696      -0.5009690  female -1.257484
+##  3 Adelie  Torgersen         -0.6634077         0.4298326            -0.4206603     -1.186793   female -1.257484
+##  4 Adelie  Torgersen         NA                NA                    NA             NA          &lt;NA&gt;   -1.257484
+##  5 Adelie  Torgersen         -1.322799          1.088129             -0.5628905     -0.9374027  female -1.257484
+##  6 Adelie  Torgersen         -0.8465718         1.746426             -0.7762357     -0.6880121  male   -1.257484
+##  7 Adelie  Torgersen         -0.9198375         0.3285561            -1.416272      -0.7191859  female -1.257484
+##  8 Adelie  Torgersen         -0.8648883         1.240044             -0.4206603      0.5901153  male   -1.257484
+##  9 Adelie  Torgersen         -1.799025          0.4804708            -0.5628905     -0.9062289  &lt;NA&gt;   -1.257484
+## 10 Adelie  Torgersen         -0.3520286         1.543873             -0.7762357      0.06016004 &lt;NA&gt;   -1.257484
+## # … with 334 more rows
+```
+
+]
+
+---
+# Whe to use `~`?
+
+You can use it whenever you feel comfortable, including always. You can also just loop a function through, and pass additional arguments to that function, e.g., 
+
+
+```r
+map_dbl(penguins, mean, na.rm = TRUE)
+```
+
+```
+##           species            island    bill_length_mm     bill_depth_mm flipper_length_mm       body_mass_g 
+##                NA                NA          43.92193          17.15117         200.91520        4201.75439 
+##               sex              year 
+##                NA        2008.02907
+```
+
+```r
+map_dbl(penguins, ~mean(.x, na.rm = TRUE))
+```
+
+```
+##           species            island    bill_length_mm     bill_depth_mm flipper_length_mm       body_mass_g 
+##                NA                NA          43.92193          17.15117         200.91520        4201.75439 
+##               sex              year 
+##                NA        2008.02907
+```
+
+---
+The `~ .x` syntax is also helpful for more complex things
+
+
+```r
+map_dbl(penguins, ~ifelse(
+    is.numeric(.x), 
+    mean(.x, na.rm = TRUE), 
+    0
+  )
+)
+```
+
+```
+##           species            island    bill_length_mm     bill_depth_mm flipper_length_mm       body_mass_g 
+##           0.00000           0.00000          43.92193          17.15117         200.91520        4201.75439 
+##               sex              year 
+##           0.00000        2008.02907
+```
+
 
 ---
 class: inverse-blue middle
@@ -161,7 +522,7 @@ Note - the example I used included only base R functions. You can feel free to u
 
 You also don't have to return a data frame output - return it however you want
 
-<div class="countdown" id="timer_60ad7aab" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60ae8289" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">07</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -291,7 +652,7 @@ Let's say we want a data frame as the output.
 
 Can you modify what we have now to make that so?
 
-<div class="countdown" id="timer_60ad7c18" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60ae8389" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -346,7 +707,7 @@ get_counts(penguins, "island")
 
 Can we make the output from the data frame have the same column that we fed it?
 
-<div class="countdown" id="timer_60ad7be0" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60ae81f9" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">02</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -632,7 +993,7 @@ Now that we have a basic function, can you write a **new** function that *calls 
 
 Should return the original data frame, but with the counts/proportions added in as a new column.
 
-<div class="countdown" id="timer_60ad7a40" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60ae84d7" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -711,7 +1072,7 @@ Can you embed a warning or error (your choice) if the column fed to the function
 
 Note - this is more difficult with our **dplyr** version. Try using `dplyr::pull()`.
 
-<div class="countdown" id="timer_60ad7a4d" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_60ae8309" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">03</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 

@@ -33,10 +33,137 @@ update_geom_defaults("point", list(size = 3))
 ---
 # Agenda
 
+* Quick looping review
+
 * Review functions
 
 * A shiny challenge
   + But first, a brief discussion on publishing shiny apps
+
+---
+class: inverse-red middle
+# Quick looping review
+
+---
+# Scenario
+
+* Let's say you want to `scale()` (standardize) every numeric column in a data frame.
+
+
+--
+Use `palmerpenguins::penguins()` for our example.
+
+```{r }
+library(palmerpenguins)
+penguins
+```
+
+---
+# For loop method
+
+You try first. Can you write a `for` loop that loops through each column and applies `scale()` if it's numeric?
+
+`r countdown::countdown(2)`
+
+
+---
+One approach
+
+```{r }
+penguins2 <- penguins
+for(i in seq_along(penguins2)) {
+  if (is.numeric(penguins2[ ,i, drop = TRUE])) {
+    penguins2[ ,i] <- scale(penguins2[ ,i])
+  }
+}
+```
+
+---
+```{r }
+penguins2
+```
+
+---
+# Replicate with `lapply()`?
+
+`r countdown::countdown(2)`
+
+---
+```{r }
+penguins3 <- penguins
+data.frame(
+  lapply(penguins3, function(x) {
+    if(is.numeric(x)) {
+      x <- scale(x)
+    }
+    x
+  })
+)
+```
+
+---
+# {purrr}
+
+When do we use `~`?
+
+Remember, `purrr::map()` is *exactly* like `base::lapply()`, except for the shortcut syntax
+
+
+--
+`~` is a shortcut for `function(.x)`
+
+---
+# Equivalent
+The following are the same
+
+.pull-left[
+
+```{r }
+map_df(penguins, ~{
+  if(is.numeric(.x)) {
+    .x <- scale(.x)
+  }
+  .x
+})
+```
+
+]
+
+.pull-right[
+
+```{r }
+map_df(penguins, function(.x) {
+  if(is.numeric(.x)) {
+    .x <- scale(.x)
+  }
+  .x
+})
+```
+
+]
+
+---
+# Whe to use `~`?
+
+You can use it whenever you feel comfortable, including always. You can also just loop a function through, and pass additional arguments to that function, e.g., 
+
+```{r warning = FALSE}
+map_dbl(penguins, mean, na.rm = TRUE)
+map_dbl(penguins, ~mean(.x, na.rm = TRUE))
+```
+
+---
+The `~ .x` syntax is also helpful for more complex things
+
+```{r }
+map_dbl(penguins, ~ifelse(
+    is.numeric(.x), 
+    mean(.x, na.rm = TRUE), 
+    0
+  )
+)
+```
+
 
 ---
 class: inverse-blue middle
