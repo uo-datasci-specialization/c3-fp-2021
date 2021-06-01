@@ -58,6 +58,12 @@ layout: true
 ---
 # Agenda
 
+* Basics of package development
+
+* An example from my first CRAN package
+
+* Creating a package (we'll actually do it!)
+
 ---
 # Want to follow along?
 
@@ -148,12 +154,12 @@ head(d)
 ## # A tibble: 6 x 3
 ##         low     high var   
 ##       &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt; 
-## 1  9.549110 13.50911 common
-## 2  9.350832 12.93887 common
-## 3 10.40181  12.20612 common
-## 4 10.81037  10.52069 common
-## 5 10.79728  12.71338 common
-## 6  9.672677 10.68060 common
+## 1  7.855059 10.69834 common
+## 2 10.40831  11.51090 common
+## 3  9.980279 10.84525 common
+## 4 10.76777  13.45303 common
+## 5  9.934628 11.16377 common
+## 6  9.520182 10.47681 common
 ```
 
 ---
@@ -174,16 +180,16 @@ d
 ## # A tibble: 4,000 x 3
 ##    var    group     value
 ##    &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt;
-##  1 common low    9.549110
-##  2 common high  13.50911 
-##  3 common low    9.350832
-##  4 common high  12.93887 
-##  5 common low   10.40181 
-##  6 common high  12.20612 
-##  7 common low   10.81037 
-##  8 common high  10.52069 
-##  9 common low   10.79728 
-## 10 common high  12.71338 
+##  1 common low    7.855059
+##  2 common high  10.69834 
+##  3 common low   10.40831 
+##  4 common high  11.51090 
+##  5 common low    9.980279
+##  6 common high  10.84525 
+##  7 common low   10.76777 
+##  8 common high  13.45303 
+##  9 common low    9.934628
+## 10 common high  11.16377 
 ## # … with 3,990 more rows
 ```
 
@@ -237,14 +243,15 @@ binned_es(common, value ~ group)
 
 ```
 ## # A tibble: 6 x 11
-##       q  qtile_lb  qtile_ub group_ref group_foc mean_diff length length1       psd        es      es_se
-##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;  &lt;int&gt;   &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1     1 0         0.3333333 high      low       -2.048922   1000    1000 0.9650763 -2.122271 0.05591828
-## 2     2 0.3333333 0.6666667 high      low       -2.080733   1000    1000 0.9650763 -2.155220 0.05623269
-## 3     3 0.6666667 1         high      low       -1.992408   1000    1000 0.9650763 -2.063733 0.05536739
-## 4     1 0         0.3333333 low       high       2.048922   1000    1000 0.9650763  2.122271 0.05591828
-## 5     2 0.3333333 0.6666667 low       high       2.080733   1000    1000 0.9650763  2.155220 0.05623269
-## 6     3 0.6666667 1         low       high       1.992408   1000    1000 0.9650763  2.063733 0.05536739
+##       q  qtile_lb  qtile_ub group_ref group_foc mean_diff length length1
+##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;  &lt;int&gt;   &lt;int&gt;
+## 1     1 0         0.3333333 high      low       -2.035098   1000    1000
+## 2     2 0.3333333 0.6666667 high      low       -1.930967   1000    1000
+## 3     3 0.6666667 1         high      low       -1.957844   1000    1000
+## 4     1 0         0.3333333 low       high       2.035098   1000    1000
+## 5     2 0.3333333 0.6666667 low       high       1.930967   1000    1000
+## 6     3 0.6666667 1         low       high       1.957844   1000    1000
+## # … with 3 more variables: psd &lt;dbl&gt;, es &lt;dbl&gt;, es_se &lt;dbl&gt;
 ```
 
 ```r
@@ -253,14 +260,15 @@ binned_es(diff, value ~ group)
 
 ```
 ## # A tibble: 6 x 11
-##       q  qtile_lb  qtile_ub group_ref group_foc mean_diff length length1      psd         es      es_se
-##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;dbl&gt;  &lt;int&gt;   &lt;int&gt;    &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
-## 1     1 0         0.3333333 high      low       -1.098328   1000    1000 1.498662 -0.7325977 0.04619822
-## 2     2 0.3333333 0.6666667 high      low       -1.967218   1000    1000 1.498662 -1.312157  0.04930276
-## 3     3 0.6666667 1         high      low       -3.133526   1000    1000 1.498662 -2.090098  0.05561428
-## 4     1 0         0.3333333 low       high       1.098328   1000    1000 1.498662  0.7325977 0.04619822
-## 5     2 0.3333333 0.6666667 low       high       1.967218   1000    1000 1.498662  1.312157  0.04930276
-## 6     3 0.6666667 1         low       high       3.133526   1000    1000 1.498662  2.090098  0.05561428
+##       q  qtile_lb  qtile_ub group_ref group_foc  mean_diff length length1
+##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;  &lt;int&gt;   &lt;int&gt;
+## 1     1 0         0.3333333 high      low       -0.9691199   1000    1000
+## 2     2 0.3333333 0.6666667 high      low       -1.922010    1000    1000
+## 3     3 0.6666667 1         high      low       -2.981083    1000    1000
+## 4     1 0         0.3333333 low       high       0.9691199   1000    1000
+## 5     2 0.3333333 0.6666667 low       high       1.922010    1000    1000
+## 6     3 0.6666667 1         low       high       2.981083    1000    1000
+## # … with 3 more variables: psd &lt;dbl&gt;, es &lt;dbl&gt;, es_se &lt;dbl&gt;
 ```
 
 ---
@@ -795,7 +803,7 @@ class: inverse-blue center middle
 
 --
 
-* Now all your code will be automatically tested each time you push! You can even test on different operating systems and different versions of R!
+* Now all your code will be automatically tested each time you push!
 
 &lt;img src = "https://media.giphy.com/media/3ohzAu2U1tOafteBa0/giphy.gif" height = 200, align = "right" /&gt;
 

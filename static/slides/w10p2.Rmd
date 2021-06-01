@@ -33,6 +33,12 @@ update_geom_defaults("point", list(size = 3))
 ---
 # Agenda
 
+* Basics of package development
+
+* An example from my first CRAN package
+
+* Creating a package (we'll actually do it!)
+
 ---
 # Want to follow along?
 
@@ -677,7 +683,7 @@ class: inverse-blue center middle
 
 --
 
-* Now all your code will be automatically tested each time you push! You can even test on different operating systems and different versions of R!
+* Now all your code will be automatically tested each time you push!
 
 <img src = "https://media.giphy.com/media/3ohzAu2U1tOafteBa0/giphy.gif" height = 200, align = "right" />
 
